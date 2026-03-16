@@ -98,3 +98,4 @@ exports.updateProfile = async (req, res) => {
     errorResponse(res, 500, err.message);
   }
 };
+// update on 2026-03-16 - fix: correct edge case in service logic

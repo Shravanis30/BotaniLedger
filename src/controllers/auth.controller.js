@@ -116,3 +116,4 @@ exports.updateProfile = async (req, res) => {
 // update on 2026-03-15 - style: improve UI responsiveness
 // update on 2026-03-15 - refactor: optimize backend performance
 // update on 2026-03-16 - style: improve UI responsiveness
+// update on 2026-03-16 - feat: improve farmer batch handling

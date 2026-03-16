@@ -1,0 +1,25 @@
+{
+  "name": "farmer-org-profile",
+  "version": "1.0.0",
+  "client": {
+    "organization": "FarmerOrg",
+    "connection": {
+      "timeout": {
+        "peer": {
+          "endorser": "300"
+        }
+      }
+    }
+  },
+  "organizations": {
+    "FarmerOrg": {
+      "mspid": "FarmerOrgMSP",
+      "peers": ["peer0.farmerorg.botanyledger.com"]
+    }
+  },
+  "peers": {
+    "peer0.farmerorg.botanyledger.com": {
+      "url": "grpcs://localhost:7051"
+    }
+  }
+}

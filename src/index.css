@@ -1,0 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 138 60% 98%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 154 42% 18%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 138 60% 96%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 154 42% 52%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 154 42% 18%;
+
+    --radius: 1rem;
+  }
+
+  .dark {
+    --background: 154 42% 5%;
+    --foreground: 210 40% 98%;
+
+    --card: 154 42% 10%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 154 42% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 154 42% 52%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 154 42% 15%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 154 42% 15%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 154 42% 30%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 154 42% 20%;
+    --input: 154 42% 20%;
+    --ring: 154 42% 52%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+/* Custom Utilities */
+.glass {
+  @apply bg-white/70 backdrop-blur-md border border-white/20;
+}
+
+.table-zebra tr:nth-child(even) {
+  @apply bg-secondary/50;
+}
+
+.sidebar-gradient {
+  background: linear-gradient(180deg, #1B4332 0%, #2D6A4F 100%);
+}
+
+.timeline-line {
+  @apply absolute left-4 h-full w-0.5 bg-border;
+}
+
+.status-dot {
+  @apply w-2 h-2 rounded-full;
+}

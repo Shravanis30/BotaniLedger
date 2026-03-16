@@ -1,0 +1,48 @@
+{
+    "name": "kaleido-network",
+    "version": "1.0.0",
+    "client": {
+        "organization": "TS",
+        "connection": {
+            "timeout": {
+                "peer": {
+                    "endorser": "300"
+                }
+            }
+        }
+    },
+    "organizations": {
+        "u1hpn7jii5": {
+            "mspid": "u1hpn7jii5",
+            "peers": [
+                "LabNode"
+            ],
+            "certificateAuthorities": [
+                "TS-CA"
+            ]
+        }
+    },
+    "peers": {
+        "LabNode": {
+            "url": "grpcs://u1upeehyfy-u1mxrqwcyw-peer.us1-azure-ws.kaleido.io:30641",
+            "tlsCACerts": {
+                "path": "/Users/shravani/Desktop/BotaniLedger/blockchain/network/connection-profiles/kaleido-cert.pem"
+            },
+            "grpcOptions": {
+                "ssl-target-name-override": "u1upeehyfy-u1mxrqwcyw-peer.us1-azure-ws.kaleido.io"
+            }
+        }
+    },
+    "certificateAuthorities": {
+        "TS-CA": {
+            "url": "https://u1upeehyfy-u1hpn7jii5-ca.us1-azure-ws.kaleido.io:30641",
+            "caName": "TS CA",
+            "tlsCACerts": {
+                "path": "/Users/shravani/Desktop/BotaniLedger/blockchain/network/connection-profiles/kaleido-cert.pem"
+            },
+            "httpOptions": {
+                "verify": false
+            }
+        }
+    }
+}

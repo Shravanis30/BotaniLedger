@@ -1,0 +1,17 @@
+{
+  "name": "lab-org-profile",
+  "version": "1.0.0",
+  "client": {
+    "organization": "LabOrg",
+    "connection": { "timeout": { "peer": { "endorser": "300" } } }
+  },
+  "organizations": {
+    "LabOrg": {
+      "mspid": "LabOrgMSP",
+      "peers": ["peer0.laborg.botanyledger.com"]
+    }
+  },
+  "peers": {
+    "peer0.laborg.botanyledger.com": { "url": "grpcs://localhost:8051" }
+  }
+}

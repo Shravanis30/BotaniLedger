@@ -1,0 +1,17 @@
+{
+  "name": "manufacturer-org-profile",
+  "version": "1.0.0",
+  "client": {
+    "organization": "ManufacturerOrg",
+    "connection": { "timeout": { "peer": { "endorser": "300" } } }
+  },
+  "organizations": {
+    "ManufacturerOrg": {
+      "mspid": "ManufacturerOrgMSP",
+      "peers": ["peer0.manufacturerorg.botanyledger.com"]
+    }
+  },
+  "peers": {
+    "peer0.manufacturerorg.botanyledger.com": { "url": "grpcs://localhost:9051" }
+  }
+}

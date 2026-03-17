@@ -99,3 +99,4 @@ module.exports = new FabricService();
 
 // update on 2026-03-15 - refactor: optimize backend performance
 // update on 2026-03-16 - feat: optimize blockchain interaction
+// update on 2026-03-17 - docs: update API documentation

@@ -53,3 +53,4 @@ export const EmptyState = ({ title, description, icon: Icon }) => (
   </div>
 );
 // update on 2026-03-15 - 
+// update on 2026-03-17 - docs: update API documentation

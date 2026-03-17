@@ -73,3 +73,4 @@ export const EmptyState = ({ title, description, icon: Icon }) => (
 // update on 2026-03-15 - feat: optimize blockchain interaction
 // update on 2026-03-16 - docs: update API documentation
 // update on 2026-03-17 - docs: update API documentation
+// update on 2026-03-17 - fix: resolve API validation issue

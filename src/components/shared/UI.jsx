@@ -74,3 +74,4 @@ export const EmptyState = ({ title, description, icon: Icon }) => (
 // update on 2026-03-16 - docs: update API documentation
 // update on 2026-03-17 - docs: update API documentation
 // update on 2026-03-17 - fix: resolve API validation issue
+// update on 2026-03-18 - refactor: improve code structure

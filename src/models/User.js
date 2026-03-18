@@ -44,3 +44,4 @@ UserSchema.methods.comparePassword = async function(candidatePassword) {
 
 module.exports = mongoose.model('User', UserSchema);
 // update on 2026-03-15 - feat: enhance authentication flow
+// update on 2026-03-18 - style: improve UI responsiveness

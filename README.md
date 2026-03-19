@@ -17,3 +17,4 @@ If you are developing a production application, we recommend using TypeScript wi
 # BotaniLedger
 // update on 2026-03-15 - feat: enhance authentication flow
 // update on 2026-03-18 - 
+// update on 2026-03-19 - fix: correct edge case in service logic

@@ -47,3 +47,4 @@ module.exports = mongoose.model('User', UserSchema);
 // update on 2026-03-18 - style: improve UI responsiveness
 // update on 2026-03-19 - fix: resolve API validation issue
 // update on 2026-03-19 - feat: update dashboard UI components
+// update on 2026-03-19 - feat: improve farmer batch handling

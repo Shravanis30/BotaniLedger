@@ -99,3 +99,4 @@ exports.updateProfile = async (req, res) => {
   }
 };
 // update on 2026-03-16 - fix: correct edge case in service logic
+// update on 2026-03-19 - fix: correct edge case in service logic

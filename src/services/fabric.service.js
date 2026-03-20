@@ -102,3 +102,4 @@ module.exports = new FabricService();
 // update on 2026-03-17 - docs: update API documentation
 // update on 2026-03-17 - docs: update API documentation
 // update on 2026-03-20 - style: improve UI responsiveness
+// update on 2026-03-20 - feat: enhance authentication flow

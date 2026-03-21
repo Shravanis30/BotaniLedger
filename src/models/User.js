@@ -49,3 +49,4 @@ module.exports = mongoose.model('User', UserSchema);
 // update on 2026-03-19 - feat: update dashboard UI components
 // update on 2026-03-19 - feat: improve farmer batch handling
 // update on 2026-03-20 - style: improve UI responsiveness
+// update on 2026-03-21 - refactor: improve code structure

@@ -2,3 +2,4 @@ feat: implement ledger API on 2026-03-16
 feat: build dashboard UI on 2026-03-17
 fix: resolve API bug on 2026-03-18
 fix: resolve API bug on 2026-03-20
+docs: update README with project details on 2026-03-21

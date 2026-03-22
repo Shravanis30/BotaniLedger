@@ -5,3 +5,4 @@ fix: resolve API bug on 2026-03-20
 docs: update README with project details on 2026-03-21
 chore: setup gitignore and configs on 2026-03-21
 fix: correct authentication issue on 2026-03-21
+docs: update usage instructions on 2026-03-22

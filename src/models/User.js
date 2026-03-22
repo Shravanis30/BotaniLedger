@@ -64,3 +64,4 @@ module.exports = mongoose.model('User', UserSchema);
 // update on 2026-03-17 - fix: resolve API validation issue
 // update on 2026-03-20 - feat: improve farmer batch handling
 // update on 2026-03-22 - docs: update API documentation
+// update on 2026-03-22 - docs: update API documentation

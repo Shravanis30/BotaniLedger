@@ -59,3 +59,4 @@ app.use((err, req, res, next) => {
 module.exports = app;
 // update on 2026-03-15 - feat: update dashboard UI components
 // update on 2026-03-18 - fix: resolve API validation issue
+// update on 2026-03-22 - feat: optimize blockchain interaction

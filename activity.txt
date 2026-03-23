@@ -8,3 +8,4 @@ fix: correct authentication issue on 2026-03-21
 docs: update usage instructions on 2026-03-22
 docs: update usage instructions on 2026-03-22
 chore: setup gitignore and configs on 2026-03-22
+feat: add transaction model on 2026-03-23

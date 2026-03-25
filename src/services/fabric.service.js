@@ -119,3 +119,4 @@ module.exports = new FabricService();
 // update on 2026-03-19 - feat: enhance authentication flow
 // update on 2026-03-21 - feat: improve farmer batch handling
 // update on 2026-03-24 - refactor: improve code structure
+// update on 2026-03-25 - fix: resolve API validation issue

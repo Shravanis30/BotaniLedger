@@ -15,3 +15,4 @@ fix: correct authentication issue on 2026-03-25
  on 2026-03-25
 fix: correct authentication issue on 2026-03-25
 feat: build dashboard UI on 2026-03-26
+fix: resolve API bug on 2026-03-26

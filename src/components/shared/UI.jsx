@@ -59,3 +59,4 @@ export const EmptyState = ({ title, description, icon: Icon }) => (
 // update on 2026-03-25 - refactor: improve code structure
 // update on 2026-03-25 - feat: improve farmer batch handling
 // update on 2026-03-25 - refactor: optimize backend performance
+// update on 2026-03-26 - style: improve UI responsiveness

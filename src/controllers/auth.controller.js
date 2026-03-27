@@ -102,3 +102,4 @@ exports.updateProfile = async (req, res) => {
 // update on 2026-03-19 - fix: correct edge case in service logic
 // update on 2026-03-24 - refactor: improve code structure
 // update on 2026-03-26 - fix: resolve API validation issue
+// update on 2026-03-27 - 

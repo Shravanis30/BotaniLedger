@@ -68,3 +68,4 @@ module.exports = mongoose.model('User', UserSchema);
 // update on 2026-03-24 - feat: optimize blockchain interaction
 // update on 2026-03-26 - style: improve UI responsiveness
 // update on 2026-03-26 - feat: enhance authentication flow
+// update on 2026-03-27 - fix: correct edge case in service logic

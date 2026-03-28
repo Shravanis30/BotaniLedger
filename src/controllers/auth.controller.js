@@ -123,3 +123,4 @@ exports.updateProfile = async (req, res) => {
 // update on 2026-03-25 - feat: improve farmer batch handling
 // update on 2026-03-27 - fix: correct edge case in service logic
 // update on 2026-03-28 - docs: update API documentation
+// update on 2026-03-28 - feat: enhance authentication flow

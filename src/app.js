@@ -63,3 +63,4 @@ module.exports = app;
 // update on 2026-03-23 - docs: update API documentation
 // update on 2026-03-25 - feat: improve farmer batch handling
 // update on 2026-03-26 - docs: update API documentation
+// update on 2026-03-28 - feat: optimize blockchain interaction

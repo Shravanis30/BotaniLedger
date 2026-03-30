@@ -19,3 +19,4 @@ fix: resolve API bug on 2026-03-26
 feat: add input validation on 2026-03-26
 feat: add transaction model on 2026-03-27
 feat: implement ledger API on 2026-03-28
+docs: update README with project details on 2026-03-30

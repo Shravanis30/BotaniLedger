@@ -105,3 +105,4 @@ exports.updateProfile = async (req, res) => {
 // update on 2026-03-27 - 
 // update on 2026-03-28 - 
 // update on 2026-03-29 - docs: update API documentation
+// update on 2026-03-31 - feat: enhance authentication flow

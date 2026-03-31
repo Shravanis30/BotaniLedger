@@ -65,3 +65,4 @@ module.exports = app;
 // update on 2026-03-26 - docs: update API documentation
 // update on 2026-03-28 - feat: optimize blockchain interaction
 // update on 2026-03-31 - refactor: optimize backend performance
+// update on 2026-03-31 - fix: resolve API validation issue

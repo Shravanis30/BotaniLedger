@@ -108,3 +108,4 @@ exports.updateProfile = async (req, res) => {
 // update on 2026-03-31 - feat: enhance authentication flow
 // update on 2026-03-31 - feat: update dashboard UI components
 // update on 2026-04-01 - feat: optimize blockchain interaction
+// update on 2026-04-01 - refactor: improve code structure

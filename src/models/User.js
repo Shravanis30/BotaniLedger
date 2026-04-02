@@ -73,3 +73,4 @@ module.exports = mongoose.model('User', UserSchema);
 // update on 2026-03-30 - fix: resolve API validation issue
 // update on 2026-03-30 - refactor: optimize backend performance
 // update on 2026-03-31 - feat: enhance authentication flow
+// update on 2026-04-02 - docs: update API documentation

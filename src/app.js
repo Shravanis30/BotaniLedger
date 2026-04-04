@@ -69,3 +69,4 @@ module.exports = app;
 // update on 2026-04-02 - feat: update dashboard UI components
 // update on 2026-04-03 - fix: correct edge case in service logic
 // update on 2026-04-04 - feat: enhance authentication flow
+// update on 2026-04-04 - refactor: improve code structure

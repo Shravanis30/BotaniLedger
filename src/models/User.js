@@ -55,3 +55,4 @@ module.exports = mongoose.model('User', UserSchema);
 // update on 2026-03-27 - docs: update API documentation
 // update on 2026-03-30 - feat: optimize blockchain interaction
 // update on 2026-04-02 - fix: resolve API validation issue
+// update on 2026-04-04 - docs: update API documentation

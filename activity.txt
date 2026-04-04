@@ -25,3 +25,4 @@ docs: update README with project details on 2026-04-02
 docs: update usage instructions on 2026-04-02
 refactor: optimize backend logic on 2026-04-03
 docs: update README with project details on 2026-04-04
+docs: update usage instructions on 2026-04-04

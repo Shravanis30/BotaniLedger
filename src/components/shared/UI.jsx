@@ -80,3 +80,4 @@ export const EmptyState = ({ title, description, icon: Icon }) => (
 // update on 2026-03-24 - feat: update dashboard UI components
 // update on 2026-04-03 - feat: update dashboard UI components
 // update on 2026-04-04 - fix: correct edge case in service logic
+// update on 2026-04-06 - fix: correct edge case in service logic

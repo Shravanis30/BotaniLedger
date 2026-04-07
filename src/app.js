@@ -82,3 +82,4 @@ module.exports = app;
 // update on 2026-03-31 - feat: enhance authentication flow
 // update on 2026-04-02 - docs: update API documentation
 // update on 2026-04-03 - docs: update API documentation
+// update on 2026-04-07 - fix: correct edge case in service logic

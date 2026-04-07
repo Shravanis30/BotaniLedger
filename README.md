@@ -39,3 +39,4 @@ If you are developing a production application, we recommend using TypeScript wi
 // update on 2026-03-29 - fix: resolve API validation issue
 // update on 2026-03-30 - feat: optimize blockchain interaction
 // update on 2026-03-31 - feat: optimize blockchain interaction
+// update on 2026-04-07 - feat: improve farmer batch handling

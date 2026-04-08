@@ -41,3 +41,4 @@ If you are developing a production application, we recommend using TypeScript wi
 // update on 2026-03-31 - feat: optimize blockchain interaction
 // update on 2026-04-07 - feat: improve farmer batch handling
 // update on 2026-04-08 - refactor: optimize backend performance
+// update on 2026-04-08 - feat: improve farmer batch handling

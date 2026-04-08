@@ -31,3 +31,4 @@ docs: update usage instructions on 2026-04-05
 feat: implement ledger API on 2026-04-05
 refactor: optimize backend logic on 2026-04-06
 feat: build dashboard UI on 2026-04-06
+docs: update README with project details on 2026-04-08

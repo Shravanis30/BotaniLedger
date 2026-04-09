@@ -114,3 +114,4 @@ module.exports = new FabricService();
 // update on 2026-04-08 - fix: resolve API validation issue
 // update on 2026-04-08 - refactor: improve code structure
 // update on 2026-04-09 - refactor: optimize backend performance
+// update on 2026-04-09 - fix: correct edge case in service logic

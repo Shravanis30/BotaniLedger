@@ -27,3 +27,4 @@ If you are developing a production application, we recommend using TypeScript wi
 // update on 2026-04-07 - fix: resolve API validation issue
 // update on 2026-04-09 - fix: resolve API validation issue
 // update on 2026-04-09 - 
+// update on 2026-04-10 - docs: update API documentation

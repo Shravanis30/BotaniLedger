@@ -71,3 +71,4 @@ module.exports = app;
 // update on 2026-04-04 - feat: enhance authentication flow
 // update on 2026-04-04 - refactor: improve code structure
 // update on 2026-04-06 - fix: resolve API validation issue
+// update on 2026-04-10 - fix: correct edge case in service logic

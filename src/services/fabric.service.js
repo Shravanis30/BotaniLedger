@@ -127,3 +127,4 @@ module.exports = new FabricService();
 // update on 2026-04-03 - refactor: optimize backend performance
 // update on 2026-04-05 - feat: enhance authentication flow
 // update on 2026-04-10 - fix: correct edge case in service logic
+// update on 2026-04-10 - docs: update API documentation

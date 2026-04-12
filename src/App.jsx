@@ -18,10 +18,10 @@ const queryClient = new QueryClient();
 
 function ProtectedRoute({ children, role }) {
   const { user, isAuthenticated } = useAuthStore();
-  
+
   if (!isAuthenticated) return <Navigate to="/login" />;
   if (role && user.role !== role) return <Navigate to="/" />;
-  
+
   return children;
 }
 

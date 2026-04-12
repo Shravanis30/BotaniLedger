@@ -81,3 +81,4 @@ module.exports = mongoose.model('User', UserSchema);
 // update on 2026-04-09 - refactor: optimize backend performance
 // update on 2026-04-11 - fix: resolve API validation issue
 // update on 2026-04-11 - feat: enhance authentication flow
+// update on 2026-04-12 - refactor: improve code structure

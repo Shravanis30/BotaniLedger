@@ -86,3 +86,4 @@ module.exports = app;
 // update on 2026-04-09 - 
 // update on 2026-04-10 - refactor: improve code structure
 // update on 2026-04-11 - refactor: optimize backend performance
+// update on 2026-04-12 - style: improve UI responsiveness

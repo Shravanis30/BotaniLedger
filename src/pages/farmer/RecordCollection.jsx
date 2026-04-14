@@ -10,6 +10,7 @@ import {
 import { useOfflineStore } from '@/lib/offlineStore';
 import { useAuthStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
+import api from '@/lib/api';
 
 const STEPS = [
   { id: 1, label: 'Herb Details', icon: Info },
@@ -61,6 +62,8 @@ const RecordCollection = () => {
     timestamp: new Date().toLocaleString()
   });
 
+  const [aiResults, setAiResults] = useState({});
+
   const [scanning, setScanning] = useState({});
   const navigate = useNavigate();
   const addPendingBatch = useOfflineStore(state => state.addPendingBatch);
@@ -75,32 +78,118 @@ const RecordCollection = () => {
   const handleNext = () => setCurrentStep(prev => Math.min(prev + 1, 4));
   const handleBack = () => setCurrentStep(prev => Math.max(prev - 1, 1));
 
-  const handlePhotoUpload = (key) => {
+  const handlePhotoUpload = async (key, file) => {
+    if (!file) return;
+    
     setScanning(prev => ({ ...prev, [key]: true }));
-    setTimeout(() => {
-        setFormData(prev => ({
-            ...prev,
-            photos: { ...prev.photos, [key]: 'uploaded' }
-        }));
+    
+    try {
+        const body = new FormData();
+        body.append('photo', file);
+        body.append('species', formData.species);
+
+        const response = await api.post('/farmer/verify-preview', body, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+
+        const result = response.data; // Note: axios interceptor already returns response.data.data or similar? 
+        // Wait, standard api.js returns response.data
+        
+        // Let's check api.js again. Line 30: return response.data;
+        // So response here IS the successResponse object { success, data, message }
+        
+        const aiData = response.data; // This is the VerificationResult
+
+        if (aiData.speciesMatch) {
+            setFormData(prev => ({
+                ...prev,
+                photos: { ...prev.photos, [key]: file }
+            }));
+            setAiResults(prev => ({
+                ...prev,
+                [key]: { confidence: aiData.confidence, status: 'verified' }
+            }));
+        } else {
+            alert(`AI Verification Failed: The image doesn't appear to match the botanical profile for ${formData.species}. Organic Score: ${aiData.metadata?.organic_score}`);
+            setFormData(prev => ({
+                ...prev,
+                photos: { ...prev.photos, [key]: null }
+            }));
+        }
+    } catch (err) {
+        console.error(err);
+        alert('AI Service Error: Could not verify image.');
+    } finally {
         setScanning(prev => ({ ...prev, [key]: false }));
-    }, 1500);
+    }
   };
 
-  const handleSubmit = (type) => {
+  const fileToBase64 = (file) => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+  });
+
+  const handleSubmit = async (type) => {
+      if (type === 'OFFLINE') {
+          // Convert files to base64 for persistence
+          const persistedPhotos = {};
+          for (const [key, file] of Object.entries(formData.photos)) {
+              if (file instanceof File) {
+                  persistedPhotos[key] = await fileToBase64(file);
+              }
+          }
+
+          addPendingBatch({ ...formData, photos: persistedPhotos });
+          navigate('/farmer');
+          return;
+      }
+
       setIsSubmitting(true);
-      
-      if (type === 'BLOCKCHAIN') {
-          // Simulate multi-phase submission
-          setTimeout(() => setSubmitPhase(1), 1000); // Uploading to IPFS
-          setTimeout(() => setSubmitPhase(2), 2500); // Committing to Fabric
+      setSubmitPhase(0);
+
+      try {
+          const body = new FormData();
+          
+          // Match backend expectations
+          const speciesParts = formData.species.split(' (');
+          const speciesObj = {
+              common: speciesParts[0],
+              scientific: speciesParts[1]?.replace(')', '') || ''
+          };
+
+          body.append('herbSpecies', JSON.stringify(speciesObj));
+          body.append('quantity', formData.quantity);
+          body.append('unit', 'kg');
+          body.append('collectionDate', formData.date);
+          body.append('location', JSON.stringify(formData.location));
+          body.append('notes', formData.notes);
+
+          // Append photos
+          Object.entries(formData.photos).forEach(([key, file]) => {
+              if (file instanceof File) {
+                  body.append(key, file);
+              }
+          });
+
+          setSubmitPhase(1); // Uploading & AI Processing
+          const response = await api.post('/farmer/collection', body, {
+              headers: { 'Content-Type': 'multipart/form-data' }
+          });
+
+          setSubmitPhase(2); // Committing to Fabric
+          // The backend already handles the Fabric anchoring in createCollection
+          
           setTimeout(() => {
-              addPendingBatch({ ...formData, id: `BL-2025-${Math.floor(Math.random() * 90000) + 10000}` });
               setSubmitPhase(3); // Success
               setTimeout(() => navigate('/farmer'), 1500);
-          }, 4000);
-      } else {
-          addPendingBatch(formData);
-          navigate('/farmer');
+          }, 1500);
+
+      } catch (err) {
+          console.error(err);
+          alert('Submission failed: ' + (err.response?.data?.message || err.message));
+          setIsSubmitting(false);
       }
   };
 
@@ -270,37 +359,45 @@ const RecordCollection = () => {
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
                             {Object.entries(formData.photos).map(([key, value]) => (
                                 <div key={key} className="space-y-4">
-                                    <button 
-                                        onClick={() => handlePhotoUpload(key)}
-                                        className={cn(
-                                            "w-full aspect-square rounded-[32px] border-4 border-dashed flex flex-col items-center justify-center p-6 transition-all duration-300 group overflow-hidden relative",
-                                            value ? "bg-success/5 border-success/20" : "bg-gray-50 border-gray-100 hover:border-primary hover:bg-white hover:shadow-xl"
-                                        )}
-                                    >
-                                        {scanning[key] ? (
-                                            <div className="flex flex-col items-center gap-3">
-                                                <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                                                <span className="text-[10px] font-black text-primary uppercase tracking-widest">Inference...</span>
-                                            </div>
-                                        ) : value ? (
-                                            <>
-                                                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1615485290382-441e4d0c9cb5?auto=format&fit=crop&w=300&q=80')] bg-cover opacity-30"></div>
-                                                <div className="relative z-10 w-12 h-12 bg-success rounded-xl flex items-center justify-center text-white shadow-lg">
-                                                    <CheckCircle size={24} />
+                                    <label className="cursor-pointer space-y-4 block">
+                                        <input 
+                                            type="file" 
+                                            className="hidden" 
+                                            accept="image/*"
+                                            onChange={(e) => handlePhotoUpload(key, e.target.files[0])}
+                                            disabled={scanning[key]}
+                                        />
+                                        <div 
+                                            className={cn(
+                                                "w-full aspect-square rounded-[32px] border-4 border-dashed flex flex-col items-center justify-center p-6 transition-all duration-300 group overflow-hidden relative",
+                                                value ? "bg-success/5 border-success/20" : "bg-gray-50 border-gray-100 hover:border-primary hover:bg-white hover:shadow-xl"
+                                            )}
+                                        >
+                                            {scanning[key] ? (
+                                                <div className="flex flex-col items-center gap-3">
+                                                    <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                                                    <span className="text-[10px] font-black text-primary uppercase tracking-widest">Inference...</span>
                                                 </div>
-                                                <span className="text-[10px] font-black text-success relative z-10 uppercase mt-4 tracking-widest">Verified ✓</span>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Upload className="w-8 h-8 text-gray-300 group-hover:text-primary mb-3 group-hover:scale-110 transition-transform" />
-                                                <span className="text-[9px] font-black text-gray-400 uppercase text-center leading-tight tracking-widest group-hover:text-primary">Click to<br/>Upload</span>
-                                            </>
-                                        )}
-                                    </button>
+                                            ) : value ? (
+                                                <>
+                                                    <img src={URL.createObjectURL(value)} className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                                                    <div className="relative z-10 w-12 h-12 bg-success rounded-xl flex items-center justify-center text-white shadow-lg">
+                                                        <CheckCircle size={24} />
+                                                    </div>
+                                                    <span className="text-[10px] font-black text-success relative z-10 uppercase mt-4 tracking-widest">Verified ✓</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Upload className="w-8 h-8 text-gray-300 group-hover:text-primary mb-3 group-hover:scale-110 transition-transform" />
+                                                    <span className="text-[9px] font-black text-gray-400 uppercase text-center leading-tight tracking-widest group-hover:text-primary">Click to<br/>Upload</span>
+                                                </>
+                                            )}
+                                        </div>
+                                    </label>
                                     <div className="text-[10px] text-center font-black text-gray-400 uppercase tracking-[0.2em]">{key}</div>
-                                    {value && (
+                                    {value && aiResults[key] && (
                                         <div className="bg-success/10 px-2 py-1.5 rounded-lg text-[9px] font-bold text-success text-center animate-slide-up">
-                                            ✓ {formData.species.split(' (')[0]}: 94.2%
+                                            ✓ {formData.species.split(' (')[0]}: {aiResults[key].confidence}%
                                         </div>
                                     )}
                                 </div>
@@ -406,9 +503,13 @@ const RecordCollection = () => {
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-5 gap-4">
-                                     {Object.keys(formData.photos).map((k) => (
+                                     {Object.entries(formData.photos).map(([k, file]) => (
                                          <div key={k} className="aspect-square bg-gray-100 rounded-2xl overflow-hidden border-2 border-white shadow-sm">
-                                             <img src="https://images.unsplash.com/photo-1615485290382-441e4d0c9cb5?auto=format&fit=crop&w=300&q=80" className="w-full h-full object-cover opacity-60" />
+                                             {file instanceof File ? (
+                                                 <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" />
+                                             ) : (
+                                                 <img src="https://images.unsplash.com/photo-1615485290382-441e4d0c9cb5?auto=format&fit=crop&w=300&q=80" className="w-full h-full object-cover opacity-60" />
+                                             )}
                                          </div>
                                      ))}
                                 </div>

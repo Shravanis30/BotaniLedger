@@ -5,14 +5,24 @@ import { Card, StatusBadge, Skeleton } from '@/components/shared/UI';
 import { 
   BarChart3, PlusCircle, Database, RefreshCw, 
   Settings, LayoutDashboard, List, PackageCheck, SignalHigh, 
-  ChevronRight, ArrowUpRight, MapPin, Smartphone, ArrowRight, Activity
+  ChevronRight, ArrowUpRight, MapPin, Smartphone, ArrowRight, Activity,
+  Loader2
 } from 'lucide-react';
-import { demoBatches } from '@/lib/mockData';
+import { useQuery } from '@tanstack/react-query';
+import api from '@/lib/api';
 import { useOfflineStore } from '@/lib/offlineStore';
 import { cn } from '@/lib/utils';
 
 const FarmerDashboard = () => {
   const { isOnline, pendingBatches } = useOfflineStore();
+
+  const { data: batches = [], isLoading } = useQuery({
+    queryKey: ['farmerBatches'],
+    queryFn: async () => {
+        const resp = await api.get('/farmer/batches');
+        return resp.data || [];
+    }
+  });
 
   const sidebarItems = [
     { label: 'Dashboard', to: '/farmer', icon: LayoutDashboard, end: true },
@@ -20,6 +30,33 @@ const FarmerDashboard = () => {
     { label: 'My Batches', to: '/farmer/batches', icon: List },
     { label: 'Sync Status', to: '/farmer/sync', icon: RefreshCw },
     { label: 'Settings', to: '/farmer/settings', icon: Settings },
+  ];
+
+  const stats = [
+    { 
+        label: "Total Batches", 
+        value: batches.length.toString().padStart(2, '0'), 
+        color: "text-blue-600", 
+        icon: Database 
+    },
+    { 
+        label: "Pending Lab", 
+        value: batches.filter(b => ['PENDING', 'LAB_TESTING'].includes(b.blockchainRecord?.status)).length.toString().padStart(2, '0'), 
+        color: "text-amber-600", 
+        icon: Smartphone 
+    },
+    { 
+        label: "Passed & Approved", 
+        value: batches.filter(b => ['LAB_PASSED', 'MANUFACTURER_APPROVED', 'QR_GENERATED'].includes(b.blockchainRecord?.status)).length.toString().padStart(2, '0'), 
+        color: "text-success", 
+        icon: PackageCheck 
+    },
+    { 
+        label: "Sync Queue", 
+        value: pendingBatches.length.toString().padStart(2, '0'), 
+        color: "text-orange-600", 
+        icon: RefreshCw 
+    }
   ];
 
   return (
@@ -53,24 +90,25 @@ const FarmerDashboard = () => {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-          {[
-            { label: "Total Batches", value: "48", trend: "+12%", color: "text-blue-600", icon: Database },
-            { label: "Pending Lab", value: "05", color: "text-amber-600", icon: Smartphone },
-            { label: "Passed & Approved", value: "34", color: "text-success", icon: PackageCheck },
-            { label: "Sync Queue", value: pendingBatches.length.toString().padStart(2, '0'), color: "text-orange-600", icon: RefreshCw }
-          ].map((stat, i) => (
+          {stats.map((stat, i) => (
             <Card key={i} className="p-8 border-none shadow-sm hover:shadow-md transition-shadow">
               <div className="flex justify-between items-start mb-6">
                    <div className="p-4 bg-gray-50 rounded-2xl">
                        <stat.icon className={stat.color} size={24} />
                    </div>
-                   {stat.trend && (
+                   {isLoading ? (
+                       <Skeleton className="h-6 w-12 rounded-full" />
+                   ) : stat.trend && (
                        <span className="flex items-center gap-1 text-xs font-bold text-success bg-success/10 px-2.5 py-1.5 rounded-full">
                            <ArrowUpRight size={14} /> {stat.trend}
                        </span>
                    )}
               </div>
-              <div className="text-4xl font-black text-gray-900 mb-1">{stat.value}</div>
+              {isLoading ? (
+                  <Skeleton className="h-10 w-20 mb-2" />
+              ) : (
+                  <div className="text-4xl font-black text-gray-900 mb-1">{stat.value}</div>
+              )}
               <div className="text-xs font-bold text-gray-400 uppercase tracking-[0.15em]">{stat.label}</div>
             </Card>
           ))}
@@ -103,48 +141,64 @@ const FarmerDashboard = () => {
                       </tr>
                    </thead>
                    <tbody className="divide-y divide-gray-50">
-                      {demoBatches.slice(0, 5).map((batch, i) => (
-                        <tr key={i} className="group hover:bg-primary/[0.02] transition-colors">
-                            <td className="px-8 py-6 font-mono text-xs font-bold text-primary">{batch.id}</td>
-                            <td className="px-8 py-6">
-                                <div className="font-bold text-gray-900 text-sm mb-0.5">{batch.herb.split(' (')[0]}</div>
-                                <div className="text-[10px] text-gray-400 font-medium italic lowercase">{batch.herb.split(' (')[1]?.replace(')', '') || ''}</div>
-                            </td>
-                            <td className="px-8 py-6 text-sm font-bold text-gray-600">{batch.date}</td>
-                            <td className="px-8 py-6">
-                                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500 bg-gray-100 px-3 py-1.5 rounded-lg w-fit">
-                                    <MapPin size={12} className="text-primary" />
-                                    {batch.location?.split(' (')[0]}
-                                </div>
-                            </td>
-                            <td className="px-8 py-6">
-                                <div className="flex flex-col items-center">
-                                    <div className="text-xs font-black text-success">{batch.aiConfidence}</div>
-                                    <div className="w-12 h-1 bg-gray-100 rounded-full mt-1 overflow-hidden">
-                                        <div className="h-full bg-success" style={{ width: batch.aiConfidence }}></div>
+                      {isLoading ? (
+                          [...Array(3)].map((_, i) => (
+                              <tr key={i}>
+                                  <td colSpan={7} className="px-8 py-6"><Skeleton className="h-12 w-full" /></td>
+                              </tr>
+                          ))
+                      ) : batches.length > 0 ? (
+                        batches.slice(0, 5).map((batch, i) => (
+                            <tr key={i} className="group hover:bg-primary/[0.02] transition-colors">
+                                <td className="px-8 py-6 font-mono text-xs font-bold text-primary">{batch.batchId}</td>
+                                <td className="px-8 py-6">
+                                    <div className="font-bold text-gray-900 text-sm mb-0.5">{batch.herbSpecies?.common}</div>
+                                    <div className="text-[10px] text-gray-400 font-medium italic lowercase">{batch.herbSpecies?.botanical || ''}</div>
+                                </td>
+                                <td className="px-8 py-6 text-sm font-bold text-gray-600">
+                                    {new Date(batch.collectionDate).toLocaleDateString()}
+                                </td>
+                                <td className="px-8 py-6">
+                                    <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500 bg-gray-100 px-3 py-1.5 rounded-lg w-fit">
+                                        <MapPin size={12} className="text-primary" />
+                                        {batch.location?.address || batch.location?.zone || 'Assigned Farm'}
                                     </div>
-                                </div>
-                            </td>
-                            <td className="px-8 py-6">
-                                <StatusBadge status={batch.status} />
-                            </td>
-                            <td className="px-8 py-6 text-right">
-                                <div className="flex gap-2 justify-end">
-                                    <button className="px-3 py-1.5 bg-white border border-gray-200 text-[10px] font-bold text-gray-600 rounded-lg hover:bg-gray-50 transition-all uppercase tracking-wider">
-                                        View Details
-                                    </button>
-                                    <button className="p-1.5 bg-primary/5 text-primary rounded-lg hover:bg-primary hover:text-white transition-all shadow-sm">
-                                        <Activity size={16} />
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                      ))}
+                                </td>
+                                <td className="px-8 py-6">
+                                    <div className="flex flex-col items-center">
+                                        <div className="text-xs font-black text-success">{batch.aiVerification?.confidence || 0}%</div>
+                                        <div className="w-12 h-1 bg-gray-100 rounded-full mt-1 overflow-hidden">
+                                            <div className="h-full bg-success" style={{ width: `${batch.aiVerification?.confidence || 0}%` }}></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className="px-8 py-6">
+                                    <StatusBadge status={batch.blockchainRecord?.status || 'PENDING'} />
+                                </td>
+                                <td className="px-8 py-6 text-right">
+                                    <div className="flex gap-2 justify-end">
+                                        <button className="px-3 py-1.5 bg-white border border-gray-200 text-[10px] font-bold text-gray-600 rounded-lg hover:bg-gray-50 transition-all uppercase tracking-wider">
+                                            View Details
+                                        </button>
+                                        <button className="p-1.5 bg-primary/5 text-primary rounded-lg hover:bg-primary hover:text-white transition-all shadow-sm">
+                                            <Activity size={16} />
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                          ))
+                      ) : (
+                          <tr>
+                              <td colSpan={7} className="px-8 py-12 text-center text-sm font-bold text-gray-400 uppercase tracking-widest">
+                                  No collections recorded yet
+                              </td>
+                          </tr>
+                      )}
                    </tbody>
                 </table>
               </div>
               <div className="p-6 border-t border-gray-50 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest">
-                  <span>Showing initial summary</span>
+                  <span>Showing {isLoading ? '...' : (batches.length > 5 ? 5 : batches.length)} of {batches.length} batches</span>
                   <div className="flex gap-2">
                        <button className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg opacity-50 cursor-not-allowed text-gray-400">Previous</button>
                        <button className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600">Next</button>

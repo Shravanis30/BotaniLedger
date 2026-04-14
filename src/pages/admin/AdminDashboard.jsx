@@ -7,9 +7,10 @@ import {
 } from 'recharts';
 import {
     Shield, Users, Database, AlertCircle, Scan, Activity,
-    ArrowUpRight, ArrowDownRight, Search, Filter, Download, Globe
+    ArrowUpRight, ArrowDownRight, Search, Filter, Download, Globe, Loader2, CheckCircle
 } from 'lucide-react';
-import { demoAlerts, demoBatches } from '@/lib/mockData';
+import { useQuery } from '@tanstack/react-query';
+import api from '@/lib/api';
 import { cn } from '@/lib/utils';
 
 const data = [
@@ -30,11 +31,37 @@ const pieData = [
 const COLORS = ['#1B4332', '#52B788', '#DC2626'];
 
 const AdminDashboard = () => {
+    const { data: stats, isLoading: statsLoading } = useQuery({
+        queryKey: ['adminStats'],
+        queryFn: async () => {
+            const resp = await api.get('/admin/stats');
+            return resp.data;
+        }
+    });
+
+    const { data: anomalies, isLoading: anomaliesLoading } = useQuery({
+        queryKey: ['adminAnomalies'],
+        queryFn: async () => {
+            const resp = await api.get('/admin/anomalies');
+            return resp.data;
+        }
+    });
+
     const sidebarItems = [
         { label: 'Network Overview', to: '/admin', icon: Activity, end: true },
+        { label: 'Pending Approvals', to: '/admin/approvals', icon: Shield },
         { label: 'Batch Explorer', to: '/admin/batches', icon: Database },
         { label: 'Farmer Registry', to: '/admin/farmers', icon: Users },
         { label: 'Anomaly Alerts', to: '/admin/alerts', icon: AlertCircle },
+    ];
+
+    const statCards = [
+        { label: "Total Batches", value: stats?.totalBatches || "0", diff: "+4.2%", icon: Database, color: "text-blue-600" },
+        { label: "Active Farmers", value: stats?.activeUsers || "0", diff: "+2", icon: Users, color: "text-emerald-600" },
+        { label: "Lab Thruput", value: "98.2%", diff: "-0.4%", icon: Shield, color: "text-purple-600" },
+        { label: "Anomalies", value: stats?.openAnomalies || "0", diff: "-1", icon: AlertCircle, color: "text-red-500" },
+        { label: "Public Scans", value: "24.1k", diff: "+18%", icon: Scan, color: "text-amber-500" },
+        { label: "Nodes Alive", value: "12/12", diff: "100%", icon: Activity, color: "text-success" },
     ];
 
     return (
@@ -59,15 +86,13 @@ const AdminDashboard = () => {
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-10">
-                    {[
-                        { label: "Total Batches", value: "8,241", diff: "+4.2%", icon: Database, color: "text-blue-600" },
-                        { label: "Active Farmers", value: "1,402", diff: "+2", icon: Users, color: "text-emerald-600" },
-                        { label: "Lab Thruput", value: "98.2%", diff: "-0.4%", icon: Shield, color: "text-purple-600" },
-                        { label: "Anomalies", value: "04", diff: "-1", icon: AlertCircle, color: "text-red-500" },
-                        { label: "Public Scans", value: "24.1k", diff: "+18%", icon: Scan, color: "text-amber-500" },
-                        { label: "Nodes Alive", value: "12/12", diff: "100%", icon: Activity, color: "text-success" },
-                    ].map((stat, i) => (
-                        <Card key={i} className="p-5 border-none shadow-sm">
+                    {statCards.map((stat, i) => (
+                        <Card key={i} className="p-5 border-none shadow-sm relative overflow-hidden">
+                            {statsLoading && i < 4 && (
+                                <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10">
+                                    <Loader2 className="animate-spin text-primary" size={16} />
+                                </div>
+                            )}
                             <div className="flex justify-between items-start mb-3">
                                 <stat.icon size={18} className={stat.color} />
                                 <span className={cn(
@@ -93,7 +118,7 @@ const AdminDashboard = () => {
                                 <option>Last Quarter</option>
                             </select>
                         </div>
-                        <div className="h-[300px] w-full">
+                        <div className="h-[300px] w-full min-h-[300px]">
                             <ResponsiveContainer width="100%" height="100%">
                                 <AreaChart data={data}>
                                     <defs>
@@ -117,7 +142,7 @@ const AdminDashboard = () => {
 
                     <Card className="p-8 border-none shadow-sm">
                         <h3 className="font-bold text-lg text-gray-800 mb-8">Status Distribution</h3>
-                        <div className="h-[250px] w-full">
+                        <div className="h-[250px] w-full min-h-[250px]">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
@@ -158,10 +183,19 @@ const AdminDashboard = () => {
                     <Card className="p-8 border-none shadow-sm">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="font-bold text-lg text-gray-800">Operational Anomaly Alerts</h3>
-                            <StatusBadge status="PENDING" />
+                            <button className="text-xs font-bold text-primary hover:underline">View All Registry</button>
                         </div>
                         <div className="space-y-4">
-                            {demoAlerts.map((alert, i) => (
+                            {anomaliesLoading ? (
+                                <div className="h-48 flex items-center justify-center">
+                                    <Loader2 className="animate-spin text-primary" size={32} />
+                                </div>
+                            ) : anomalies?.length === 0 ? (
+                                <div className="h-48 flex flex-col items-center justify-center text-gray-400 italic">
+                                    <CheckCircle className="mb-2 text-success" size={32} />
+                                    <p className="text-sm">No active anomalies detected</p>
+                                </div>
+                            ) : anomalies?.slice(0, 3).map((alert, i) => (
                                 <div key={i} className="group p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-red-100 hover:bg-white transition-all">
                                     <div className="flex justify-between items-start mb-2">
                                         <div className="flex items-center gap-2">
@@ -171,7 +205,7 @@ const AdminDashboard = () => {
                                             )}></div>
                                             <span className="text-xs font-bold uppercase tracking-widest">{alert.type}</span>
                                         </div>
-                                        <span className="text-[10px] text-gray-400 font-bold">{new Date(alert.timestamp).toLocaleTimeString()}</span>
+                                        <span className="text-[10px] text-gray-400 font-bold">{new Date(alert.createdAt).toLocaleTimeString()}</span>
                                     </div>
                                     <p className="text-sm text-gray-600 mb-4">{alert.description}</p>
                                     <div className="flex items-center justify-between">

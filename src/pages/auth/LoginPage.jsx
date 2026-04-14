@@ -1,31 +1,45 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../lib/store';
-import { ShieldCheck, Eye, EyeOff, TreeDeciduous } from 'lucide-react';
+import { ShieldCheck, Eye, EyeOff, TreeDeciduous, Loader2 } from 'lucide-react';
+import api from '../../lib/api';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('FARMER');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const login = useAuthStore((state) => state.login);
 
-  const handleLogin = (e) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Simulate login
-    const userData = { email, role, name: 'Demo User', org: 'BotaniLedger Demo' };
-    login(userData, 'demo-token');
-    
-    // Redirect based on role
-    const routes = {
-      FARMER: '/farmer',
-      LABORATORY: '/lab',
-      MANUFACTURER: '/manufacturer',
-      ADMIN: '/admin',
-      REGULATOR: '/regulator'
-    };
-    navigate(routes[role] || '/');
+    setIsSubmitting(true);
+    setError('');
+
+    try {
+        const response = await api.post('/auth/login', { email, password });
+        // response is the body { success, message, data: { user, accessToken } }
+        const { user, accessToken } = response.data;
+        
+        login(user, accessToken);
+        
+        const roleRedirects = {
+          farmer: '/farmer',
+          lab: '/lab',
+          manufacturer: '/manufacturer',
+          admin: '/admin',
+          regulator: '/regulator'
+        };
+        
+        navigate(roleRedirects[user.role] || '/');
+    } catch (err) {
+        setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   return (
@@ -55,7 +69,6 @@ const LoginPage = () => {
           </div>
         </div>
 
-        {/* Animated illustration placeholder */}
         <div className="relative h-64 w-full bg-white/5 rounded-3xl border border-white/10 overflow-hidden flex items-center justify-center">
             <div className="absolute inset-0 opacity-20">
                 <svg className="w-full h-full" viewBox="0 0 100 100">
@@ -80,17 +93,25 @@ const LoginPage = () => {
               <span className="text-2xl font-bold">BotaniLedger</span>
             </div>
             <h1 className="text-4xl font-bold text-gray-900 mb-3">Welcome back</h1>
-            <p className="text-gray-500">Sign in to your specialized ecosystem portal</p>
+            <p className="text-gray-500">Sign in to your secure ecosystem node</p>
+            
+            {error && (
+                <div className="mt-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-sm font-bold animate-in slide-in-from-top-2">
+                    {error}
+                </div>
+            )}
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-gray-700 ml-1">Email Address</label>
+              <label htmlFor="email" className="text-sm font-semibold text-gray-700 ml-1">Official Email</label>
               <input 
+                id="email"
+                name="email"
                 type="email" 
                 required
                 className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl focus:border-primary focus:ring-0 transition-all outline-none bg-white font-medium"
-                placeholder="ramesh@botanifarmer.in"
+                placeholder="yourname@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -110,35 +131,17 @@ const LoginPage = () => {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-5 top-[44px] text-gray-400 hover:text-primary transition-colors"
-                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
-              <div className="flex justify-end pt-1">
-                <a href="#" className="text-sm font-medium text-accent-light hover:text-primary">Forgot password?</a>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-gray-700 ml-1">Portal Role</label>
-              <select 
-                className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl focus:border-primary focus:ring-0 transition-all outline-none bg-white font-medium appearance-none cursor-pointer"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-              >
-                <option value="FARMER">Farmer / Collector</option>
-                <option value="LABORATORY">Processing Laboratory</option>
-                <option value="MANUFACTURER">Herbal Manufacturer</option>
-                <option value="ADMIN">System Administrator</option>
-                <option value="REGULATOR">AYUSH / Regulator Portal</option>
-              </select>
             </div>
 
             <button 
               type="submit"
-              className="w-full py-4 bg-primary text-white rounded-2xl font-bold hover:bg-primary-mid transition-all shadow-lg shadow-green-900/10"
+              disabled={isSubmitting}
+              className="w-full py-4 bg-primary text-white rounded-2xl font-bold hover:bg-primary-dark transition-all shadow-lg shadow-green-900/10 flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              Sign In to Platform
+              {isSubmitting ? <><Loader2 className="animate-spin" size={20} /> Authenticating...</> : 'Sign In to Platform'}
             </button>
 
             <div className="relative py-4 flex items-center justify-center">
@@ -147,7 +150,7 @@ const LoginPage = () => {
             </div>
 
             <p className="text-center text-gray-500 font-medium">
-              Don't have an account? <Link to="#" className="text-accent-light font-bold hover:underline">Apply for Onboarding</Link>
+              New stakeholder? <Link to="/register" className="text-accent-light font-bold hover:underline">Apply for Onboarding</Link>
             </p>
           </form>
         </div>

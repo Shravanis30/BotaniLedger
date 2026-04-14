@@ -4,15 +4,24 @@ import { Card, StatusBadge, EmptyState } from '@/components/shared/UI';
 import { 
   PlusCircle, LayoutDashboard, List, RefreshCw, 
   Search, Filter, Download, ArrowRight, MapPin, 
-  Activity, Calendar, ChevronLeft, ChevronRight, Settings
+  Activity, Calendar, ChevronLeft, ChevronRight, Settings, Loader2
 } from 'lucide-react';
-import { demoBatches } from '@/lib/mockData';
+import { useQuery } from '@tanstack/react-query';
+import api from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 
 const BatchList = () => {
   const [filter, setFilter] = useState('ALL');
   const [search, setSearch] = useState('');
+
+  const { data: batches, isLoading } = useQuery({
+    queryKey: ['farmerBatches'],
+    queryFn: async () => {
+        const resp = await api.get('/farmer/batches');
+        return resp.data;
+    }
+  });
 
   const sidebarItems = [
     { label: 'Dashboard', to: '/farmer', icon: LayoutDashboard },
@@ -22,10 +31,10 @@ const BatchList = () => {
     { label: 'Settings', to: '/farmer/settings', icon: Settings },
   ];
 
-  const filteredBatches = demoBatches.filter(batch => {
-    const matchesSearch = batch.id.toLowerCase().includes(search.toLowerCase()) || 
-                         batch.herb.toLowerCase().includes(search.toLowerCase());
-    const matchesFilter = filter === 'ALL' || batch.status === filter;
+  const filteredBatches = (batches || []).filter(batch => {
+    const matchesSearch = batch.batchId.toLowerCase().includes(search.toLowerCase()) || 
+                         batch.herbSpecies?.common.toLowerCase().includes(search.toLowerCase());
+    const matchesFilter = filter === 'ALL' || batch.blockchainRecord?.status === filter;
     return matchesSearch && matchesFilter;
   });
 
@@ -59,7 +68,7 @@ const BatchList = () => {
                 />
             </div>
             <div className="flex gap-2 bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
-                {['ALL', 'PENDING', 'LAB_TESTING', 'LAB_PASSED', 'APPROVED'].map((f) => (
+                {['ALL', 'PENDING', 'IN_TRANSIT', 'LAB_TESTING', 'CERTIFIED'].map((f) => (
                     <button
                         key={f}
                         onClick={() => setFilter(f)}
@@ -80,7 +89,12 @@ const BatchList = () => {
 
         {/* Batch List */}
         <Card className="border-none shadow-sm overflow-hidden">
-            {filteredBatches.length > 0 ? (
+            {isLoading ? (
+                <div className="p-20 flex flex-col items-center justify-center">
+                    <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
+                    <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Loading from Private Subscriptions...</p>
+                </div>
+            ) : filteredBatches.length > 0 ? (
                 <>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
@@ -95,38 +109,38 @@ const BatchList = () => {
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {filteredBatches.map((batch) => (
-                                    <tr key={batch.id} className="group hover:bg-primary/[0.02] transition-colors">
+                                    <tr key={batch._id} className="group hover:bg-primary/[0.02] transition-colors">
                                         <td className="px-8 py-7">
-                                            <div className="font-mono text-xs font-bold text-primary mb-1">{batch.id}</div>
-                                            <div className="text-sm font-black text-gray-900">{batch.herb.split(' (')[0]}</div>
-                                            <div className="text-[10px] text-gray-400 font-medium italic lowercase">{batch.herb.split(' (')[1].replace(')', '')}</div>
+                                            <div className="font-mono text-xs font-bold text-primary mb-1">{batch.batchId}</div>
+                                            <div className="text-sm font-black text-gray-900">{batch.herbSpecies?.common}</div>
+                                            <div className="text-[10px] text-gray-400 font-medium italic lowercase">{batch.herbSpecies?.scientific}</div>
                                         </td>
                                         <td className="px-8 py-7">
                                             <div className="flex items-center gap-2 text-sm font-bold text-gray-600 mb-2">
                                                 <Calendar size={14} className="text-gray-400" />
-                                                {batch.date}
+                                                {new Date(batch.collectionDate).toLocaleDateString()}
                                             </div>
                                             <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 px-3 py-1 bg-gray-50 border border-gray-100 rounded-lg w-fit">
                                                 <MapPin size={12} className="text-primary" />
-                                                {batch.location.split(' (')[0]}
+                                                {batch.location?.name || 'Assigned Farm'}
                                             </div>
                                         </td>
                                         <td className="px-8 py-7">
                                             <div className="flex flex-col gap-1.5 w-32">
                                                 <div className="flex justify-between items-end">
                                                     <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Confidence</span>
-                                                    <span className="text-xs font-black text-success">{batch.aiConfidence}</span>
+                                                    <span className="text-xs font-black text-success">{batch.aiVerification?.confidence}%</span>
                                                 </div>
                                                 <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                                                     <div 
                                                         className="h-full bg-success transition-all duration-1000 shadow-[0_0_8px_rgba(22,163,74,0.4)]" 
-                                                        style={{ width: batch.aiConfidence }}
+                                                        style={{ width: `${batch.aiVerification?.confidence}%` }}
                                                     ></div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-8 py-7">
-                                            <StatusBadge status={batch.status} />
+                                            <StatusBadge status={batch.blockchainRecord?.status || 'PENDING'} />
                                         </td>
                                         <td className="px-8 py-7 text-right">
                                             <div className="flex gap-2 justify-end">
@@ -144,7 +158,7 @@ const BatchList = () => {
                         </table>
                     </div>
                     <div className="p-8 border-t border-gray-50 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest">
-                        <span>Showing {filteredBatches.length} of {demoBatches.length} results</span>
+                        <span>Showing {filteredBatches.length} of {batches?.length || 0} results</span>
                         <div className="flex gap-3">
                             <button className="p-2 bg-white border border-gray-200 rounded-xl opacity-50 cursor-not-allowed">
                                 <ChevronLeft size={18} />

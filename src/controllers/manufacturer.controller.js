@@ -5,6 +5,26 @@ const aiService = require('../services/ai.service');
 const qrService = require('../services/qr.service');
 const { successResponse, errorResponse } = require('../utils/response.util');
 
+exports.getInventory = async (req, res) => {
+  try {
+    const batches = await HerbCollection.find({
+      'blockchainRecord.status': { $in: ['LAB_PASSED', 'RECEIVED', 'MANUFACTURER_APPROVED'] }
+    }).sort({ updatedAt: -1 });
+    successResponse(res, batches);
+  } catch (err) {
+    errorResponse(res, 500, err.message);
+  }
+};
+
+exports.getProducts = async (req, res) => {
+  try {
+    const products = await ProductBatch.find({ manufacturerId: req.user._id }).sort({ createdAt: -1 });
+    successResponse(res, products);
+  } catch (err) {
+    errorResponse(res, 500, err.message);
+  }
+};
+
 exports.confirmReceipt = async (req, res) => {
   try {
     const { batchId } = req.params;

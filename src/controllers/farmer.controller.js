@@ -8,7 +8,12 @@ const logger = require('../utils/logger.util');
 
 exports.createCollection = async (req, res) => {
   try {
-    const { herbSpecies, quantity, unit, collectionDate, location, notes } = req.body;
+    let { herbSpecies, quantity, unit, collectionDate, location, notes } = req.body;
+    
+    // Parse JSON strings from FormData
+    if (typeof herbSpecies === 'string') herbSpecies = JSON.parse(herbSpecies);
+    if (typeof location === 'string') location = JSON.parse(location);
+    
     const photos = req.files;
 
     // 1. Upload photos to IPFS
@@ -33,7 +38,7 @@ exports.createCollection = async (req, res) => {
       quantity,
       unit,
       collectionDate,
-      location: JSON.parse(location),
+      location,
       photos: {
         ipfsFolderCid,
         macro: { cid: '', url: `${process.env.PINATA_GATEWAY}/ipfs/${ipfsFolderCid}/macro...` }
@@ -118,6 +123,19 @@ exports.dispatchBatch = async (req, res) => {
     await batch.save();
 
     successResponse(res, batch, 'Batch dispatched successfully');
+  } catch (err) {
+    errorResponse(res, 500, err.message);
+  }
+};
+
+exports.verifyPreview = async (req, res) => {
+  try {
+    const { species } = req.body;
+    const photo = req.file;
+    if (!photo) return errorResponse(res, 400, 'Photo is required');
+
+    const result = await aiService.verifySpecies(photo.buffer, species);
+    successResponse(res, result);
   } catch (err) {
     errorResponse(res, 500, err.message);
   }

@@ -15,6 +15,17 @@ exports.getPending = async (req, res) => {
   }
 };
 
+exports.getCertificates = async (req, res) => {
+  try {
+    const certificates = await LabReport.find({ labId: req.user._id })
+      .populate('batchId')
+      .sort({ createdAt: -1 });
+    successResponse(res, certificates);
+  } catch (err) {
+    errorResponse(res, 500, err.message);
+  }
+};
+
 exports.startTesting = async (req, res) => {
   try {
     const { batchId } = req.params;

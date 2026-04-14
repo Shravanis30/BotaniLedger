@@ -50,13 +50,25 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    logger.info(`Login attempt for: ${email}`);
 
     const user = await User.findOne({ email });
-    if (!user || !(await user.comparePassword(password))) {
+    if (!user) {
+      logger.warn(`Login failed: User ${email} not found`);
+      return errorResponse(res, 401, 'Invalid email or password');
+    }
+
+    const isMatch = await user.comparePassword(password);
+    logger.info(`Password match for ${email}: ${isMatch}`);
+
+    if (!isMatch) {
+      // Log for debug only - do not reveal in production
+      logger.debug(`Provided password: ${password}`);
       return errorResponse(res, 401, 'Invalid email or password');
     }
 
     if (!user.isActive) {
+      logger.warn(`Login blocked: User ${email} is inactive`);
       return errorResponse(res, 401, 'Account is inactive');
     }
 

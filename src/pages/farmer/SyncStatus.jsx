@@ -7,10 +7,11 @@ import {
   WifiOff, AlertTriangle, Clock, Database, CloudUpload, Settings
 } from 'lucide-react';
 import { useOfflineStore } from '@/lib/offlineStore';
+import api from '@/lib/api';
 import { cn } from '@/lib/utils';
 
 const SyncStatus = () => {
-  const { pendingBatches, isOnline } = useOfflineStore();
+  const { pendingBatches, isOnline, removeBatch } = useOfflineStore();
   const [syncing, setSyncing] = useState(false);
 
   const sidebarItems = [
@@ -21,13 +22,70 @@ const SyncStatus = () => {
     { label: 'Settings', to: '/farmer/settings', icon: Settings },
   ];
 
-  const handleSync = () => {
+  const base64ToBlob = (base64) => {
+    const parts = base64.split(';base64,');
+    const contentType = parts[0].split(':')[1];
+    const raw = window.atob(parts[1]);
+    const rawLength = raw.length;
+    const uInt8Array = new Uint8Array(rawLength);
+    for (let i = 0; i < rawLength; ++i) {
+        uInt8Array[i] = raw.charCodeAt(i);
+    }
+    return new Blob([uInt8Array], { type: contentType });
+  };
+
+  const handleSync = async () => {
     if (!isOnline || pendingBatches.length === 0) return;
     setSyncing(true);
-    setTimeout(() => {
-        setSyncing(false);
-        // In a real app, logic would trigger here
-    }, 3000);
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const batch of pendingBatches) {
+        try {
+            const body = new FormData();
+            const speciesParts = batch.species.split(' (');
+            const speciesObj = {
+                common: speciesParts[0],
+                scientific: speciesParts[1]?.replace(')', '') || ''
+            };
+
+            body.append('herbSpecies', JSON.stringify(speciesObj));
+            body.append('quantity', batch.quantity);
+            body.append('unit', 'kg');
+            body.append('collectionDate', batch.date);
+            body.append('location', JSON.stringify(batch.location));
+            body.append('notes', batch.notes || '');
+
+            // Append photos (handling both File objects and Base64 strings)
+            Object.entries(batch.photos || {}).forEach(([key, photo]) => {
+                if (photo instanceof File) {
+                    body.append(key, photo);
+                } else if (typeof photo === 'string' && photo.startsWith('data:image')) {
+                    const blob = base64ToBlob(photo);
+                    body.append(key, blob, `${key}.jpg`);
+                }
+            });
+
+            await api.post('/farmer/collection', body, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
+            removeBatch(batch.id);
+            successCount++;
+        } catch (err) {
+            console.error(`Sync failed for batch ${batch.id}:`, err);
+            failCount++;
+        }
+    }
+
+    setSyncing(false);
+    if (successCount > 0) {
+        alert(`Successfully synchronized ${successCount} records to the blockchain!`);
+    }
+    if (failCount > 0) {
+        alert(`Failed to sync ${failCount} records. They will remain in your local queue.`);
+    }
   };
 
   return (
@@ -94,7 +152,7 @@ const SyncStatus = () => {
                     <div className="relative z-10 space-y-8">
                         <div className="flex items-center justify-between">
                             <h4 className="font-bold text-lg opacity-80">Connection</h4>
-                            {isOnline ? <Wifi className="text-accent-light" /> : <WifiOff className="text-red-400" />}
+                            {isOnline ? <Wifi className="text-secondary" /> : <WifiOff className="text-red-400" />}
                         </div>
                         
                         <div className="text-center py-6">
@@ -111,11 +169,11 @@ const SyncStatus = () => {
 
                         <ul className="space-y-4 text-xs font-bold opacity-80">
                             <li className="flex items-center gap-3">
-                                <SignalHigh size={16} className={isOnline ? "text-accent-light" : "text-gray-500"} />
+                                <SignalHigh size={16} className={isOnline ? "text-accent" : "text-gray-500"} />
                                 Latency: {isOnline ? '42ms' : '--'}
                             </li>
                             <li className="flex items-center gap-3">
-                                <Database size={16} className={isOnline ? "text-accent-light" : "text-gray-500"} />
+                                <Database size={16} className={isOnline ? "text-accent" : "text-gray-500"} />
                                 Queue Priority: High
                             </li>
                         </ul>
@@ -126,7 +184,7 @@ const SyncStatus = () => {
                             className={cn(
                                 "w-full py-5 rounded-2xl font-black transition-all flex items-center justify-center gap-3 text-sm tracking-widest uppercase",
                                 isOnline && pendingBatches.length > 0
-                                    ? "bg-accent-light text-primary-dark hover:bg-white hover:scale-[1.02] shadow-xl shadow-accent-light/20" 
+                                    ? "bg-accent text-primary hover:bg-white hover:scale-[1.02] shadow-xl shadow-accent/20" 
                                     : "bg-white/10 text-white/30 cursor-not-allowed"
                             )}
                         >

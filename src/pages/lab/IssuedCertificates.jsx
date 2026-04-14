@@ -1,8 +1,9 @@
 import React from 'react';
 import Sidebar from '@/components/shared/Sidebar';
-import { Card, StatusBadge } from '@/components/shared/UI';
-import { FileCheck, Download, Search, LayoutDashboard, List, Microscope, History } from 'lucide-react';
-import { demoBatches } from '@/lib/mockData';
+import { Card, StatusBadge, Skeleton } from '@/components/shared/UI';
+import { FileCheck, Download, Search, LayoutDashboard, List, Microscope, History, Loader2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import api from '@/lib/api';
 import { cn } from '@/lib/utils';
 
 const IssuedCertificates = () => {
@@ -12,7 +13,13 @@ const IssuedCertificates = () => {
     { label: 'Quality Analytics', to: '/lab/analytics', icon: Microscope },
   ];
 
-  const certifiedBatches = demoBatches.filter(b => b.status === 'LAB_PASSED' || b.status === 'APPROVED');
+  const { data: certificates = [], isLoading } = useQuery({
+    queryKey: ['labCertificates'],
+    queryFn: async () => {
+        const resp = await api.get('/lab/certificates');
+        return resp.data || [];
+    }
+  });
 
   return (
     <div className="flex bg-background min-h-screen">
@@ -32,45 +39,72 @@ const IssuedCertificates = () => {
           </div>
         </header>
 
-        <Card className="border-none shadow-2xl shadow-green-900/5">
-          <table className="w-full text-left">
-            <thead className="bg-gray-50/50 text-[10px] uppercase tracking-[0.2em] font-black text-gray-400">
-              <tr>
-                <th className="px-8 py-6">Cert ID</th>
-                <th className="px-8 py-6">Product Identity</th>
-                <th className="px-8 py-6">Timestamp</th>
-                <th className="px-8 py-6">Results</th>
-                <th className="px-8 py-6 text-right">Certificate</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {certifiedBatches.map((batch, i) => (
-                <tr key={i} className="hover:bg-primary/5 transition-all group">
-                  <td className="px-8 py-6">
-                    <div className="font-mono text-xs font-black text-primary">AYUSH-CERT-{2000 + i}</div>
-                    <div className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">Ref: {batch.id}</div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <span className="font-black text-sm text-gray-800 tracking-tight">{batch.herb.split(' (')[0]}</span>
-                  </td>
-                  <td className="px-8 py-6 text-xs font-bold text-gray-500 italic">
-                    2025-04-{12 - i} | 14:20 IST
-                  </td>
-                  <td className="px-8 py-6">
-                    <div className="flex gap-2">
-                      <span className="text-[9px] font-black bg-success/10 text-success px-2 py-1 rounded border border-success/10">PURITY: 98%</span>
-                      <span className="text-[9px] font-black bg-success/10 text-success px-2 py-1 rounded border border-success/10">METAL: ND</span>
-                    </div>
-                  </td>
-                  <td className="px-8 py-6 text-right">
-                    <button className="text-[10px] font-black uppercase text-primary tracking-widest hover:underline flex items-center justify-end gap-2 ml-auto">
-                      <Download size={14} /> PDF Result
-                    </button>
-                  </td>
+        <Card className="border-none shadow-sm overflow-hidden bg-white">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="bg-gray-50/50 text-[10px] uppercase tracking-[0.2em] font-black text-gray-400">
+                <tr>
+                  <th className="px-8 py-6">Cert ID / Batch</th>
+                  <th className="px-8 py-6">Herb Identity</th>
+                  <th className="px-8 py-6">Issued Timestamp</th>
+                  <th className="px-8 py-6">Purity Signature</th>
+                  <th className="px-8 py-6 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {isLoading ? (
+                  [...Array(3)].map((_, i) => (
+                    <tr key={i}>
+                        <td colSpan={5} className="px-8 py-6"><Skeleton className="h-12 w-full" /></td>
+                    </tr>
+                  ))
+                ) : certificates.length > 0 ? (
+                  certificates.map((cert, i) => (
+                    <tr key={cert._id || i} className="hover:bg-primary/[0.02] transition-all group">
+                      <td className="px-8 py-7">
+                        <div className="font-mono text-xs font-black text-primary uppercase">{cert.referenceNumber || `AYUSH-${cert._id.slice(-6)}`}</div>
+                        <div className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">Ref: {cert.batchId?.batchId || 'N/A'}</div>
+                      </td>
+                      <td className="px-8 py-7">
+                        <span className="font-black text-sm text-gray-800 tracking-tight">{cert.batchId?.herbSpecies?.common || 'Unlabeled Batch'}</span>
+                      </td>
+                      <td className="px-8 py-7 text-xs font-bold text-gray-500 italic">
+                        {new Date(cert.testDate || cert.createdAt).toLocaleDateString()} | {new Date(cert.testDate || cert.createdAt).toLocaleTimeString()}
+                      </td>
+                      <td className="px-8 py-7">
+                        <div className="flex gap-2">
+                          <span className={cn(
+                            "text-[9px] font-black px-2 py-1 rounded border",
+                            cert.results?.overallResult === 'PASS' 
+                                ? "bg-success/10 text-success border-success/10" 
+                                : "bg-red-50 text-red-500 border-red-100"
+                          )}>
+                             RESULT: {cert.results?.overallResult || 'N/A'}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-8 py-7 text-right">
+                        <a 
+                          href={cert.document?.ipfsUrl} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="text-[10px] font-black uppercase text-primary tracking-widest hover:underline inline-flex items-center gap-2"
+                        >
+                          <Download size={14} /> PDF Report
+                        </a>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="px-8 py-20 text-center text-sm font-bold text-gray-400 uppercase tracking-widest">
+                        Archive empty. No certificates issued yet.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </Card>
       </main>
     </div>

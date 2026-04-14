@@ -71,3 +71,21 @@ exports.verifyUser = async (req, res) => {
     errorResponse(res, 500, err.message);
   }
 };
+
+exports.getAllBatches = async (req, res) => {
+  try {
+    const batches = await HerbCollection.find().sort({ createdAt: -1 });
+    successResponse(res, batches);
+  } catch (err) {
+    errorResponse(res, 500, err.message);
+  }
+};
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({ role: { $ne: 'admin' } }).select('-password');
+    successResponse(res, users);
+  } catch (err) {
+    errorResponse(res, 500, err.message);
+  }
+};

@@ -4,20 +4,20 @@ const logger = require('../utils/logger.util');
 class AIService {
   async verifySpecies(photoBuffer, expectedSpecies) {
     try {
-      // Logic would be a POST to the AI Python service
-      // const response = await axios.post(`${process.env.AI_SERVICE_URL}/verify-species`, { photo: photoBuffer, species: expectedSpecies });
-      // return response.data;
+      const FormData = require('form-data');
+      const form = new FormData();
+      form.append('photo', photoBuffer, { filename: 'herb_macro.jpg' });
+      form.append('species', expectedSpecies);
 
-      // Mocking for now
-      return {
-        speciesMatch: true,
-        confidence: 92.5,
-        matchedSpecies: expectedSpecies,
-        modelVersion: 'v1.2.0-cnn-resnet50'
-      };
+      const response = await axios.post(`${process.env.AI_SERVICE_URL}/verify-species`, form, {
+        headers: form.getHeaders()
+      });
+
+      return response.data;
     } catch (err) {
-      logger.error('AI Species verification failed:', err);
-      return { speciesMatch: false, confidence: 0 };
+      logger.error('AI Species verification failed:', err.message);
+      // Fallback to safe failure if AI node is down
+      return { speciesMatch: false, confidence: 0, matchedSpecies: 'unknown' };
     }
   }
 

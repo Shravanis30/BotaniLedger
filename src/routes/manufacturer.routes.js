@@ -9,6 +9,9 @@ const { auditLog } = require('../middleware/audit.middleware');
 router.use(protect);
 router.use(authorize('manufacturer'));
 
+router.get('/inventory', manufacturerController.getInventory);
+router.get('/products', manufacturerController.getProducts);
+
 router.post('/receipt/:batchId', auditLog('CONFIRM_RECEIPT', 'HerbCollection'), manufacturerController.confirmReceipt);
 router.post('/similarity-check', 
   upload.array('arrivalPhotos', 5), 

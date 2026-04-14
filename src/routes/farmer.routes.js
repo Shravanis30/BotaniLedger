@@ -21,6 +21,11 @@ router.post('/collection',
   farmerController.createCollection
 );
 
+router.post('/verify-preview',
+  upload.single('photo'),
+  farmerController.verifyPreview
+);
+
 router.get('/batches', farmerController.getBatches);
 router.post('/dispatch/:batchId', auditLog('DISPATCH_BATCH', 'HerbCollection'), farmerController.dispatchBatch);
 

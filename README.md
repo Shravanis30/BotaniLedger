@@ -108,6 +108,18 @@ BotaniLedger is a state-of-the-art supply chain transparency platform designed f
     npm run dev
     ```
 
+    **AI Verification Service:**
+    ```bash
+    cd ai-service
+    # Create and activate virtual environment
+    python3 -m venv venv
+    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+    # Install dependencies
+    pip install -r requirements.txt
+    # Run server
+    python main.py
+    ```
+
 ---
 
 ## 📁 Project Structure

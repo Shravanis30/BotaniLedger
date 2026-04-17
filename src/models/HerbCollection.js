@@ -40,6 +40,9 @@ const HerbCollectionSchema = new mongoose.Schema({
     speciesMatch: Boolean,
     confidence: Number,
     matchedSpecies: String,
+    purityScore: Number,
+    qualityGrade: String,
+    moistureLevel: Number,
     inferenceTimestamp: Date,
     modelVersion: String
   },

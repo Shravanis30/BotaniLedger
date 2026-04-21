@@ -11,6 +11,7 @@ const envSchema = z.object({
   PINATA_JWT: z.string(),
   FABRIC_CHANNEL: z.string().default('botanyledger-channel'),
   FABRIC_CHAINCODE: z.string().default('botanyledger'),
+  AI_SERVICE_URL: z.string().url().default('http://localhost:8000'),
 });
 
 const validateEnv = () => {

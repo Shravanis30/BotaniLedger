@@ -144,6 +144,52 @@ BotaniLedger/
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## 🚀 Deployment Guide
+
+### Backend (Render)
+1. **Create Web Service**: Connect your GitHub repository to [Render](https://render.com).
+2. **Environment Variables**: Add all variables from `.env` to the Render Dashboard.
+   - Set `NODE_ENV=production`
+   - Set `PORT=5080` (or leave default and Render will provide one)
+   - Set `CORS_ORIGIN=https://your-frontend.vercel.app`
+3. **Build & Start**:
+   - Build Command: `npm install`
+   - Start Command: `npm start`
+
+### Frontend (Vercel)
+1. **Connect Repo**: Import your project into [Vercel](https://vercel.com).
+2. **Framework**: Select **Vite** as the framework preset.
+3. **Overriding Settings**:
+   - Output Directory: `dist`
+4. **Environment Variables**:
+   - Add `VITE_API_URL=https://your-backend-url.onrender.com/api/v1`
+5. **Route Handling**: Vercel automatically uses the included `vercel.json` to handle SPA routing.
+
+### AI Service (Render / PythonAnywhere)
+1. **Create Web Service**: Select the `ai-service` directory (or use a separate repo).
+2. **Environment**: Python 3.10+.
+3. **Commands**:
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+4. **Integration**: Update the `AI_SERVICE_URL` in your **Backend (Render)** environment variables to point to this new AI service URL.
+
+### Blockchain (Kaleido)
+The project is pre-configured for **Hyperledger Fabric** on Kaleido.
+1. **Login to Kaleido**: Use your existing credentials (found in `.env`).
+2. **Upload Chaincode**:
+   - Navigate to **Chaincode** > **Deploy New**.
+   - Upload the `botaniledger.zip` located in `blockchain/chaincode/botanyledger/`.
+3. **Instantiate**: Deploy the chaincode to your channel (default is `default-channel`).
+4. **App Credentials**: Ensure `FABRIC_AUTH` in your backend env vars matches the App Creds generated in the Kaleido dashboard.
+
+---
+
+### Alternative Deployment Options
+- **Railway**: Great for full-stack apps with easy database setup.
+- **DigitalOcean App Platform**: Robust PaaS for production scaling.
+- **AWS Amplify / App Runner**: Scalable enterprise-grade deployment.
+- **Docker**: The project includes a `Dockerfile` for containerized environments.
+
 ---
 
 Developed with ❤️ for the **Botanical Transparency Initiative**.

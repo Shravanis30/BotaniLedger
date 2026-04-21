@@ -14,45 +14,76 @@ exports.createCollection = async (req, res) => {
     if (typeof herbSpecies === 'string') herbSpecies = JSON.parse(herbSpecies);
     if (typeof location === 'string') location = JSON.parse(location);
     
-    const photos = req.files;
+    const photos = req.files || {};
 
     // 1. Upload photos to IPFS
     const photoFiles = [];
     for (const key in photos) {
-      const file = photos[key][0];
-      photoFiles.push({
-        buffer: file.buffer,
-        name: `${key}-${Date.now()}.${file.originalname.split('.').pop()}`,
-        type: file.mimetype
-      });
+      if (photos[key] && photos[key][0]) {
+        const file = photos[key][0];
+        photoFiles.push({
+          buffer: file.buffer,
+          name: `${key}-${Date.now()}.${file.originalname.split('.').pop()}`,
+          type: file.mimetype
+        });
+      }
     }
 
-    const ipfsFolderCid = await ipfsService.uploadFolder(photoFiles);
+    let ipfsFolderCid = 'QmNotUploadedDueToError';
+    try {
+        ipfsFolderCid = await ipfsService.uploadFolder(photoFiles);
+    } catch (ipfsErr) {
+        logger.error('IPFS Upload Error:', ipfsErr);
+    }
     
-    // 2. AI Species Verification
-    const aiResult = await aiService.verifySpecies(photos.macro[0].buffer, herbSpecies.common);
+    // 2. AI Species Verification (Only if macro photo exists)
+    let aiResult = { speciesMatch: false, confidence: 0, matchedSpecies: 'none' };
+    if (photos.macro && photos.macro[0]) {
+        try {
+            aiResult = await aiService.verifySpecies(photos.macro[0].buffer, herbSpecies.common);
+        } catch (aiErr) {
+            logger.error('AI Verification Error:', aiErr);
+        }
+    }
+
+    // Format location for GeoJSON
+    const formattedLocation = {
+        type: 'Point',
+        coordinates: [location.lng || 0, location.lat || 0],
+        accuracy: location.accuracy,
+        zone: location.zone
+    };
 
     const batchData = {
       farmerId: req.user._id,
-      herbSpecies,
-      quantity,
-      unit,
-      collectionDate,
-      location,
+      herbSpecies: {
+          common: herbSpecies.common,
+          botanical: herbSpecies.botanical || herbSpecies.scientific || '',
+          code: herbSpecies.code
+      },
+      quantity: parseFloat(quantity),
+      unit: unit || 'kg',
+      collectionDate: collectionDate || new Date(),
+      location: formattedLocation,
       photos: {
         ipfsFolderCid,
-        macro: { cid: '', url: `${process.env.PINATA_GATEWAY}/ipfs/${ipfsFolderCid}/macro...` }
+        macro: photos.macro ? { url: `${process.env.PINATA_GATEWAY}/ipfs/${ipfsFolderCid}/macro.jpg` } : undefined
       },
       aiVerification: aiResult,
       notes
     };
 
     // 3. Anomaly Detection
-    const anomalies = await anomalyService.checkForAnomalies(batchData, req.user._id);
+    let anomalies = [];
+    try {
+        anomalies = await anomalyService.checkForAnomalies(batchData, req.user._id);
+    } catch (anoErr) {
+        logger.error('Anomaly Detection Error:', anoErr);
+    }
+
     if (anomalies.length > 0) {
       batchData.isAnomaly = true;
       batchData.anomalyType = anomalies[0].type;
-      // Log anomaly alert record separately
     }
 
     // 4. Save to MongoDB
@@ -60,26 +91,31 @@ exports.createCollection = async (req, res) => {
 
     // 5. Anchor to Blockchain
     try {
-      const result = await fabricService.submitTransaction(
-        req.user.fabricIdentity,
-        'registerBatch',
-        herbBatch.batchId,
-        JSON.stringify({
-          herbSpecies,
-          quantity,
-          collectionDate,
-          location: batchData.location,
-          ipfsFolderCid,
-          aiConfidence: aiResult.confidence
-        })
-      );
-
-      herbBatch.blockchainRecord = {
-        txId: result.txId,
-        status: 'PENDING',
-        timestamp: new Date()
-      };
-      herbBatch.syncStatus = 'synced';
+      if (req.user.fabricIdentity) {
+        const result = await fabricService.submitTransaction(
+          req.user.fabricIdentity,
+          'registerBatch',
+          herbBatch.batchId,
+          JSON.stringify({
+            herbSpecies,
+            quantity,
+            collectionDate,
+            location: batchData.location,
+            ipfsFolderCid,
+            aiConfidence: aiResult.confidence
+          })
+        );
+  
+        herbBatch.blockchainRecord = {
+          txId: result.txId,
+          status: 'PENDING',
+          timestamp: new Date()
+        };
+        herbBatch.syncStatus = 'synced';
+      } else {
+        logger.warn('User has no Fabric Identity. Skipping blockchain anchor.');
+        herbBatch.syncStatus = 'failed';
+      }
       await herbBatch.save();
     } catch (blockchainErr) {
       logger.error('Blockchain anchor failed for batch:', herbBatch.batchId, blockchainErr);

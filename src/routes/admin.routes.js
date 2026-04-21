@@ -16,5 +16,7 @@ router.post('/verify/:userId', adminController.verifyUser);
 
 router.get('/batches', adminController.getAllBatches);
 router.get('/farmers', adminController.getAllUsers);
+router.delete('/nodes/:userId', adminController.deleteUser);
+router.get('/nodes/:userId/history', adminController.getNodeHistory);
 
 module.exports = router;

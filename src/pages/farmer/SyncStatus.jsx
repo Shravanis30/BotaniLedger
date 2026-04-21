@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Sidebar from '@/components/shared/Sidebar';
 import { Card, StatusBadge, EmptyState } from '@/components/shared/UI';
 import { 
   PlusCircle, LayoutDashboard, List, RefreshCw, 
@@ -9,18 +8,12 @@ import {
 import { useOfflineStore } from '@/lib/offlineStore';
 import api from '@/lib/api';
 import { cn } from '@/lib/utils';
+import FarmerLayout from '@/components/shared/FarmerLayout';
 
 const SyncStatus = () => {
   const { pendingBatches, isOnline, removeBatch } = useOfflineStore();
   const [syncing, setSyncing] = useState(false);
 
-  const sidebarItems = [
-    { label: 'Dashboard', to: '/farmer', icon: LayoutDashboard },
-    { label: 'Record Collection', to: '/farmer/record', icon: PlusCircle },
-    { label: 'My Batches', to: '/farmer/batches', icon: List },
-    { label: 'Sync Status', to: '/farmer/sync', icon: RefreshCw },
-    { label: 'Settings', to: '/farmer/settings', icon: Settings },
-  ];
 
   const base64ToBlob = (base64) => {
     const parts = base64.split(';base64,');
@@ -89,17 +82,14 @@ const SyncStatus = () => {
   };
 
   return (
-    <div className="flex bg-[#F8FAFC] min-h-screen">
-      <Sidebar portalName="Farmer Portal" items={sidebarItems} />
-      
-      <main className="flex-1 ml-64 p-8">
+    <FarmerLayout portalName="Farmer Portal">
         <header className="mb-10">
-          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">Sync Status</h1>
+          <h1 className="text-3xl lg:text-4xl font-extrabold text-gray-900 tracking-tight">Sync Status</h1>
           <p className="text-gray-500 font-medium mt-1">Manage offline data and synchronize records with the blockchain.</p>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <div className="xl:col-span-2 space-y-8">
                 <Card className="p-8 border-none shadow-sm">
                     <div className="flex items-center justify-between mb-8">
                         <h3 className="font-bold text-xl text-gray-800">Pending Sync Queue</h3>
@@ -218,8 +208,7 @@ const SyncStatus = () => {
                 </Card>
             </div>
         </div>
-      </main>
-    </div>
+    </FarmerLayout>
   );
 };
 

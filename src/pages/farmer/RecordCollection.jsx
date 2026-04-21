@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '@/components/shared/Sidebar';
 import { Card, StatusBadge } from '@/components/shared/UI';
 import { 
   PlusCircle, LayoutDashboard, List, RefreshCw, Settings, 
@@ -11,6 +10,7 @@ import { useOfflineStore } from '@/lib/offlineStore';
 import { useAuthStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 import api from '@/lib/api';
+import FarmerLayout from '@/components/shared/FarmerLayout';
 
 const STEPS = [
   { id: 1, label: 'Herb Details', icon: Info },
@@ -68,12 +68,6 @@ const RecordCollection = () => {
   const navigate = useNavigate();
   const addPendingBatch = useOfflineStore(state => state.addPendingBatch);
 
-  const sidebarItems = [
-    { label: 'Dashboard', to: '/farmer', icon: LayoutDashboard },
-    { label: 'Record Collection', to: '/farmer/record', icon: PlusCircle },
-    { label: 'My Batches', to: '/farmer/batches', icon: List },
-    { label: 'Sync Status', to: '/farmer/sync', icon: RefreshCw },
-  ];
 
   const handleNext = () => setCurrentStep(prev => Math.min(prev + 1, 4));
   const handleBack = () => setCurrentStep(prev => Math.max(prev - 1, 1));
@@ -198,24 +192,21 @@ const RecordCollection = () => {
   );
 
   return (
-    <div className="flex bg-background min-h-screen">
-      <Sidebar portalName="Farmer Portal" items={sidebarItems} />
-      
-      <main className="flex-1 ml-64 p-8">
-        <header className="mb-12 flex justify-between items-end">
+    <FarmerLayout portalName="Farmer Portal">
+        <header className="mb-12 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
           <div>
-            <h1 className="text-4xl font-black text-gray-900 tracking-tight">New Herb Collection</h1>
-            <p className="text-gray-500 font-bold uppercase text-[10px] tracking-widest mt-2 bg-primary/5 w-fit px-3 py-1 rounded-full border border-primary/10">
+            <h1 className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tight">New Herb Collection</h1>
+            <p className="text-gray-500 font-bold uppercase text-[9px] tracking-[0.25em] mt-3 bg-primary/5 w-fit px-4 py-1.5 rounded-full border border-primary/10">
                 Phase {currentStep} of 4: {STEPS[currentStep-1].label}
             </p>
           </div>
-          <div className="text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-            Protocol v1.4.2 Active
+          <div className="text-right text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] opacity-40">
+            Protocol v1.4.2 [STABLE]
           </div>
         </header>
 
         {/* Progress Bar */}
-        <div className="mb-16 max-w-4xl mx-auto px-12">
+        <div className="mb-16 max-w-4xl mx-auto px-4 sm:px-12">
             <div className="flex justify-between relative">
                 <div className="absolute top-1/2 left-0 w-full h-1.5 bg-gray-100 -translate-y-1/2 rounded-full overflow-hidden">
                     <div 
@@ -227,7 +218,7 @@ const RecordCollection = () => {
                 {STEPS.map((step) => (
                     <div key={step.id} className="relative z-10 flex flex-col items-center">
                         <div className={cn(
-                            "w-14 h-14 rounded-[20px] flex items-center justify-center border-4 transition-all duration-500",
+                            "w-12 h-12 sm:w-14 sm:h-14 rounded-[20px] flex items-center justify-center border-4 transition-all duration-500",
                             currentStep > step.id ? "bg-primary border-primary text-white scale-90" : 
                             currentStep === step.id ? "bg-white border-primary text-primary shadow-2xl shadow-green-900/20 scale-110" : 
                             "bg-white border-gray-100 text-gray-300"
@@ -237,10 +228,10 @@ const RecordCollection = () => {
                     </div>
                 ))}
             </div>
-            <div className="flex justify-between mt-6 px-[-20px]">
+            <div className="flex justify-between mt-6 px-[-20px] overflow-hidden lg:overflow-visible">
                 {STEPS.map((step) => (
                     <span key={step.id} className={cn(
-                        "text-[10px] font-black uppercase tracking-[0.2em] w-20 text-center",
+                        "text-[9px] sm:text-[10px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] w-20 text-center",
                         currentStep === step.id ? "text-primary" : "text-gray-400"
                     )}>
                         {step.label}
@@ -623,8 +614,7 @@ const RecordCollection = () => {
                 </div>
             </div>
         )}
-      </main>
-    </div>
+    </FarmerLayout>
   );
 };
 

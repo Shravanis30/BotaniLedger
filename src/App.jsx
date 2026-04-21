@@ -56,6 +56,7 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/awaiting-approval" element={<AwaitingApproval />} />
           <Route path="/verify/:batchId" element={<VerifyPortal />} />
+          <Route path="/verify" element={<VerifyPortal />} />
 
           {/* Farmer Routes */}
           <Route path="/farmer" element={

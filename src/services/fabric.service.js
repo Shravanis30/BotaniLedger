@@ -21,7 +21,11 @@ class FabricService {
 
       // Create gRPC client with Kaleido Basic Auth
       const authHeader = Buffer.from(process.env.FABRIC_AUTH).toString('base64');
-      const credentials = grpc.credentials.createSsl(fs.readFileSync(peer.tlsCACerts.path));
+      const certPath = path.isAbsolute(peer.tlsCACerts.path) 
+        ? peer.tlsCACerts.path 
+        : path.resolve(process.cwd(), peer.tlsCACerts.path);
+        
+      const credentials = grpc.credentials.createSsl(fs.readFileSync(certPath));
       
       this.client = new grpc.Client(peer.url.replace('grpcs://', ''), credentials, {
         'grpc.ssl_target_name_override': peer.grpcOptions['ssl-target-name-override'],

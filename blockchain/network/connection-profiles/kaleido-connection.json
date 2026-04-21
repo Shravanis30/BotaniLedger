@@ -26,7 +26,7 @@
         "LabNode": {
             "url": "grpcs://u1upeehyfy-u1mxrqwcyw-peer.us1-azure-ws.kaleido.io:30641",
             "tlsCACerts": {
-                "path": "/Users/shravani/Desktop/BotaniLedger/blockchain/network/connection-profiles/kaleido-cert.pem"
+                "path": "./blockchain/network/connection-profiles/cert.pem"
             },
             "grpcOptions": {
                 "ssl-target-name-override": "u1upeehyfy-u1mxrqwcyw-peer.us1-azure-ws.kaleido.io"
@@ -38,7 +38,7 @@
             "url": "https://u1upeehyfy-u1hpn7jii5-ca.us1-azure-ws.kaleido.io:30641",
             "caName": "TS CA",
             "tlsCACerts": {
-                "path": "/Users/shravani/Desktop/BotaniLedger/blockchain/network/connection-profiles/kaleido-cert.pem"
+                "path": "./blockchain/network/connection-profiles/cert.pem"
             },
             "httpOptions": {
                 "verify": false

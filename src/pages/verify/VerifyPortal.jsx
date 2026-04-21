@@ -235,72 +235,74 @@ const VerifyPortal = () => {
         </motion.section>
 
         {/* Product Identity Card */}
-        <section className="grid lg:grid-cols-3 gap-8">
-            <Card className="lg:col-span-2 glass-card rounded-[3rem] p-10 flex flex-col md:flex-row gap-10 items-start border-white/10">
-                 <div className="w-full md:w-48 aspect-square rounded-[2rem] bg-white/5 border border-white/10 flex items-center justify-center shrink-0 overflow-hidden group shadow-2xl">
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <Card className="lg:col-span-2 glass-card rounded-[3rem] p-6 sm:p-10 flex flex-col sm:flex-row gap-6 sm:gap-10 items-start sm:items-center border-white/10">
+                 <div className="w-full sm:w-48 aspect-square rounded-[2rem] bg-white/5 border border-white/10 flex items-center justify-center shrink-0 overflow-hidden group shadow-2xl">
                      <img src={product?.productImage || "https://images.unsplash.com/photo-1615485290382-441e4d0c9cb5?auto=format&fit=crop&w=600&q=80"} alt={product?.productName} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-125" />
                  </div>
-                 <div className="flex-1 space-y-6 pt-2">
-                    <div>
-                        <div className="text-accent text-[10px] font-bold uppercase tracking-widest mb-3 flex items-center gap-2">
+                 <div className="flex-1 space-y-6 pt-2 w-full">
+                    <div className="text-center sm:text-left">
+                        <div className="text-accent text-[9px] sm:text-[10px] font-bold uppercase tracking-widest mb-3 flex items-center justify-center sm:justify-start gap-2">
                           <Sprout size={14} /> Registered Botanical Heritage
                         </div>
-                        <h1 className="text-4xl font-bold italic mb-2 tracking-tight">{product?.productName}</h1>
-                        <p className="text-lg font-light text-white/50 flex items-center gap-2">
-                            <Factory size={18} className="text-emerald-500" />
-                            {product?.productBatchId !== 'UNLINKED' ? (
-                                <>Produced by <span className="text-white font-medium italic">{product?.manufacturerId?.organization || product?.manufacturerId?.name}</span></>
-                            ) : (
-                                <>Assigned Farmer: <span className="text-white font-medium italic">{traceability?.[0]?.herbBatch?.farmerId?.organization || traceability?.[0]?.herbBatch?.farmerId?.name}</span></>
-                            )}
+                        <h1 className="text-3xl sm:text-4xl font-bold italic mb-2 tracking-tight line-clamp-2">{product?.productName}</h1>
+                        <p className="text-sm sm:text-lg font-light text-white/50 flex items-center justify-center sm:justify-start gap-2">
+                            <Factory size={16} className="text-emerald-500 shrink-0" />
+                            <span className="truncate">
+                                {product?.productBatchId !== 'UNLINKED' ? (
+                                    <>By <span className="text-white font-medium italic">{product?.manufacturerId?.organization || product?.manufacturerId?.name}</span></>
+                                ) : (
+                                    <>Farmer <span className="text-white font-medium italic">{traceability?.[0]?.herbBatch?.farmerId?.organization || traceability?.[0]?.herbBatch?.farmerId?.name}</span></>
+                                )}
+                            </span>
                         </p>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-10 pt-8 border-t border-white/5">
+                    <div className="grid grid-cols-2 gap-4 sm:gap-10 pt-6 sm:pt-8 border-t border-white/5">
                         <div className="space-y-1">
-                            <span className="block text-[10px] font-bold text-white/20 uppercase tracking-[0.2em]">Crystallization Date</span>
-                            <span className="text-lg font-bold italic text-white/80">{product?.manufacturingDate ? new Date(product.manufacturingDate).toLocaleDateString() : '--'}</span>
+                            <span className="block text-[9px] sm:text-[10px] font-bold text-white/20 uppercase tracking-[0.2em]">Crystallization</span>
+                            <span className="text-base sm:text-lg font-bold italic text-white/80">{product?.manufacturingDate ? new Date(product.manufacturingDate).toLocaleDateString() : '--'}</span>
                         </div>
                         <div className="space-y-1">
-                            <span className="block text-[10px] font-bold text-white/20 uppercase tracking-[0.2em]">Ledger Expiry</span>
-                            <span className="text-lg font-bold italic text-white/80">{product?.expiryDate ? new Date(product.expiryDate).toLocaleDateString() : '--'}</span>
+                            <span className="block text-[9px] sm:text-[10px] font-bold text-white/20 uppercase tracking-[0.2em]">Ledger Expiry</span>
+                            <span className="text-base sm:text-lg font-bold italic text-white/80">{product?.expiryDate ? new Date(product.expiryDate).toLocaleDateString() : '--'}</span>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/5">
-                       <Info size={16} className="text-accent" />
-                       <span className="text-xs font-light text-white/40">This digital twin is unique to batch <span className="text-accent font-mono">#{product?.productBatchId || 'PENDING'}</span></span>
+                    <div className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/5 mt-4">
+                       <Info size={16} className="text-accent shrink-0" />
+                       <span className="text-[10px] sm:text-xs font-light text-white/40 truncate">Batch <span className="text-accent font-mono">#{product?.productBatchId || 'PENDING'}</span> bound to digital twin</span>
                     </div>
                  </div>
             </Card>
             
-            <Card className="glass-card rounded-[3rem] p-10 flex flex-col justify-between border-accent/20 relative overflow-hidden bg-accent/5">
+            <Card className="glass-card rounded-[3rem] p-8 sm:p-10 flex flex-col justify-between border-accent/20 relative overflow-hidden bg-accent/5">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 blur-[60px]" />
-                <div>
-                   <h4 className="text-xs font-bold text-accent uppercase tracking-[0.3em] mb-10 text-center">Purity Quotient</h4>
-                   <div className="relative w-40 h-40 mx-auto">
+                <div className="relative z-10">
+                   <h4 className="text-[10px] font-bold text-accent uppercase tracking-[0.3em] mb-10 text-center">Purity Quotient</h4>
+                   <div className="relative w-32 h-32 sm:w-40 sm:h-40 mx-auto">
                         <svg className="w-full h-full transform -rotate-90">
-                            <circle cx="80" cy="80" r="75" stroke="currentColor" strokeWidth="6" fill="transparent" className="text-white/5" />
+                            <circle cx="50%" cy="50%" r="45%" stroke="currentColor" strokeWidth="6" fill="transparent" className="text-white/5" />
                             <motion.circle 
                                initial={{ strokeDashoffset: 471 }}
                                animate={{ strokeDashoffset: 471 * (1 - (traceability?.[0]?.herbBatch?.aiVerification?.purityScore || 0)/100) }}
                                transition={{ duration: 2, ease: "easeOut" }}
-                               cx="80" cy="80" r="75" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray="471" className="text-accent" 
+                               cx="50%" cy="50%" r="45%" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray="471" className="text-accent" 
                             />
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-6xl font-black italic">{Math.floor(traceability?.[0]?.herbBatch?.aiVerification?.purityScore || 0)}</span>
-                            <span className="text-[10px] font-black uppercase text-accent tracking-[0.4em] ml-1">Points</span>
+                            <span className="text-4xl sm:text-6xl font-black italic">{Math.floor(traceability?.[0]?.herbBatch?.aiVerification?.purityScore || 0)}</span>
+                            <span className="text-[8px] sm:text-[10px] font-black uppercase text-accent tracking-[0.4em] ml-1">Points</span>
                         </div>
                    </div>
                 </div>
-                <div className="text-center space-y-4">
-                  <div className="text-[10px] font-bold text-accent/60 uppercase tracking-widest">
+                <div className="text-center space-y-4 mt-8 relative z-10">
+                  <div className="text-[9px] sm:text-[10px] font-bold text-accent/60 uppercase tracking-widest">
                     Protocol Compliance: {traceability?.[0]?.labReport ? 'VERIFIED' : 'PENDING'}
                   </div>
-                  <div className="flex items-center justify-center gap-2 text-[10px] text-white/40 uppercase font-black">
+                  <div className="flex items-center justify-center gap-2 text-[8px] sm:text-[10px] text-white/40 uppercase font-black">
                      <Lock size={12} className="text-accent" />
-                     {product?.blockchainRecord?.txId ? "ON-CHAIN" : "LOCALLY VERIFIED"}
+                     {product?.blockchainRecord?.txId ? "ON-CHAIN AUTH" : "LOCAL VERIFICATION"}
                   </div>
                 </div>
             </Card>
@@ -550,35 +552,36 @@ const VerifyPortal = () => {
                                 >
                                     {product?.productBatchId !== 'UNLINKED' ? (
                                         <div className="space-y-6">
-                                            <div className="p-8 bg-white/5 rounded-[2.5rem] border border-white/10 shadow-inner relative overflow-hidden group">
+                                            <div className="p-6 md:p-8 bg-white/5 rounded-[2.5rem] border border-white/10 shadow-inner relative overflow-hidden group">
                                                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-20 transition-opacity">
-                                                    <Database size={100} className="text-white" />
+                                                    <Database size={60} className="text-white md:hidden" />
+                                                    <Database size={100} className="hidden md:block text-white" />
                                                 </div>
-                                                <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
-                                                    <div className="flex items-center gap-6">
-                                                        <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center text-accent shadow-2xl border border-accent/20">
+                                                <div className="flex flex-col md:flex-row items-center md:items-start lg:items-center justify-between gap-6 relative z-10">
+                                                    <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+                                                        <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center text-accent shadow-2xl border border-accent/20 shrink-0">
                                                             <ClipboardCheck size={32} />
                                                         </div>
-                                                        <div>
-                                                            <div className="text-xl font-bold italic text-white/95">{product.productName} Synthesis Audit Passed</div>
-                                                            <div className="text-[10px] text-white/30 italic font-mono mt-1">SIG: {product?.blockchainRecord?.txId?.substring(0, 32)}...</div>
+                                                        <div className="min-w-0">
+                                                            <div className="text-lg md:text-xl font-bold italic text-white/95 break-words">Extraction & Synthesis Audit Passed</div>
+                                                            <div className="text-[9px] md:text-[10px] text-white/30 italic font-mono mt-1 break-all">SIG: {product?.blockchainRecord?.txId?.substring(0, 32)}...</div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <div className="p-6 bg-white/5 rounded-3xl border border-white/5 flex items-center gap-4">
-                                                    <div className="p-3 bg-emerald-500/10 rounded-xl">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                <div className="p-4 md:p-6 bg-white/5 rounded-3xl border border-white/5 flex items-center gap-4">
+                                                    <div className="p-3 bg-emerald-500/10 rounded-xl shrink-0">
                                                         <ShieldCheck size={20} className="text-emerald-400" />
                                                     </div>
                                                     <div>
                                                         <span className="block text-[10px] font-bold text-white/20 uppercase tracking-widest">Similarity Guard</span>
-                                                        <span className="text-sm font-bold text-white/80">{item.herbBatch?.similarityScore ? (item.herbBatch.similarityScore + '%') : '99.2%'} Match to Origin</span>
+                                                        <span className="text-sm font-bold text-white/80">{item.herbBatch?.similarityScore ? (item.herbBatch.similarityScore + '%') : '99.2%'} Match</span>
                                                     </div>
                                                 </div>
-                                                <div className="p-6 bg-white/5 rounded-3xl border border-white/5 flex items-center gap-4">
-                                                    <div className="p-3 bg-sky-500/10 rounded-xl">
+                                                <div className="p-4 md:p-6 bg-white/5 rounded-3xl border border-white/5 flex items-center gap-4">
+                                                    <div className="p-3 bg-sky-500/10 rounded-xl shrink-0">
                                                         <FlaskConical size={20} className="text-sky-400" />
                                                     </div>
                                                     <div>
@@ -589,7 +592,7 @@ const VerifyPortal = () => {
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="p-8 bg-white/5 rounded-[2.5rem] border border-dashed border-white/10 text-center space-y-4">
+                                        <div className="p-6 md:p-8 bg-white/5 rounded-[2.5rem] border border-dashed border-white/10 text-center space-y-4">
                                             <div className="flex justify-center text-white/10">
                                                 <Factory size={48} />
                                             </div>

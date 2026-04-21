@@ -160,14 +160,18 @@ const FarmerDashboard = () => {
                                     <StatusBadge status={batch.blockchainRecord?.status || 'PENDING'} />
                                 </td>
                                 <td className="px-8 py-6 text-right">
-                                    <div className="flex gap-2 justify-end">
+                                    <div className="flex gap-2 justify-end whitespace-nowrap">
                                         <button 
                                           onClick={() => navigate(`/verify/${batch.batchId}`)}
-                                          className="px-4 py-2 bg-white border border-gray-100 text-[10px] font-black text-gray-600 rounded-xl hover:text-primary hover:border-primary transition-all uppercase tracking-widest active:scale-95"
+                                          className="px-4 py-2 bg-white border border-gray-100 text-[10px] font-black text-gray-600 rounded-xl hover:text-primary hover:border-primary transition-all uppercase tracking-widest active:scale-95 shadow-sm"
                                         >
                                             Audit
                                         </button>
-                                        <button className="p-2 bg-gray-50 text-gray-400 rounded-xl hover:bg-primary hover:text-white transition-all shadow-sm">
+                                        <button 
+                                          onClick={() => navigate(`/verify/${batch.batchId}`)}
+                                          className="p-2 bg-gray-50 text-gray-400 rounded-xl hover:bg-primary hover:text-white transition-all shadow-sm"
+                                          title="View Trace"
+                                        >
                                             <Activity size={16} />
                                         </button>
                                     </div>

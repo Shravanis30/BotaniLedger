@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/shared/AdminLayout';
 import { Card, StatusBadge } from '@/components/shared/UI';
-import { Users, Search, MapPin, Activity, Shield, Database, AlertCircle, Phone, Mail, Loader2, X, Clock, Terminal, ChevronRight } from 'lucide-react';
+import { Users, Search, MapPin, Activity, Shield, Database, AlertCircle, Phone, Mail, Filter, Loader2, X, Clock, Terminal, ChevronRight } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { cn } from '@/lib/utils';
@@ -74,30 +74,34 @@ const AdminFarmerRegistry = () => {
                 </div>
             </div>
 
-            {/* Role Categories */}
-            <div className="flex flex-wrap items-center gap-3 bg-white/50 p-2 rounded-[2rem] border border-gray-100/50 backdrop-blur-sm">
-                {[
-                    { id: 'all', label: 'All Clusters', icon: Database },
-                    { id: 'farmer', label: 'Cultivators', icon: Users },
-                    { id: 'lab', label: 'Lab Nodes', icon: Shield },
-                    { id: 'manufacturer', label: 'Processing', icon: Activity },
-                ].map((cat) => (
-                    <button
-                        key={cat.id}
-                        onClick={() => setActiveRole(cat.id)}
-                        className={cn(
-                            "flex items-center gap-3 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all",
-                            activeRole === cat.id 
-                                ? "bg-primary text-white shadow-xl shadow-green-900/20 ring-2 ring-white/10" 
-                                : "text-gray-400 hover:text-gray-900 hover:bg-white"
-                        )}
+            {/* Filter Dropdown */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-white/50 p-4 rounded-3xl border border-gray-100/50 backdrop-blur-sm">
+                <div className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-100 rounded-xl shadow-sm">
+                    <Filter className="text-primary" size={14} />
+                    <select 
+                        value={activeRole} 
+                        onChange={(e) => setActiveRole(e.target.value)}
+                        className="bg-transparent text-[10px] font-black uppercase tracking-widest outline-none border-none focus:ring-0 cursor-pointer text-gray-700 min-w-[140px]"
                     >
-                        <cat.icon size={14} />
-                        {cat.label}
-                    </button>
-                ))}
-                <div className="ml-auto pr-6 hidden lg:flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <option value="all">All Clusters</option>
+                        <option value="farmer">Cultivators</option>
+                        <option value="lab">Lab Nodes</option>
+                        <option value="manufacturer">Processing</option>
+                    </select>
+                </div>
+                
+                <div className="flex gap-2">
+                    {['all', 'farmer', 'lab', 'manufacturer'].map((role) => (
+                        activeRole === role && (
+                            <div key={role} className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-xl border border-primary/20 text-[9px] font-black uppercase tracking-widest animate-in fade-in zoom-in duration-300">
+                                <Activity size={10} /> Active: {role}
+                            </div>
+                        )
+                    ))}
+                </div>
+
+                <div className="sm:ml-auto pr-2 flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{filteredUsers?.length || 0} Nodes Connected</span>
                 </div>
             </div>

@@ -43,21 +43,21 @@ const AdminDashboard = () => {
 
     return (
         <AdminLayout portalName="Admin Portal">
-            <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-10">
                 <div>
-                    <div className="text-xs font-black text-primary uppercase tracking-[0.3em] mb-3 flex items-center gap-2">
-                        <div className="w-10 h-[1px] bg-primary/20" /> System Control Hub
+                    <div className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-2 flex items-center gap-2">
+                        <div className="w-8 h-[1px] bg-primary/20" /> System Control Hub
                     </div>
-                    <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tighter leading-none italic">
-                        Network <span className="text-primary font-light not-italic underline decoration-primary/20 underline-offset-4">Intelligence</span>
+                    <h1 className="text-xl md:text-2xl font-black text-gray-900 tracking-tighter leading-none italic">
+                        Network <span className="text-primary font-light not-italic underline decoration-primary/20 underline-offset-4 tracking-normal">Intelligence</span>
                     </h1>
                 </div>
                 <div className="flex gap-4 w-full md:w-auto">
-                    <button className="flex-1 md:flex-none px-6 py-4 bg-white border border-gray-100 rounded-3xl font-black text-gray-600 text-[10px] uppercase tracking-widest hover:bg-gray-50 flex items-center justify-center gap-3 shadow-xl shadow-black/5 active:scale-95 transition-all">
-                        <Download size={16} /> Export JSON
+                    <button className="flex-1 md:flex-none px-5 py-3.5 bg-white border border-gray-100 rounded-2xl font-black text-gray-600 text-[9px] uppercase tracking-widest hover:bg-gray-50 flex items-center justify-center gap-3 shadow-xl shadow-black/5 active:scale-95 transition-all">
+                        <Download size={14} /> Export JSON
                     </button>
-                    <button className="flex-1 md:flex-none px-8 py-4 sidebar-gradient text-white rounded-3xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-green-900/20 flex items-center justify-center gap-3 active:scale-95 transition-all">
-                        <Activity size={16} /> Network Audit
+                    <button className="flex-1 md:flex-none px-7 py-3.5 sidebar-gradient text-white rounded-2xl font-black text-[9px] uppercase tracking-widest shadow-xl shadow-green-900/20 flex items-center justify-center gap-3 active:scale-95 transition-all">
+                        <Activity size={14} /> Network Audit
                     </button>
                 </div>
             </header>

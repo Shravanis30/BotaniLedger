@@ -16,6 +16,7 @@ import ManufacturerDashboard from './pages/manufacturer/ManufacturerDashboard';
 import VerifyArrivals from './pages/manufacturer/VerifyArrivals';
 import BuildProduct from './pages/manufacturer/BuildProduct';
 import QRManagement from './pages/manufacturer/QRManagement';
+import ProductionLog from './pages/manufacturer/ProductionLog';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminApprovals from './pages/admin/AdminApprovals';
 import AdminBatchExplorer from './pages/admin/AdminBatchExplorer';
@@ -133,6 +134,11 @@ function App() {
           <Route path="/manufacturer/qr" element={
             <ProtectedRoute role="manufacturer">
               <QRManagement />
+            </ProtectedRoute>
+          } />
+          <Route path="/manufacturer/production" element={
+            <ProtectedRoute role="manufacturer">
+              <ProductionLog />
             </ProtectedRoute>
           } />
 

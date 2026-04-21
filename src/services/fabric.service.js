@@ -2,6 +2,7 @@ const { connect, signers } = require('@hyperledger/fabric-gateway');
 const grpc = require('@grpc/grpc-js');
 const crypto = require('crypto');
 const fs = require('fs');
+const path = require('path');
 const fabricConfig = require('../config/fabric');
 const logger = require('../utils/logger.util');
 

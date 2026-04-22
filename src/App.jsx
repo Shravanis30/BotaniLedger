@@ -106,7 +106,7 @@ function App() {
             </ProtectedRoute>
           } />
           <Route path="/lab/certificates" element={
-            <ProtectedRoute role="lab">
+            <ProtectedRoute>
               <IssuedCertificates />
             </ProtectedRoute>
           } />

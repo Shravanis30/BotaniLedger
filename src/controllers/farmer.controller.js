@@ -139,6 +139,19 @@ exports.getBatches = async (req, res) => {
   }
 };
 
+exports.getBatch = async (req, res) => {
+  try {
+    const { batchId } = req.params;
+    // Note: This allows any authenticated node to view batch details by ID
+    // which is necessary for Lab testing and verification.
+    const batch = await HerbCollection.findOne({ batchId });
+    if (!batch) return errorResponse(res, 404, 'Batch not found');
+    successResponse(res, batch);
+  } catch (err) {
+    errorResponse(res, 500, err.message);
+  }
+};
+
 exports.dispatchBatch = async (req, res) => {
   try {
     const { batchId } = req.params;

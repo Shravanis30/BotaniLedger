@@ -5,6 +5,7 @@ import AdminLayout from '@/components/shared/AdminLayout';
 import { Card, Skeleton } from '@/components/shared/UI';
 import { FileCheck, Download, Search, Microscope, FlaskConical } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
+import { useAuthStore } from '@/lib/store';
 import api from '@/lib/api';
 import { cn } from '@/lib/utils';
 
@@ -133,7 +134,7 @@ const IssuedCertificates = () => {
           </table>
         </div>
       </Card>
-    </LabLayout>
+    </Layout>
   );
 };
 

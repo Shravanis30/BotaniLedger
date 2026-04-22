@@ -7,6 +7,8 @@ const upload = require('../middleware/upload.middleware');
 const { auditLog } = require('../middleware/audit.middleware');
 
 router.use(protect);
+router.get('/batch/:batchId', authorize('farmer', 'lab', 'admin'), farmerController.getBatch);
+
 router.use(authorize('farmer'));
 
 router.post('/collection',

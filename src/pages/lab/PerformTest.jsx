@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 const PerformTest = () => {
     const { batchId } = useParams();
     const navigate = useNavigate();
+    const [file, setFile] = useState(null);
     const [showSuccess, setShowSuccess] = useState(false);
     const [results, setResults] = useState({
         overallResult: 'PASS',

@@ -12,6 +12,7 @@ import Settings from './pages/shared/Settings';
 import LabDashboard from './pages/lab/LabDashboard';
 import IssuedCertificates from './pages/lab/IssuedCertificates';
 import LabAnalytics from './pages/lab/LabAnalytics';
+import PerformTest from './pages/lab/PerformTest';
 import ManufacturerDashboard from './pages/manufacturer/ManufacturerDashboard';
 import VerifyArrivals from './pages/manufacturer/VerifyArrivals';
 import BuildProduct from './pages/manufacturer/BuildProduct';
@@ -114,6 +115,16 @@ function App() {
               <LabAnalytics />
             </ProtectedRoute>
           } />
+          <Route path="/lab/test/:batchId" element={
+            <ProtectedRoute role="lab">
+              <PerformTest />
+            </ProtectedRoute>
+          } />
+          <Route path="/lab/settings" element={
+            <ProtectedRoute role="lab">
+              <Settings />
+            </ProtectedRoute>
+          } />
 
           {/* Manufacturer Routes */}
           <Route path="/manufacturer" element={
@@ -139,6 +150,11 @@ function App() {
           <Route path="/manufacturer/production" element={
             <ProtectedRoute role="manufacturer">
               <ProductionLog />
+            </ProtectedRoute>
+          } />
+          <Route path="/manufacturer/settings" element={
+            <ProtectedRoute role="manufacturer">
+              <Settings />
             </ProtectedRoute>
           } />
 

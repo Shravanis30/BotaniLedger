@@ -7,10 +7,11 @@ const upload = require('../middleware/upload.middleware');
 const { auditLog } = require('../middleware/audit.middleware');
 
 router.use(protect);
-router.use(authorize('lab'));
+router.get('/certificates', authorize('lab', 'admin', 'farmer'), labController.getCertificates);
 
+router.use(authorize('lab'));
 router.get('/pending', labController.getPending);
-router.get('/certificates', labController.getCertificates);
+router.get('/analytics', labController.getAnalytics);
 router.put('/start-testing/:batchId', auditLog('START_TESTING', 'LabReport'), labController.startTesting);
 router.post('/report',
   upload.single('report'),

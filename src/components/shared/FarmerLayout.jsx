@@ -10,6 +10,7 @@ const FarmerLayout = ({ children, portalName = "Farmer Portal" }) => {
     { label: 'Dashboard', to: '/farmer', icon: LayoutDashboard, end: true },
     { label: 'Record Collection', to: '/farmer/record', icon: PlusCircle },
     { label: 'My Batches', to: '/farmer/batches', icon: List },
+    { label: 'Certificates', to: '/lab/certificates', icon: RefreshCw },
     { label: 'Sync Status', to: '/farmer/sync', icon: RefreshCw },
     { label: 'Settings', to: '/farmer/settings', icon: Settings },
   ];

@@ -471,34 +471,89 @@ const VerifyPortal = () => {
                                     color={item.labReport ? "bg-sky-600" : (item.herbBatch?.blockchainRecord?.status === 'LAB_TESTING' ? "bg-sky-900 animate-pulse" : "bg-gray-800 opacity-50")}
                                 >
                                     {item.labReport ? (
-                                        <div className="space-y-8">
-                                            <div className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/5">
-                                                <FlaskConical size={18} className="text-sky-400" />
-                                                <span className="text-xs font-medium">Accredited Laboratory: <span className="text-white italic">{item.labReport?.labId?.organization || item.labReport?.labId?.name}</span></span>
+                                        <div className="space-y-10">
+                                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                                                <div className="flex items-center gap-4 p-5 bg-white/5 rounded-3xl border border-white/5 flex-1">
+                                                    <div className="p-3 bg-sky-500/20 rounded-2xl text-sky-400">
+                                                        <FlaskConical size={24} />
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <div className="text-[10px] font-black text-white/20 uppercase tracking-widest mb-1 italic">Analytical Authority</div>
+                                                        <div className="text-lg font-bold italic text-white truncate">{item.labReport?.labId?.organization || item.labReport?.labId?.name}</div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="p-5 bg-sky-500/10 border-2 border-sky-500/20 rounded-[2.5rem] flex flex-col items-center justify-center min-w-[200px] hover:scale-105 transition-transform duration-500">
+                                                    <div className="text-[10px] font-black text-sky-400 uppercase tracking-[0.3em] mb-1">Percentage Pass</div>
+                                                    <div className="text-5xl font-black italic text-gradient">{item.labReport?.results?.purityScore || item.labReport?.results?.activeIngredient?.measured || 0}<span className="text-2xl ml-1">%</span></div>
+                                                    <div className="text-[8px] font-black text-success uppercase tracking-widest mt-1">Molecular Integrity Confirmed</div>
+                                                </div>
                                             </div>
-                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                                                 {[
-                                                    { l: "Phytochemicals", v: item.labReport?.results?.chemicalQuality || "Verified", s: "PASS" },
-                                                    { l: "Toxic Residue", v: item.labReport?.results?.toxicResidue || "ND", s: "PASS" },
-                                                    { l: "Microbial Load", v: item.labReport?.results?.microbialLoad || "SAFE", s: "PASS" },
-                                                    { l: "Purity Index", v: `${item.labReport?.results?.purityScore || 0}%`, s: "PASS" }
+                                                    { 
+                                                        l: "Active Content", 
+                                                        v: `${item.labReport?.results?.activeIngredient?.measured || 0}%`, 
+                                                        s: "COMPLIANT",
+                                                        icon: Zap,
+                                                        color: "text-emerald-400"
+                                                    },
+                                                    { 
+                                                        l: "Heavy Metals", 
+                                                        v: item.labReport?.results?.heavyMetals?.status || "ND", 
+                                                        s: "SAFE_PASS",
+                                                        icon: ShieldCheck,
+                                                        color: "text-sky-400"
+                                                    },
+                                                    { 
+                                                        l: "Microbiology", 
+                                                        v: item.labReport?.results?.microbiology?.status || "SAFE", 
+                                                        s: "STERILE",
+                                                        icon: Activity,
+                                                        color: "text-orange-400"
+                                                    },
+                                                    { 
+                                                        l: "Consensus", 
+                                                        v: item.labReport?.results?.overallResult || "PASS", 
+                                                        s: "VERIFIED",
+                                                        icon: Lock,
+                                                        color: "text-primary"
+                                                    }
                                                 ].map((m, i) => (
-                                                    <div key={i} className="glass-card p-5 rounded-2xl text-center border-white/5">
-                                                        <div className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-2">{m.l}</div>
-                                                        <div className="text-lg font-bold italic text-sky-400">{m.v}</div>
-                                                        <div className="text-[8px] font-black text-success tracking-[0.3em] mt-1">{m.s}</div>
+                                                    <div key={i} className="glass-card p-6 rounded-[2.5rem] text-center border-white/5 relative group/metric overflow-hidden">
+                                                        <div className="absolute inset-0 bg-white/[0.02] group-hover/metric:bg-white/[0.05] transition-colors" />
+                                                        <div className="relative z-10">
+                                                            <div className="w-10 h-10 bg-white/5 rounded-2xl flex items-center justify-center text-white/20 mx-auto mb-4 group-hover/metric:scale-110 group-hover/metric:rotate-3 transition-all">
+                                                                <m.icon size={18} className={m.color} />
+                                                            </div>
+                                                            <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">{m.l}</div>
+                                                            <div className={cn("text-xl font-bold italic mb-1", m.color)}>{m.v}</div>
+                                                            <div className="text-[7px] font-black text-success/60 tracking-[0.4em] uppercase">{m.s}</div>
+                                                        </div>
                                                     </div>
                                                 ))}
                                             </div>
-                                            <div className="flex items-center gap-4">
+
+                                            <div className="flex flex-col sm:flex-row items-center gap-6 pt-4">
                                                 {item.labReport?.document?.ipfsUrl && (
-                                                    <a href={item.labReport.document.ipfsUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-[10px] font-bold text-sky-400 uppercase tracking-widest hover:text-white transition-all">
-                                                        <FileText size={16} />
-                                                        View IPFS Certificate
+                                                    <a 
+                                                        href={item.labReport.document.ipfsUrl} 
+                                                        target="_blank" 
+                                                        rel="noopener noreferrer" 
+                                                        className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 bg-sky-600/10 border-2 border-sky-600/20 text-sky-400 rounded-3xl text-xs font-black uppercase tracking-widest hover:bg-sky-600 hover:text-white transition-all shadow-[0_15px_40px_-10px_rgba(2,132,199,0.3)] group/btn"
+                                                    >
+                                                        <FileText size={18} className="group-hover/btn:scale-110 transition-transform" />
+                                                        Download Sovereign Certificate
                                                     </a>
                                                 )}
-                                                <div className="h-4 w-px bg-white/10" />
-                                                <span className="text-[10px] font-mono text-white/20">TRUTH_REF: {item.labReport?.blockchainRecord?.txId?.substring(0, 12)}...</span>
+                                                <div className="hidden sm:block h-6 w-px bg-white/10" />
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] mb-1">Blockchain Hash Signature</div>
+                                                    <div className="text-[10px] font-mono text-white/40 truncate bg-white/5 px-4 py-2 rounded-xl border border-white/5">
+                                                        0x{item.labReport?.blockchainRecord?.txId || 'AYUSH_HASH_PENDING_SYNC'}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     ) : (

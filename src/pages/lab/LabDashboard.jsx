@@ -1,7 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import LabLayout from '@/components/shared/LabLayout';
 import { Card, Skeleton } from '@/components/shared/UI';
-import { Microscope, FileCheck, AlertTriangle, List, Upload } from 'lucide-react';
+import { Microscope, FileCheck, AlertTriangle, List, FlaskConical } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { cn } from '@/lib/utils';
@@ -86,9 +87,12 @@ const LabDashboard = () => {
                                             </span>
                                         </td>
                                         <td className="px-8 py-7 text-right">
-                                            <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-primary-mid transition-all shadow-xl shadow-green-900/10 active:scale-95 whitespace-nowrap">
-                                                <Upload size={14} /> Report
-                                            </button>
+                                            <Link 
+                                                to={`/lab/test/${batch.batchId}`}
+                                                className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-primary-mid transition-all shadow-xl shadow-green-900/10 active:scale-95 whitespace-nowrap"
+                                            >
+                                                <FlaskConical size={14} /> Perform Test
+                                            </Link>
                                         </td>
                                     </tr>
                                 ))

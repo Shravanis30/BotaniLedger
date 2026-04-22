@@ -9,6 +9,7 @@ const AdminLayout = ({ children, portalName = "Admin Portal" }) => {
   const sidebarItems = [
     { label: 'Network Overview', to: '/admin', icon: Activity, end: true },
     { label: 'Access Control', to: '/admin/approvals', icon: Shield },
+    { label: 'Certificates', to: '/lab/certificates', icon: Database },
     { label: 'Batch Explorer', to: '/admin/batches', icon: Database },
     { label: 'Farmer Registry', to: '/admin/farmers', icon: Users },
     { label: 'Anomaly Alerts', to: '/admin/alerts', icon: AlertCircle },

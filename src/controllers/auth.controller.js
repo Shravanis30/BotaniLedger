@@ -50,26 +50,25 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    logger.info(`Login attempt for: ${email}`);
+    logger.info(`AUTHENTICATION_REQUEST: ${email}`);
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
     if (!user) {
-      logger.warn(`Login failed: User ${email} not found`);
-      return errorResponse(res, 401, 'Invalid email or password');
+      logger.warn(`AUTHENTICATION_FAILURE: Entity not found for [${email}]`);
+      return errorResponse(res, 401, 'Credentials rejected by node');
     }
 
     const isMatch = await user.comparePassword(password);
-    logger.info(`Password match for ${email}: ${isMatch}`);
+    logger.info(`CRYPTO_VERIFICATION: ${email} - Signature match: ${isMatch}`);
 
     if (!isMatch) {
-      // Log for debug only - do not reveal in production
-      logger.debug(`Provided password: ${password}`);
-      return errorResponse(res, 401, 'Invalid email or password');
+      logger.warn(`AUTHENTICATION_FAILURE: Password mismatch for ${email}`);
+      return errorResponse(res, 401, 'Credentials rejected by node');
     }
 
     if (!user.isActive) {
-      logger.warn(`Login blocked: User ${email} is inactive`);
-      return errorResponse(res, 401, 'Account is inactive');
+      logger.warn(`AUTHENTICATION_BLOCKED: ${email} is currently inactive/pending`);
+      return errorResponse(res, 401, 'Administrative approval required');
     }
 
     user.lastLogin = new Date();

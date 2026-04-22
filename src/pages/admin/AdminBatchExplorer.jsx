@@ -3,12 +3,13 @@ import AdminLayout from '@/components/shared/AdminLayout';
 import { Card, StatusBadge } from '@/components/shared/UI';
 import { Database, Search, Filter, Download, ExternalLink, Loader2, ChevronLeft, ChevronRight, Hash, Globe } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import api from '@/lib/api';
 import { cn } from '@/lib/utils';
 
 const AdminBatchExplorer = () => {
-  const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
   const farmerId = searchParams.get('farmerId');
 
   const { data: batches, isLoading } = useQuery({
@@ -116,7 +117,10 @@ const AdminBatchExplorer = () => {
                                     </div>
                                 </td>
                                 <td className="px-10 py-8 text-right">
-                                    <button className="inline-flex items-center gap-2 px-6 py-3 bg-gray-50 text-gray-400 hover:bg-primary hover:text-white hover:shadow-xl hover:shadow-primary/20 rounded-2xl transition-all group/btn">
+                                    <button 
+                                        onClick={() => navigate(`/verify/${batch.batchId}`)}
+                                        className="inline-flex items-center gap-2 px-6 py-3 bg-gray-50 text-gray-400 hover:bg-primary hover:text-white hover:shadow-xl hover:shadow-primary/20 rounded-2xl transition-all group/btn"
+                                    >
                                         <span className="text-[9px] font-black uppercase tracking-[0.3em] opacity-0 group-hover/btn:opacity-100 transition-opacity translate-x-4 group-hover/btn:translate-x-0 transition-transform">Audit Proof</span>
                                         <ExternalLink size={18} />
                                     </button>

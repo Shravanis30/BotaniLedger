@@ -43,6 +43,51 @@ export const Skeleton = ({ className }) => (
   <div className={cn("animate-pulse bg-gray-200 rounded-lg", className)} />
 );
 
+export const Button = ({ children, className, variant = "primary", ...props }) => {
+  const variants = {
+    primary: "bg-primary text-white hover:bg-primary-mid shadow-lg shadow-green-900/10",
+    secondary: "bg-white border-2 border-gray-100 text-gray-500 hover:border-primary/30 hover:text-primary",
+    accent: "gold-gradient text-primary-dark shadow-xl shadow-green-900/20",
+    danger: "bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-900/10",
+    ghost: "bg-transparent hover:bg-gray-50 text-gray-400"
+  };
+
+  return (
+    <button 
+      className={cn(
+        "px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-2",
+        variants[variant],
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
+
+export const Input = React.forwardRef(({ label, error, className, ...props }, ref) => (
+  <div className="space-y-2 w-full">
+    {label && (
+      <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">
+        {label}
+      </label>
+    )}
+    <input
+      ref={ref}
+      className={cn(
+        "w-full px-6 py-4 bg-gray-50 border-2 border-transparent border-gray-50 rounded-2xl focus:bg-white focus:border-primary transition-all outline-none font-bold text-gray-800 placeholder:text-gray-300",
+        error && "border-red-500 bg-red-50/10",
+        className
+      )}
+      {...props}
+    />
+    {error && <p className="text-[10px] font-bold text-red-500 mt-1 ml-1">{error}</p>}
+  </div>
+));
+
+Input.displayName = "Input";
+
 export const EmptyState = ({ title, description, icon: Icon }) => (
   <div className="flex flex-col items-center justify-center p-12 text-center bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
     <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-gray-300 mb-6 shadow-sm">

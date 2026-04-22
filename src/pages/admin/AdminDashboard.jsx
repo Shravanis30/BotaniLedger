@@ -102,8 +102,8 @@ const AdminDashboard = () => {
                             <option>Last Quarter</option>
                         </select>
                     </div>
-                    <div className="h-[350px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
+                    <div className="h-[350px] w-full relative">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                             <AreaChart data={stats?.batchVolume || []}>
                                 <defs>
                                     <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
@@ -128,7 +128,7 @@ const AdminDashboard = () => {
                     <h3 className="font-black text-xl text-gray-900 italic tracking-tight uppercase mb-2">Ledger Status</h3>
                     <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-10">Network-wide batch verification state</div>
                     <div className="flex-1 h-[300px] w-full relative">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                             <PieChart>
                                 <Pie
                                     data={stats?.statusDistribution || []}

@@ -40,3 +40,9 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+
+# AI Service Data
+ai-service/data/
+ai-service/models/*.keras
+ai-service/__pycache__/
+test_images/

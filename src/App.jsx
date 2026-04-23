@@ -29,6 +29,7 @@ import RegulatorTrends from './pages/regulator/RegulatorTrends';
 import RegulatorAnomalyReports from './pages/regulator/RegulatorAnomalyReports';
 import VerifyPortal from './pages/verify/VerifyPortal';
 import { useAuthStore } from './lib/store';
+import { Toaster } from 'sonner';
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,7 @@ function ProtectedRoute({ children, role }) {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <Toaster richColors position="top-right" />
       <Router>
         <Routes>
           {/* Public Routes */}

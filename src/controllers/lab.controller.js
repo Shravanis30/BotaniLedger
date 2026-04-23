@@ -3,6 +3,7 @@ const LabReport = require('../models/LabReport');
 const fabricService = require('../services/fabric.service');
 const ipfsService = require('../services/ipfs.service');
 const { successResponse, errorResponse } = require('../utils/response.util');
+const logger = require('../utils/logger.util');
 
 exports.getPending = async (req, res) => {
   try {
@@ -27,7 +28,7 @@ exports.getCertificates = async (req, res) => {
     // Admin sees all by default with query = {}
 
     const certificates = await LabReport.find(query)
-      .populate('batchId')
+      .populate('batch')
       .sort({ createdAt: -1 });
     successResponse(res, certificates);
   } catch (err) {
@@ -60,30 +61,73 @@ exports.uploadReport = async (req, res) => {
     const { batchId, results, referenceNumber, testDate } = req.body;
     const reportFile = req.file;
 
+    logger.info(`Processing Lab Report Submission - Batch: ${batchId}, Ref: ${referenceNumber}`);
+    logger.info(`Request Content-Type: ${req.headers['content-type']}`);
+    logger.info(`File Object Present: ${!!reportFile}`);
+    
+    if (!batchId) {
+      logger.warn('Lab Report Submission Failed: Missing Batch ID');
+      return errorResponse(res, 400, 'Batch ID is missing from the request');
+    }
+    if (!reportFile) {
+      logger.warn('Lab Report Submission Failed: Missing Report File');
+      return errorResponse(res, 400, 'The laboratory report PDF file is required');
+    }
+    if (!results) {
+      logger.warn('Lab Report Submission Failed: Missing Results Data');
+      return errorResponse(res, 400, 'Laboratory test results data is required');
+    }
+
+    logger.info(`Starting lab report upload for batch: ${batchId}`);
+
     // 1. Upload PDF to IPFS
-    const ipfsResult = await ipfsService.uploadFile(
-      reportFile.buffer,
-      `report-${batchId}.pdf`,
-      'application/pdf'
-    );
+    let ipfsResult;
+    try {
+      ipfsResult = await ipfsService.uploadFile(
+        reportFile.buffer,
+        `report-${batchId}-${Date.now()}.pdf`,
+        'application/pdf'
+      );
+    } catch (ipfsErr) {
+      logger.error('IPFS Upload Failed for Lab Report:', ipfsErr);
+      return errorResponse(res, 502, 'Failed to upload report to IPFS storage. Please try again.');
+    }
 
     // 2. Anchor to Blockchain
-    const resultJson = JSON.parse(results);
-    const fabricResult = await fabricService.submitTransaction(
-      req.user.fabricIdentity,
-      'recordLabResult',
-      batchId,
-      resultJson.overallResult,
-      ipfsResult.cid,
-      results
-    );
+    let resultJson;
+    try {
+      resultJson = typeof results === 'string' ? JSON.parse(results) : results;
+    } catch (parseErr) {
+      logger.error('Failed to parse results JSON:', parseErr);
+      return errorResponse(res, 400, 'Invalid format for laboratory results data');
+    }
+
+    if (!resultJson.overallResult) {
+      return errorResponse(res, 400, 'Overall test result (PASS/FAIL) is missing from data');
+    }
+
+    logger.info(`Anchoring lab results to blockchain for batch: ${batchId}`);
+    let fabricResult;
+    try {
+      fabricResult = await fabricService.submitTransaction(
+        req.user.fabricIdentity,
+        'recordLabResult',
+        batchId,
+        resultJson.overallResult,
+        ipfsResult.cid,
+        typeof results === 'string' ? results : JSON.stringify(results)
+      );
+    } catch (fabricErr) {
+      logger.error('Fabric Transaction Failed (recordLabResult):', fabricErr);
+      return errorResponse(res, 500, `Blockchain anchoring failed: ${fabricErr.message}`);
+    }
 
     // 3. Save LabReport to MongoDB
     const report = await LabReport.create({
       batchId,
       labId: req.user._id,
       referenceNumber,
-      testDate,
+      testDate: testDate || new Date(),
       results: resultJson,
       document: {
         ipfsCid: ipfsResult.cid,
@@ -100,14 +144,29 @@ exports.uploadReport = async (req, res) => {
     });
 
     // 4. Update HerbCollection status
-    await HerbCollection.findOneAndUpdate(
+    const updatedCollection = await HerbCollection.findOneAndUpdate(
       { batchId },
-      { 'blockchainRecord.status': resultJson.overallResult === 'PASS' ? 'LAB_PASSED' : 'LAB_FAILED' }
+      { 
+        'blockchainRecord.status': resultJson.overallResult === 'PASS' ? 'LAB_PASSED' : 'LAB_FAILED',
+        'blockchainRecord.txId': fabricResult.txId,
+        'blockchainRecord.timestamp': new Date()
+      },
+      { new: true }
     );
 
-    successResponse(res, report, 'Lab report uploaded and anchored to blockchain');
+    if (!updatedCollection) {
+      logger.warn(`HerbCollection not found for batchId: ${batchId} during status update`);
+    }
+
+    logger.info(`Lab report successfully processed for batch: ${batchId}`);
+    successResponse(res, report, 'Laboratory report uploaded and anchored to blockchain successfully');
   } catch (err) {
-    errorResponse(res, 500, err.message);
+    logger.error('Lab Report Upload Error:', err);
+    if (err.name === 'ValidationError') {
+      const messages = Object.values(err.errors).map(e => e.message);
+      return errorResponse(res, 400, `Validation failed: ${messages.join(', ')}`);
+    }
+    errorResponse(res, 500, `Internal server error during lab report upload: ${err.message}`);
   }
 };
 
@@ -126,7 +185,7 @@ exports.getAnalytics = async (req, res) => {
       }},
       { $unwind: '$herb' },
       { $group: {
-          _id: '$herb.herbSpecies.common',
+          _id: { $toUpper: '$herb.herbSpecies.common' },
           purity: { $avg: '$results.activeIngredient.measured' }
       }},
       { $project: {
@@ -167,10 +226,17 @@ exports.getAnalytics = async (req, res) => {
       { $sort: { _id: 1 } }
     ]);
 
-    const trendData = trendStats.map(s => ({
-      date: s._id,
-      count: s.count
-    }));
+    const trendData = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0].substring(5, 10); // MM-DD
+      const dayData = trendStats.find(s => s._id === dateStr);
+      trendData.push({
+        date: dateStr,
+        count: dayData ? dayData.count : 0
+      });
+    }
 
     successResponse(res, {
       qualityData,

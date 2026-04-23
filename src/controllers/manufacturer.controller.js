@@ -8,8 +8,10 @@ const { successResponse, errorResponse } = require('../utils/response.util');
 exports.getInventory = async (req, res) => {
   try {
     const batches = await HerbCollection.find({
-      'blockchainRecord.status': { $in: ['LAB_PASSED', 'RECEIVED', 'MANUFACTURER_APPROVED'] }
-    }).sort({ updatedAt: -1 });
+      'blockchainRecord.status': { $in: ['LAB_PASSED', 'RECEIVED', 'MANUFACTURER_APPROVED', 'MANUFACTURER_REJECTED'] }
+    })
+    .populate('labReport')
+    .sort({ updatedAt: -1 });
     successResponse(res, batches);
   } catch (err) {
     errorResponse(res, 500, err.message);
@@ -55,6 +57,9 @@ exports.similarityCheck = async (req, res) => {
     
     // Simulate AI similarity check
     const similarityResult = await aiService.calculateSimilarity();
+    
+    // Ensure we have a zone for status mapping
+    if (!similarityResult.zone) similarityResult.zone = 'GREEN';
 
     const result = await fabricService.submitTransaction(
       req.user.fabricIdentity,
@@ -72,7 +77,7 @@ exports.similarityCheck = async (req, res) => {
     await HerbCollection.findOneAndUpdate(
       { batchId },
       { 
-        'blockchainRecord.status': statusMap[similarityResult.zone],
+        'blockchainRecord.status': statusMap[similarityResult.zone] || 'MANUFACTURER_APPROVED',
         similarityScore: similarityResult.overallScore
       }
     );
@@ -83,45 +88,116 @@ exports.similarityCheck = async (req, res) => {
   }
 };
 
+exports.rejectBatch = async (req, res) => {
+  try {
+    const { batchId } = req.params;
+    const { reason } = req.body;
+
+    const result = await fabricService.submitTransaction(
+      req.user.fabricIdentity,
+      'rejectBatch',
+      batchId,
+      JSON.stringify({ reason })
+    );
+
+    await HerbCollection.findOneAndUpdate(
+      { batchId },
+      { 'blockchainRecord.status': 'MANUFACTURER_REJECTED', rejectionReason: reason }
+    );
+
+    successResponse(res, result, 'Batch rejected successfully');
+  } catch (err) {
+    errorResponse(res, 500, err.message);
+  }
+};
+
 exports.createProductBatch = async (req, res) => {
   try {
     const { productName, productType, linkedHerbBatches, manufacturingDate, expiryDate, quantity } = req.body;
+    logger.info(`[CreateProductBatch] Request for: ${productName}`);
 
     const productBatchId = `BP-${Date.now()}`;
     
-    // 1. Generate QR Code
-    const qrData = await qrService.generateProductQR(productBatchId);
+    // 1. Anchor to Blockchain
+    let result;
+    try {
+      result = await fabricService.submitTransaction(
+        req.user.fabricIdentity,
+        'createProductBatch',
+        productBatchId,
+        JSON.stringify({
+          productName, productType, linkedHerbBatches, manufacturingDate, expiryDate, quantity
+        })
+      );
+      logger.info(`[CreateProductBatch] Blockchain Anchor Success: ${productBatchId}`);
+    } catch (fbErr) {
+      logger.error('[CreateProductBatch] Blockchain Error:', fbErr);
+      throw new Error(`Blockchain anchoring failed: ${fbErr.message}`);
+    }
 
-    // 2. Anchor to Blockchain
-    const result = await fabricService.submitTransaction(
-      req.user.fabricIdentity,
-      'createProductBatch',
-      productBatchId,
-      JSON.stringify({
-        productName, productType, linkedHerbBatches, manufacturingDate, expiryDate, quantity
-      })
-    );
+    // 2. Save to MongoDB (QR will be generated later)
+    try {
+      const productBatch = await ProductBatch.create({
+        productBatchId,
+        manufacturerId: req.user._id,
+        productName,
+        productType,
+        linkedHerbBatches: linkedHerbBatches.map(id => ({ batchId: id })),
+        manufacturingDate,
+        expiryDate,
+        quantity: Number(quantity),
+        blockchainRecord: {
+          txId: result.txId || 'SIMULATED_TX',
+          timestamp: result.timestamp || new Date(),
+          status: 'ACTIVE'
+        }
+      });
 
-    // 3. Save to MongoDB
-    const productBatch = await ProductBatch.create({
-      productBatchId,
-      manufacturerId: req.user._id,
-      productName,
-      productType,
-      linkedHerbBatches: linkedHerbBatches.map(id => ({ batchId: id })),
-      manufacturingDate,
-      expiryDate,
-      quantity,
-      qrCode: qrData,
-      blockchainRecord: {
-        txId: result.txId,
-        status: 'ACTIVE',
-        timestamp: new Date()
-      }
-    });
-
-    successResponse(res, productBatch, 'Product batch created and anchored');
+      logger.info(`[CreateProductBatch] Product Created: ${productBatchId}`);
+      return successResponse(res, productBatch, 'Product batch created and anchored successfully');
+    } catch (dbErr) {
+      logger.error('[CreateProductBatch] Database Error:', dbErr);
+      return errorResponse(res, 500, `Database error: ${dbErr.message}`);
+    }
   } catch (err) {
-    errorResponse(res, 500, err.message);
+    logger.error('[CreateProductBatch] Global Error:', err);
+    return errorResponse(res, 500, err.message);
+  }
+};
+
+exports.generateProductQR = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const product = await ProductBatch.findById(id);
+
+    if (!product) {
+      return errorResponse(res, 404, 'Product batch not found');
+    }
+
+    if (product.qrCode?.data) {
+      return successResponse(res, product, 'QR code already exists');
+    }
+
+    // Generate QR Code
+    const qrData = await qrService.generateProductQR(product.productBatchId);
+    
+    product.qrCode = {
+      data: qrData.data,
+      url: qrData.url,
+      signature: qrData.signature,
+      generatedAt: new Date()
+    };
+
+    await product.save();
+
+    logger.info(`[GenerateQR] Success for: ${product.productBatchId}`);
+    
+    const responseData = product.toObject();
+    delete responseData.qrCode.data; // Don't send huge base64
+    
+    return successResponse(res, responseData, 'QR code generated and registered successfully');
+  } catch (err) {
+    logger.error('[GenerateQR] Error:', err);
+    return errorResponse(res, 500, err.message);
   }
 };

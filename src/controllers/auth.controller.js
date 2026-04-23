@@ -50,21 +50,27 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    logger.info(`AUTHENTICATION_REQUEST: ${email}`);
+    if (!email || !password) {
+      return errorResponse(res, 400, 'Please provide both email and password');
+    }
 
-    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    const normalizedEmail = email.toLowerCase().trim();
+    logger.info(`AUTHENTICATION_REQUEST: ${normalizedEmail}`);
+
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
       logger.warn(`AUTHENTICATION_FAILURE: Entity not found for [${email}]`);
       return errorResponse(res, 401, 'Credentials rejected by node');
     }
 
     const isMatch = await user.comparePassword(password);
-    logger.info(`CRYPTO_VERIFICATION: ${email} - Signature match: ${isMatch}`);
 
     if (!isMatch) {
-      logger.warn(`AUTHENTICATION_FAILURE: Password mismatch for ${email}`);
+      logger.warn(`AUTHENTICATION_FAILURE: Password mismatch for ${normalizedEmail}`);
       return errorResponse(res, 401, 'Credentials rejected by node');
     }
+
+    logger.info(`CRYPTO_VERIFICATION: ${normalizedEmail} - Signature match: true`);
 
     if (!user.isActive) {
       logger.warn(`AUTHENTICATION_BLOCKED: ${email} is currently inactive/pending`);

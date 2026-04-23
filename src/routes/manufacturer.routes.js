@@ -18,6 +18,8 @@ router.post('/similarity-check',
   auditLog('SIMILARITY_CHECK', 'HerbCollection'),
   manufacturerController.similarityCheck
 );
+router.post('/reject/:batchId', auditLog('REJECT_BATCH', 'HerbCollection'), manufacturerController.rejectBatch);
 router.post('/product-batch', auditLog('CREATE_PRODUCT_BATCH', 'ProductBatch'), manufacturerController.createProductBatch);
+router.post('/generate-qr/:id', auditLog('GENERATE_QR', 'ProductBatch'), manufacturerController.generateProductQR);
 
 module.exports = router;

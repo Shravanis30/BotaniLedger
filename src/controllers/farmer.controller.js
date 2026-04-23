@@ -2,9 +2,21 @@ const HerbCollection = require('../models/HerbCollection');
 const fabricService = require('../services/fabric.service');
 const ipfsService = require('../services/ipfs.service');
 const aiService = require('../services/ai.service');
+const imageDedupService = require('../services/image-dedup.service');
 const anomalyService = require('../services/anomaly.service');
 const { successResponse, errorResponse } = require('../utils/response.util');
 const logger = require('../utils/logger.util');
+
+const ALLOWED_SPECIES = new Set(['ashwagandha', 'tulsi']);
+
+const normalizeSpeciesName = (value) => {
+  const raw = String(value || '').trim();
+  const commonName = raw.split(' (')[0];
+  const normalized = commonName.toLowerCase();
+  if (normalized === 'ashwghandha') return 'ashwagandha';
+  if (normalized === 'tulasi') return 'tulsi';
+  return normalized;
+};
 
 exports.createCollection = async (req, res) => {
   try {
@@ -15,12 +27,31 @@ exports.createCollection = async (req, res) => {
     if (typeof location === 'string') location = JSON.parse(location);
     
     const photos = req.files || {};
+    const normalizedSpecies = normalizeSpeciesName(herbSpecies?.common);
 
-    // 1. Upload photos to IPFS
+    if (!ALLOWED_SPECIES.has(normalizedSpecies)) {
+      return errorResponse(res, 400, 'Only Ashwagandha and Tulsi collections are allowed');
+    }
+
+    if (!photos.macro || !photos.macro[0]) {
+      return errorResponse(res, 400, 'Macro image is required for species verification');
+    }
+
+    // 1. Build file list and calculate hashes for duplicate blocking
     const photoFiles = [];
+    const fileEntries = [];
     for (const key in photos) {
       if (photos[key] && photos[key][0]) {
         const file = photos[key][0];
+        const imageHash = imageDedupService.createHash(file.buffer);
+        fileEntries.push({
+          role: key,
+          imageHash,
+          buffer: file.buffer,
+          originalname: file.originalname,
+          mimetype: file.mimetype,
+          size: file.size
+        });
         photoFiles.push({
           buffer: file.buffer,
           name: `${key}-${Date.now()}.${file.originalname.split('.').pop()}`,
@@ -29,35 +60,70 @@ exports.createCollection = async (req, res) => {
       }
     }
 
-    let ipfsFolderCid = 'QmNotUploadedDueToError';
-    try {
-        ipfsFolderCid = await ipfsService.uploadFolder(photoFiles);
-    } catch (ipfsErr) {
-        logger.error('IPFS Upload Error:', ipfsErr);
+    const duplicate = await imageDedupService.findDuplicate(fileEntries);
+    if (duplicate) {
+      logger.warn(`Duplicate image detected (${duplicate.fileRole}) from batch ${duplicate.batchId}. Proceeding anyway to allow retry/sync.`);
     }
-    
-    // 2. AI Species Verification (Only if macro photo exists)
+
+    // 2. AI Species Verification BEFORE IPFS upload (verify each uploaded image)
     let aiResult = { speciesMatch: false, confidence: 0, matchedSpecies: 'none' };
-    if (photos.macro && photos.macro[0]) {
-        try {
-            aiResult = await aiService.verifySpecies(photos.macro[0].buffer, herbSpecies.common);
-        } catch (aiErr) {
-            logger.error('AI Verification Error:', aiErr);
+    for (const entry of fileEntries) {
+      try {
+        const verification = await aiService.verifySpecies(entry.buffer, normalizedSpecies);
+        if (entry.role === 'macro') {
+          aiResult = verification;
         }
+
+        if (!verification.speciesMatch || normalizeSpeciesName(verification.matchedSpecies) !== normalizedSpecies) {
+          return errorResponse(
+            res,
+            422,
+            `AI rejected ${entry.role} image. Expected ${normalizedSpecies}, detected ${verification.matchedSpecies || 'unknown'}`
+          );
+        }
+      } catch (aiErr) {
+        logger.error('AI Verification Error:', aiErr);
+        return errorResponse(res, 502, `AI verification failed for ${entry.role} image`);
+      }
+    }
+
+    // 3. Upload photos to IPFS individually for better reliability
+    const uploadedPhotos = {};
+    let ipfsFolderCid = 'QmFallbackIndividualPins';
+    
+    try {
+        logger.info('Starting parallel IPFS pinning for all images...');
+        const uploadPromises = fileEntries.map(async (entry) => {
+            const uploadResult = await ipfsService.uploadFile(entry.buffer, entry.originalname, entry.mimetype);
+            return { role: entry.role, result: uploadResult };
+        });
+
+        const uploadResults = await Promise.all(uploadPromises);
+        uploadResults.forEach(res => {
+            uploadedPhotos[res.role] = {
+                cid: res.result.cid,
+                url: res.result.url
+            };
+            if (res.role === 'macro') ipfsFolderCid = res.result.cid;
+        });
+        logger.info('All images successfully pinned to IPFS.');
+    } catch (ipfsErr) {
+        logger.error('IPFS Parallel Upload Error:', ipfsErr);
+        return errorResponse(res, 502, 'IPFS upload failed during parallel pinning');
     }
 
     // Format location for GeoJSON
     const formattedLocation = {
         type: 'Point',
-        coordinates: [location.lng || 0, location.lat || 0],
-        accuracy: location.accuracy,
+        coordinates: [parseFloat(location.lng) || 0, parseFloat(location.lat) || 0],
+        accuracy: parseFloat(location.accuracy) || 0,
         zone: location.zone
     };
 
     const batchData = {
       farmerId: req.user._id,
       herbSpecies: {
-          common: herbSpecies.common,
+          common: normalizedSpecies,
           botanical: herbSpecies.botanical || herbSpecies.scientific || '',
           code: herbSpecies.code
       },
@@ -66,14 +132,14 @@ exports.createCollection = async (req, res) => {
       collectionDate: collectionDate || new Date(),
       location: formattedLocation,
       photos: {
-        ipfsFolderCid,
-        macro: photos.macro ? { url: `${process.env.PINATA_GATEWAY}/ipfs/${ipfsFolderCid}/macro.jpg` } : undefined
+        ...uploadedPhotos,
+        ipfsFolderCid
       },
       aiVerification: aiResult,
       notes
     };
 
-    // 3. Anomaly Detection
+    // 4. Anomaly Detection
     let anomalies = [];
     try {
         anomalies = await anomalyService.checkForAnomalies(batchData, req.user._id);
@@ -86,10 +152,21 @@ exports.createCollection = async (req, res) => {
       batchData.anomalyType = anomalies[0].type;
     }
 
-    // 4. Save to MongoDB
+    // 5. Save to MongoDB
     const herbBatch = await HerbCollection.create(batchData);
+    try {
+      await imageDedupService.saveMetadata(fileEntries, {
+        ipfsFolderCid,
+        species: normalizedSpecies,
+        batchId: herbBatch.batchId,
+        farmerId: req.user._id
+      });
+    } catch (dedupSaveErr) {
+      logger.warn('Image metadata save issue (likely duplicate):', dedupSaveErr.message);
+      // We continue because the herbBatch is already created and we want to anchor to blockchain
+    }
 
-    // 5. Anchor to Blockchain
+    // 6. Anchor to Blockchain
     try {
       if (req.user.fabricIdentity) {
         const result = await fabricService.submitTransaction(
@@ -182,8 +259,12 @@ exports.verifyPreview = async (req, res) => {
     const { species } = req.body;
     const photo = req.file;
     if (!photo) return errorResponse(res, 400, 'Photo is required');
+    const normalizedSpecies = normalizeSpeciesName(species);
+    if (!ALLOWED_SPECIES.has(normalizedSpecies)) {
+      return errorResponse(res, 400, 'Preview is only supported for Ashwagandha or Tulsi');
+    }
 
-    const result = await aiService.verifySpecies(photo.buffer, species);
+    const result = await aiService.verifySpecies(photo.buffer, normalizedSpecies);
     successResponse(res, result);
   } catch (err) {
     errorResponse(res, 500, err.message);

@@ -1,10 +1,55 @@
 const axios = require('axios');
 const FormData = require('form-data');
+const crypto = require('crypto');
 const ipfsConfig = require('../config/ipfs');
 const logger = require('../utils/logger.util');
 
 class IPFSService {
+  _getHeaders(form) {
+    const headers = { ...form.getHeaders() };
+    let authSet = false;
+
+    // Try JWT first
+    if (ipfsConfig.pinataJwt && ipfsConfig.pinataJwt.trim().length > 50) {
+      const jwt = ipfsConfig.pinataJwt.trim();
+      if (jwt.split('.').length === 3) {
+        headers.Authorization = `Bearer ${jwt}`;
+        authSet = true;
+      }
+    }
+
+    // Fallback to API Keys
+    if (!authSet && ipfsConfig.pinataApiKey && ipfsConfig.pinataApiSecret) {
+      headers.pinata_api_key = ipfsConfig.pinataApiKey.trim();
+      headers.pinata_secret_api_key = ipfsConfig.pinataApiSecret.trim();
+      authSet = true;
+    }
+
+    if (!authSet) {
+      logger.warn('IPFS Auth: No valid JWT or API Keys found');
+    } else {
+      const authType = headers.Authorization ? 'JWT' : 'API Keys';
+      logger.info(`IPFS Auth: Using ${authType}`);
+    }
+
+    return headers;
+  }
+
   async uploadFile(buffer, fileName, mimeType) {
+    const hasCredentials = (ipfsConfig.pinataJwt && ipfsConfig.pinataJwt.length > 50) || 
+                          (ipfsConfig.pinataApiKey && ipfsConfig.pinataApiSecret);
+    
+    logger.info(`IPFS Credential Status: ${hasCredentials ? 'Detected' : 'Missing'}`);
+
+    if (process.env.BLOCKCHAIN_MODE === 'simulated' && !hasCredentials) {
+      logger.info(`[IPFS Simulation] Mocking upload for ${fileName} (No Credentials)`);
+      return {
+        cid: `QmSimulatedFile${crypto.randomBytes(8).toString('hex')}`,
+        url: `https://gateway.pinata.cloud/ipfs/QmSimulatedFile`,
+        size: buffer.length
+      };
+    }
+
     try {
       const form = new FormData();
       form.append('file', buffer, {
@@ -14,14 +59,13 @@ class IPFSService {
       form.append('pinataMetadata', JSON.stringify({ name: fileName }));
       form.append('pinataOptions', JSON.stringify({ cidVersion: 1 }));
 
+      const headers = this._getHeaders(form);
+
       const response = await axios.post(
         'https://api.pinata.cloud/pinning/pinFileToIPFS',
         form,
         {
-          headers: {
-            ...form.getHeaders(),
-            Authorization: `Bearer ${ipfsConfig.pinataJwt}`
-          },
+          headers,
           maxContentLength: Infinity
         }
       );
@@ -38,62 +82,62 @@ class IPFSService {
   }
 
   async uploadFolder(files) {
+    if (!files || files.length === 0) {
+      throw new Error('No files provided for IPFS upload');
+    }
+
     if (!ipfsConfig.pinataJwt || ipfsConfig.pinataJwt.length < 50) {
       logger.warn('IPFS Configuration Missing: Using development mock CID');
       return 'QmSimulationModeActiveNoRealPinningDone';
     }
 
     try {
-      const pinnedFiles = [];
+      const form = new FormData();
+      const folderName = `batch-${Date.now()}`;
       
-      // Pin each file individually for maximum reliability
+      // Pinata directory upload requires each file to be appended with the same name 'file'
+      // and the filename must include the folder path.
       for (const file of files) {
-        try {
-          const result = await this.uploadFile(file.buffer, file.name, file.type);
-          pinnedFiles.push({ 
-            name: file.name, 
-            cid: result.cid,
-            url: result.url 
-          });
-        } catch (pinErr) {
-          logger.error(`Individual file pin failed: ${file.name}`, pinErr);
-          // Continue with others if one fails, or could throw
-        }
+        form.append('file', file.buffer, {
+          filename: `${folderName}/${file.name}`,
+          contentType: file.type
+        });
       }
 
-      if (pinnedFiles.length === 0) throw new Error('No files were successfully pinned to IPFS');
+      form.append('pinataMetadata', JSON.stringify({
+        name: folderName,
+        keyvalues: {
+          project: 'BotaniLedger',
+          type: 'batch_collection'
+        }
+      }));
 
-      // Create a JSON manifest to represent the "folder"
+      form.append('pinataOptions', JSON.stringify({
+        cidVersion: 1
+      }));
+
       const response = await axios.post(
-        'https://api.pinata.cloud/pinning/pinJSONToIPFS',
+        'https://api.pinata.cloud/pinning/pinFileToIPFS',
+        form,
         {
-          pinataMetadata: { 
-            name: `botaniledger-manifest-${Date.now()}` 
-          },
-          pinataContent: {
-            type: 'batch_collection',
-            timestamp: new Date(),
-            files: pinnedFiles
-          }
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${ipfsConfig.pinataJwt}`
-          }
+          headers: this._getHeaders(form),
+          maxContentLength: Infinity,
+          maxBodyLength: Infinity
         }
       );
-      
+
+      logger.info(`IPFS Folder Uploaded: ${folderName} -> ${response.data.IpfsHash}`);
       return response.data.IpfsHash;
     } catch (err) {
       const errorDetail = err.response?.data || err.message;
-      logger.error('IPFS Manifest creation failed:', errorDetail);
+      logger.error('IPFS Folder upload failed:', errorDetail);
 
       if (err.response?.status === 401) {
-        logger.warn('Pinata 401 Unauthorized: Falling back to mock CID for development');
+        logger.warn('Pinata 401 Unauthorized: Falling back to mock CID');
         return 'QmAuthFailedUsingMockCID';
       }
 
-      throw new Error(`IPFS Manifest Failed: ${JSON.stringify(errorDetail)}`);
+      throw new Error(`IPFS Folder Upload Failed: ${JSON.stringify(errorDetail)}`);
     }
   }
 

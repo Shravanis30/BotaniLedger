@@ -86,28 +86,36 @@ const RecordCollection = () => {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
 
-        const result = response.data; // Note: axios interceptor already returns response.data.data or similar? 
-        // Wait, standard api.js returns response.data
-        
-        // Let's check api.js again. Line 30: return response.data;
-        // So response here IS the successResponse object { success, data, message }
-        
-        const aiData = response.data; // This is the VerificationResult
+        // api.js interceptor returns response.data directly:
+        // { success, message, data }.
+        const result = response.data || response;
 
-        if (aiData.speciesMatch) {
+        if (result.speciesMatch) {
             setFormData(prev => ({
                 ...prev,
                 photos: { ...prev.photos, [key]: file }
             }));
             setAiResults(prev => ({
                 ...prev,
-                [key]: { confidence: aiData.confidence, status: 'verified' }
+                [key]: { 
+                    confidence: result.confidence, 
+                    status: 'verified',
+                    message: `Verified as ${result.matchedSpecies}`
+                }
             }));
         } else {
-            alert(`AI Verification Failed: The image doesn't appear to match the botanical profile for ${formData.species}. Organic Score: ${aiData.metadata?.organic_score}`);
+            // Keep the photo in state but mark as failed
             setFormData(prev => ({
                 ...prev,
-                photos: { ...prev.photos, [key]: null }
+                photos: { ...prev.photos, [key]: file }
+            }));
+            setAiResults(prev => ({
+                ...prev,
+                [key]: { 
+                    confidence: result.confidence, 
+                    status: 'failed',
+                    error: `Wrong image: detected ${result.matchedSpecies || 'unknown'} (${result.confidence || 0}%). Cannot proceed, please enter a new image.`
+                }
             }));
         }
     } catch (err) {
@@ -371,11 +379,22 @@ const RecordCollection = () => {
                                                 </div>
                                             ) : value ? (
                                                 <>
-                                                    <img src={URL.createObjectURL(value)} className="absolute inset-0 w-full h-full object-cover opacity-60" />
-                                                    <div className="relative z-10 w-12 h-12 bg-success rounded-xl flex items-center justify-center text-white shadow-lg">
-                                                        <CheckCircle size={24} />
-                                                    </div>
-                                                    <span className="text-[10px] font-black text-success relative z-10 uppercase mt-4 tracking-widest">Verified ✓</span>
+                                                    <img src={URL.createObjectURL(value)} className={cn("absolute inset-0 w-full h-full object-cover", aiResults[key]?.status === 'failed' ? "opacity-30 grayscale" : "opacity-60")} />
+                                                    {aiResults[key]?.status === 'failed' ? (
+                                                        <div className="relative z-10 flex flex-col items-center">
+                                                            <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center text-white shadow-lg">
+                                                                <AlertCircle size={24} />
+                                                            </div>
+                                                            <span className="text-[10px] font-black text-red-600 uppercase mt-4 tracking-widest">FAILED</span>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="relative z-10 flex flex-col items-center">
+                                                            <div className="w-12 h-12 bg-success rounded-xl flex items-center justify-center text-white shadow-lg">
+                                                                <CheckCircle size={24} />
+                                                            </div>
+                                                            <span className="text-[10px] font-black text-success uppercase mt-4 tracking-widest">Verified ✓</span>
+                                                        </div>
+                                                    )}
                                                 </>
                                             ) : (
                                                 <>
@@ -387,15 +406,22 @@ const RecordCollection = () => {
                                     </label>
                                     <div className="text-[10px] text-center font-black text-gray-400 uppercase tracking-[0.2em]">{key}</div>
                                     {value && aiResults[key] && (
-                                        <div className="bg-success/10 px-2 py-1.5 rounded-lg text-[9px] font-bold text-success text-center animate-slide-up">
-                                            ✓ {formData.species.split(' (')[0]}: {aiResults[key].confidence}%
+                                        <div className={cn(
+                                            "px-2 py-1.5 rounded-lg text-[9px] font-bold text-center animate-slide-up",
+                                            aiResults[key].status === 'verified' ? "bg-success/10 text-success" : "bg-red-100 text-red-600 border border-red-200"
+                                        )}>
+                                            {aiResults[key].status === 'verified' ? (
+                                                `✓ ${formData.species.split(' (')[0]}: ${aiResults[key].confidence}%`
+                                            ) : (
+                                                aiResults[key].error
+                                            )}
                                         </div>
                                     )}
                                 </div>
                             ))}
                         </div>
 
-                        {Object.values(formData.photos).every(Boolean) ? (
+                        {Object.values(aiResults).filter(r => r.status === 'verified').length === 5 ? (
                             <div className="p-6 bg-success text-white rounded-[24px] flex items-center justify-center gap-4 shadow-xl shadow-success/20 animate-bounce-subtle">
                                 <CheckCircle size={24} />
                                 <span className="text-sm font-black uppercase tracking-widest">
@@ -406,7 +432,9 @@ const RecordCollection = () => {
                             <div className="p-6 bg-gray-50 rounded-[24px] border border-gray-100 flex items-center justify-center gap-4 text-gray-400">
                                 <AlertCircle size={24} />
                                 <span className="text-sm font-bold uppercase tracking-widest italic tracking-wider">
-                                    Awaiting Photos for AI Fingerprinting...
+                                    {Object.values(aiResults).some(r => r.status === 'failed') 
+                                        ? "Validation errors detected. Replace failed images to proceed." 
+                                        : "Awaiting Photos for AI Fingerprinting..."}
                                 </span>
                             </div>
                         )}
@@ -499,7 +527,7 @@ const RecordCollection = () => {
                                              {file instanceof File ? (
                                                  <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" />
                                              ) : (
-                                                 <img src="https://images.unsplash.com/photo-1615485290382-441e4d0c9cb5?auto=format&fit=crop&w=300&q=80" className="w-full h-full object-cover opacity-60" />
+                                                 <img src="https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=300&q=80" className="w-full h-full object-cover opacity-60" />
                                              )}
                                          </div>
                                      ))}
@@ -542,7 +570,13 @@ const RecordCollection = () => {
                     {currentStep < 4 ? (
                         <button 
                             onClick={handleNext}
-                            className="px-12 py-5 bg-primary text-white rounded-2xl font-black flex items-center gap-3 hover:bg-primary-mid transition-all shadow-xl shadow-green-900/20 uppercase text-[11px] tracking-widest"
+                            disabled={currentStep === 2 && Object.values(aiResults).filter(r => r.status === 'verified').length < 5}
+                            className={cn(
+                                "px-12 py-5 text-white rounded-2xl font-black flex items-center gap-3 transition-all shadow-xl uppercase text-[11px] tracking-widest",
+                                currentStep === 2 && Object.values(aiResults).filter(r => r.status === 'verified').length < 5
+                                    ? "bg-gray-300 cursor-not-allowed shadow-none"
+                                    : "bg-primary hover:bg-primary-mid shadow-green-900/20"
+                            )}
                         >
                             Next Step
                             <ChevronRight size={20} />

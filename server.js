@@ -6,6 +6,8 @@ const initializeAdmin = require('./src/services/admin.init');
 const logger = require('./src/utils/logger.util');
 
 // Connect to Database & Initialize
+let server;
+
 const startServer = async () => {
   try {
     // Validate Environment
@@ -16,23 +18,40 @@ const startServer = async () => {
     // Initialize Admin User from .env
     await initializeAdmin();
 
-    const PORT = process.env.PORT || 5000;
-    server.listen(PORT, () => {
+    const PORT = process.env.PORT || 5080;
+    server = app.listen(PORT, '0.0.0.0', () => {
       logger.info(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+      logger.info(`Accepting connections from all interfaces (0.0.0.0)`);
     });
+
   } catch (err) {
     logger.error('Failed to start server:', err);
     process.exit(1);
   }
 };
 
-const server = app; // Using the exported express app
-
 startServer();
 
-// Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
   logger.error(`Error: ${err.message}`);
-  // Close server & exit process
-  server.close(() => process.exit(1));
+  if (server) {
+    server.close(() => process.exit(1));
+  } else {
+    process.exit(1);
+  }
 });
+
+// Handle graceful shutdown
+const gracefulShutdown = () => {
+  if (server) {
+    server.close(() => {
+      logger.info('HTTP server closed');
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
+};
+
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);

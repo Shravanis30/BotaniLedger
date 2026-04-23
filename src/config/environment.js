@@ -4,8 +4,9 @@ const logger = require('../utils/logger.util');
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.string().transform(Number).default('5000'),
-  MONGODB_URI: z.string().url(),
-  REDIS_URL: z.string().url(),
+  MONGODB_URI: z.string(),
+  REDIS_URL: z.string(),
+
   JWT_ACCESS_SECRET: z.string().min(32),
   JWT_REFRESH_SECRET: z.string().min(32),
   PINATA_JWT: z.string(),

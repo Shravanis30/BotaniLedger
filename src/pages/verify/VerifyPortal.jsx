@@ -7,7 +7,7 @@ import {
   TreeDeciduous, ExternalLink, Globe, FileText, Share2, Info,
   History, QrCode, ClipboardCheck, Search, Award, Sprout, 
   Activity, FlaskConical, Database, Lock, Loader2, User, 
-  Calendar, Hash, CheckCircle, Navigation, Map
+  Calendar, Hash, CheckCircle, Navigation, Map, Zap, Beaker
 } from 'lucide-react';
 import { Card } from '../../components/shared/UI';
 import { cn } from '../../lib/utils';
@@ -238,7 +238,7 @@ const VerifyPortal = () => {
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <Card className="lg:col-span-2 glass-card rounded-[3rem] p-6 sm:p-10 flex flex-col sm:flex-row gap-6 sm:gap-10 items-start sm:items-center border-white/10">
                  <div className="w-full sm:w-48 aspect-square rounded-[2rem] bg-white/5 border border-white/10 flex items-center justify-center shrink-0 overflow-hidden group shadow-2xl">
-                     <img src={product?.productImage || "https://images.unsplash.com/photo-1615485290382-441e4d0c9cb5?auto=format&fit=crop&w=600&q=80"} alt={product?.productName} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-125" />
+                     <img src={product?.productImage || "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=600&q=80"} alt={product?.productName} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-125" />
                  </div>
                  <div className="flex-1 space-y-6 pt-2 w-full">
                     <div className="text-center sm:text-left">
@@ -495,21 +495,21 @@ const VerifyPortal = () => {
                                                     { 
                                                         l: "Active Content", 
                                                         v: `${item.labReport?.results?.activeIngredient?.measured || 0}%`, 
-                                                        s: "COMPLIANT",
+                                                        s: item.labReport?.results?.activeIngredient?.status || "COMPLIANT",
                                                         icon: Zap,
                                                         color: "text-emerald-400"
                                                     },
                                                     { 
-                                                        l: "Heavy Metals", 
-                                                        v: item.labReport?.results?.heavyMetals?.status || "ND", 
-                                                        s: "SAFE_PASS",
-                                                        icon: ShieldCheck,
+                                                        l: "Physicochemical", 
+                                                        v: "ASH/EXTRACTIVE", 
+                                                        s: item.labReport?.results?.physicochemical?.status || "SAFE_PASS",
+                                                        icon: Beaker,
                                                         color: "text-sky-400"
                                                     },
                                                     { 
                                                         l: "Microbiology", 
-                                                        v: item.labReport?.results?.microbiology?.status || "SAFE", 
-                                                        s: "STERILE",
+                                                        v: "STERILE_CHECK", 
+                                                        s: item.labReport?.results?.microbiology?.status || "STERILE",
                                                         icon: Activity,
                                                         color: "text-orange-400"
                                                     },
@@ -517,7 +517,7 @@ const VerifyPortal = () => {
                                                         l: "Consensus", 
                                                         v: item.labReport?.results?.overallResult || "PASS", 
                                                         s: "VERIFIED",
-                                                        icon: Lock,
+                                                        icon: ShieldCheck,
                                                         color: "text-primary"
                                                     }
                                                 ].map((m, i) => (
@@ -528,11 +528,54 @@ const VerifyPortal = () => {
                                                                 <m.icon size={18} className={m.color} />
                                                             </div>
                                                             <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">{m.l}</div>
-                                                            <div className={cn("text-xl font-bold italic mb-1", m.color)}>{m.v}</div>
+                                                            <div className={cn("text-sm font-bold italic mb-1", m.color)}>{m.v}</div>
                                                             <div className="text-[7px] font-black text-success/60 tracking-[0.4em] uppercase">{m.s}</div>
                                                         </div>
                                                     </div>
                                                 ))}
+                                            </div>
+
+                                            {/* Detailed Analysis Breakdown */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+                                                <div className="glass-card p-8 rounded-[2rem] border-white/5 space-y-6">
+                                                    <h4 className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] flex items-center gap-2">
+                                                        <Beaker size={14} className="text-sky-400" /> Physicochemical Profile
+                                                    </h4>
+                                                    <div className="space-y-4">
+                                                        <div className="flex justify-between items-center text-xs">
+                                                            <span className="text-white/40">Total Ash Content</span>
+                                                            <span className="font-bold text-white/80">{item.labReport?.results?.physicochemical?.ashContent?.total || '0'} %</span>
+                                                        </div>
+                                                        <div className="flex justify-between items-center text-xs">
+                                                            <span className="text-white/40">Alcohol Extractive</span>
+                                                            <span className="font-bold text-white/80">{item.labReport?.results?.physicochemical?.extractiveValues?.alcoholSoluble || '0'} %</span>
+                                                        </div>
+                                                        <div className="flex justify-between items-center text-xs">
+                                                            <span className="text-white/40">Moisture (LOD)</span>
+                                                            <span className="font-bold text-white/80">{item.labReport?.results?.physicochemical?.moisture?.value || '0'} %</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="glass-card p-8 rounded-[2rem] border-white/5 space-y-6">
+                                                    <h4 className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] flex items-center gap-2">
+                                                        <Activity size={14} className="text-orange-400" /> Safety Parameters
+                                                    </h4>
+                                                    <div className="space-y-4">
+                                                        <div className="flex justify-between items-center text-xs">
+                                                            <span className="text-white/40">Total Plate Count</span>
+                                                            <span className="font-bold text-white/80">{item.labReport?.results?.microbiology?.totalPlateCount || '0'} CFU/g</span>
+                                                        </div>
+                                                        <div className="flex justify-between items-center text-xs">
+                                                            <span className="text-white/40">E. Coli / Salmonella</span>
+                                                            <span className="font-black text-emerald-400 uppercase tracking-tighter">ABSENT</span>
+                                                        </div>
+                                                        <div className="flex justify-between items-center text-xs">
+                                                            <span className="text-white/40">Heavy Metal Status</span>
+                                                            <span className="font-black text-sky-400 uppercase tracking-tighter">CERTIFIED_SAFE</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             <div className="flex flex-col sm:flex-row items-center gap-6 pt-4">

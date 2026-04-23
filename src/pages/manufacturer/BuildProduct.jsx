@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ManufacturerLayout from '@/components/shared/ManufacturerLayout';
 import { Card } from '@/components/shared/UI';
 import { PlusCircle, Database, Package, Loader2, CheckCircle2 } from 'lucide-react';
@@ -8,6 +9,7 @@ import { cn } from '@/lib/utils';
 
 const BuildProduct = () => {
     const queryClient = useQueryClient();
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         productName: '',
         productType: 'HERBAL_SUPPLEMENT',
@@ -34,14 +36,7 @@ const BuildProduct = () => {
         onSuccess: () => {
             alert('Production batch anchor success! QR codes generated.');
             queryClient.invalidateQueries(['manufacturerProducts']);
-            setFormData({
-                productName: '',
-                productType: 'HERBAL_SUPPLEMENT',
-                linkedHerbBatches: [],
-                manufacturingDate: new Date().toISOString().split('T')[0],
-                expiryDate: '',
-                quantity: ''
-            });
+            navigate('/manufacturer/production');
         },
         onError: (error) => alert(error.message)
     });

@@ -14,6 +14,11 @@ class FabricService {
   }
 
   async connect(identity) {
+    if (!identity || !identity.certificate || !identity.privateKey) {
+      logger.error('Fabric identity missing or incomplete:', identity);
+      throw new Error('Fabric identity (certificate/privateKey) is missing. Please ensure the user is correctly provisioned on the blockchain.');
+    }
+
     try {
       const profilePath = fabricConfig.connectionProfiles[identity.mspId] || fabricConfig.connectionProfiles['u1hpn7jii5'];
       const connectionProfile = JSON.parse(fs.readFileSync(profilePath, 'utf8'));
@@ -69,10 +74,25 @@ class FabricService {
   }
 
   async submitTransaction(identity, fnName, ...args) {
+    if (process.env.BLOCKCHAIN_MODE === 'simulated') {
+      logger.info(`[Blockchain Simulation] Executing ${fnName} with args:`, args);
+      return {
+        success: true,
+        txId: `SIM-${crypto.randomBytes(16).toString('hex')}`,
+        timestamp: new Date().toISOString(),
+        payload: args[0] || {}
+      };
+    }
+
     const contract = await this.connect(identity);
     try {
       const result = await contract.submitTransaction(fnName, ...args);
       return JSON.parse(new TextDecoder().decode(result));
+    } catch (err) {
+      logger.error(`Fabric transaction failed (${fnName}):`, err);
+      // If we are in production but the blockchain is unavailable, 
+      // we could potentially fallback here if desired, but for now we throw.
+      throw err;
     } finally {
       if (this.gateway) {
         this.gateway.close();
@@ -84,10 +104,18 @@ class FabricService {
   }
 
   async evaluateTransaction(identity, fnName, ...args) {
+    if (process.env.BLOCKCHAIN_MODE === 'simulated') {
+      logger.info(`[Blockchain Simulation Query] Executing ${fnName} with args:`, args);
+      return { success: true, data: [] }; // Generic mock response for queries
+    }
+
     const contract = await this.connect(identity);
     try {
       const result = await contract.evaluateTransaction(fnName, ...args);
       return JSON.parse(new TextDecoder().decode(result));
+    } catch (err) {
+      logger.error(`Fabric evaluation failed (${fnName}):`, err);
+      throw err;
     } finally {
       if (this.gateway) {
         this.gateway.close();

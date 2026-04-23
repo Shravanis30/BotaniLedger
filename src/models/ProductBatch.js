@@ -16,7 +16,7 @@ const ProductBatchSchema = new mongoose.Schema({
   productName: { type: String, required: true },
   productType: {
     type: String,
-    enum: ['tablet', 'capsule', 'oil', 'powder', 'extract', 'syrup'],
+    enum: ['tablet', 'capsule', 'oil', 'powder', 'extract', 'syrup', 'HERBAL_SUPPLEMENT'],
     required: true
   },
   linkedHerbBatches: [{

@@ -39,11 +39,11 @@ const QRManagement = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 p-4 md:p-8 gap-6 md:gap-8">
                             {isLoading ? (
                                 <div className="col-span-1 md:col-span-2 py-20 flex justify-center"><Loader2 className="animate-spin text-primary" size={32} /></div>
-                            ) : products.length > 0 ? (
-                                products.map((product) => (
+                            ) : products.filter(p => p.qrCode?.data).length > 0 ? (
+                                products.filter(p => p.qrCode?.data).map((product) => (
                                     <div key={product._id} className="p-6 bg-gray-50/50 rounded-3xl border border-gray-100 group hover:border-primary-light transition-all flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8">
                                         <div className="w-32 h-32 bg-white p-3 rounded-2xl shadow-sm group-hover:shadow-md transition-shadow relative shrink-0">
-                                            <img src={product.qrCode} alt="QR Code" className="w-full h-full object-contain" />
+                                            <img src={product.qrCode?.data} alt="QR Code" className="w-full h-full object-contain" />
                                             <div className="absolute inset-0 bg-primary/80 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl flex items-center justify-center pointer-events-none">
                                                 <Download size={24} className="text-white" />
                                             </div>
@@ -55,13 +55,16 @@ const QRManagement = () => {
                                             
                                             <div className="flex flex-wrap justify-center sm:justify-start gap-2">
                                                 <a 
-                                                    href={product.qrCode} 
+                                                    href={product.qrCode?.data} 
                                                     download={`${product.productBatchId}-QR.png`}
                                                     className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center gap-2"
                                                 >
                                                     <Download size={14} /> Download
                                                 </a>
-                                                <button className="p-2 bg-white border border-gray-200 rounded-lg text-gray-400 hover:text-primary hover:border-primary transition-all">
+                                                <button 
+                                                    onClick={() => window.open(`/verify/${product.productBatchId}`, '_blank')}
+                                                    className="p-2 bg-white border border-gray-200 rounded-lg text-gray-400 hover:text-primary hover:border-primary transition-all"
+                                                >
                                                     <ExternalLink size={14} />
                                                 </button>
                                             </div>

@@ -5,9 +5,6 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5080/api/
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 // Add a request interceptor to include the JWT token
@@ -16,6 +13,9 @@ api.interceptors.request.use(
     const token = useAuthStore.getState().token;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log(`[API] Auth Token Attached: ${token.substring(0, 10)}...`);
+    } else {
+      console.warn('[API] No Auth Token found in state!');
     }
     return config;
   },

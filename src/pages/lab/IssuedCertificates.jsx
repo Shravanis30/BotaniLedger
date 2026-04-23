@@ -80,11 +80,11 @@ const IssuedCertificates = () => {
                   <tr key={cert._id || i} className="hover:bg-primary/[0.01] transition-all group">
                     <td className="px-10 py-8 whitespace-nowrap">
                       <div className="font-mono text-[10px] font-black text-primary uppercase tracking-tighter">AYUSH::{cert.referenceNumber || cert._id?.slice(-8).toUpperCase()}</div>
-                      <div className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">Batch Ref: <span className="text-gray-600">#{cert.batchId?.batchId || 'N/A'}</span></div>
+                      <div className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">Batch Ref: <span className="text-gray-600">#{cert.batchId}</span></div>
                     </td>
                     <td className="px-10 py-8 min-w-[200px]">
-                      <div className="font-black text-base text-gray-900 tracking-tight italic uppercase">{cert.batchId?.herbSpecies?.common || 'Botanical Unit'}</div>
-                      <div className="text-[9px] text-primary font-black uppercase tracking-widest mt-0.5">{cert.batchId?.herbSpecies?.botanical}</div>
+                      <div className="font-black text-base text-gray-900 tracking-tight italic uppercase">{cert.batch?.herbSpecies?.common || 'Botanical Unit'}</div>
+                      <div className="text-[9px] text-primary font-black uppercase tracking-widest mt-0.5">{cert.batch?.herbSpecies?.botanical}</div>
                     </td>
                     <td className="px-10 py-8 text-xs font-bold text-gray-500 italic whitespace-nowrap">
                         <div className="flex flex-col">

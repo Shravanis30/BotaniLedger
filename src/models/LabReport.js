@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const LabReportSchema = new mongoose.Schema({
-  batchId: { type: String, required: true, ref: 'HerbCollection' },
+  batchId: { type: String, required: true }, // The human-readable ID
   labId: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'User',
@@ -16,30 +16,49 @@ const LabReportSchema = new mongoose.Schema({
       required: true 
     },
     activeIngredient: {
-      measured: Number,
-      expectedMin: Number,
-      expectedMax: Number,
+      measured: { type: Number, default: 0 },
+      expectedMin: { type: Number, default: 0 },
+      expectedMax: { type: Number, default: 0 },
       unit: String,
       status: String
     },
     heavyMetals: {
-      lead: { measured: Number, limit: Number, status: String },
-      mercury: { measured: Number, limit: Number, status: String },
-      arsenic: { measured: Number, limit: Number, status: String },
-      cadmium: { measured: Number, limit: Number, status: String }
+      lead: { measured: { type: Number, default: 0 }, limit: { type: Number, default: 0 }, status: String },
+      mercury: { measured: { type: Number, default: 0 }, limit: { type: Number, default: 0 }, status: String },
+      arsenic: { measured: { type: Number, default: 0 }, limit: { type: Number, default: 0 }, status: String },
+      cadmium: { measured: { type: Number, default: 0 }, limit: { type: Number, default: 0 }, status: String }
+    },
+    physicochemical: {
+      ashContent: { 
+        total: { type: Number, default: 0 }, 
+        acidInsoluble: { type: Number, default: 0 },
+        status: String
+      },
+      extractiveValues: {
+        alcoholSoluble: { type: Number, default: 0 },
+        waterSoluble: { type: Number, default: 0 },
+        status: String
+      },
+      moisture: { value: { type: Number, default: 0 }, limit: { type: Number, default: 0 }, status: String }
+    },
+    organoleptic: {
+      appearance: String,
+      color: String,
+      odor: String
     },
     pesticides: {
       detected: [String],
-      totalResidues: Number,
+      totalResidues: { type: Number, default: 0 },
       status: String
     },
     microbiology: {
-      totalPlateCount: Number,
+      totalPlateCount: { type: Number, default: 0 },
+      yeastAndMould: { type: Number, default: 0 },
       ecoli: String,
       salmonella: String,
       status: String
     },
-    moisture: { value: Number, limit: Number, status: String }
+    verificationStatus: mongoose.Schema.Types.Mixed // For storing botanical image verification
   },
   document: {
     ipfsCid: String,
@@ -55,6 +74,18 @@ const LabReportSchema = new mongoose.Schema({
   },
   validUntil: Date,           // Certificate expiry (e.g. 90 days)
   notes: String
-}, { timestamps: true });
+}, { 
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+// Virtual for populating batch info via string batchId
+LabReportSchema.virtual('batch', {
+  ref: 'HerbCollection',
+  localField: 'batchId',
+  foreignField: 'batchId',
+  justOne: true
+});
 
 module.exports = mongoose.model('LabReport', LabReportSchema);

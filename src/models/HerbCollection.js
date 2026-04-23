@@ -80,11 +80,20 @@ const HerbCollectionSchema = new mongoose.Schema({
   similarityScore: Number
 }, {
   timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+// Virtual for lab reports
+HerbCollectionSchema.virtual('labReport', {
+  ref: 'LabReport',
+  localField: 'batchId',
+  foreignField: 'batchId',
+  justOne: true
 });
 
 HerbCollectionSchema.index({ 'location': '2dsphere' });
 HerbCollectionSchema.index({ 'farmerId': 1 });
 HerbCollectionSchema.index({ 'blockchainRecord.status': 1 });
-HerbCollectionSchema.index({ 'batchId': 1 }, { unique: true });
 
 module.exports = mongoose.model('HerbCollection', HerbCollectionSchema);

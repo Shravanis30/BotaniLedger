@@ -2,7 +2,8 @@ import React from 'react';
 import LabLayout from '@/components/shared/LabLayout';
 import { Card } from '@/components/shared/UI';
 import { 
-    Microscope, TrendingUp, BarChart3, PieChart as PieChartIcon, Loader2, FileX
+    Microscope, TrendingUp, BarChart3, PieChart as PieChartIcon, Loader2, FileX,
+    CheckCircle2
 } from 'lucide-react';
 import { 
     ResponsiveContainer, BarChart, Bar, XAxis, YAxis, 
@@ -20,7 +21,10 @@ const LabAnalytics = () => {
         }
     });
 
-    const qualityData = analytics?.qualityData || [];
+    const qualityData = (analytics?.qualityData || []).map(d => ({
+        ...d,
+        herb: d.herb.charAt(0).toUpperCase() + d.herb.slice(1).toLowerCase()
+    }));
     const passFailData = analytics?.passFailData || [];
     const trendData = analytics?.trendData || [];
 
@@ -114,7 +118,7 @@ const LabAnalytics = () => {
                                     </PieChart>
                                 </ResponsiveContainer>
                                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mb-4">
-                                    <ShieldCheck size={28} className="text-primary/10 mb-1" />
+                                    <CheckCircle2 size={28} className="text-primary/10 mb-1" />
                                     <div className="text-[8px] font-black text-gray-300 uppercase tracking-widest">Consensus</div>
                                 </div>
                             </div>

@@ -46,3 +46,8 @@ ai-service/data/
 ai-service/models/*.keras
 ai-service/__pycache__/
 test_images/
+
+# Cloned repos (token saving)
+code-review-graph/
+# Added by code-review-graph
+.code-review-graph/

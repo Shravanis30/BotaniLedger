@@ -39,57 +39,46 @@
 
 ```mermaid
 flowchart TD
-    %% Frontend Layer
-    subgraph Frontend ["Frontend Layer (React 19)"]
-        direction LR
-        F(("🧑‍🌾<br/>Farmer UI<br/>(Offline-First)"))
-        L(("🧪<br/>Lab UI<br/>(Certify)"))
-        M(("🏭<br/>Manufacturer<br/>(Verify + QR)"))
-        A(("🛡️<br/>Admin & Regulators<br/>(Governance)"))
-    end
+    %% Nodes
+    Client(["Client Side<br/><b>React Web + Mobile App</b><br/>(Farmer | Lab | Manufacturer | Admin | Consumer)"])
+    Gateway["API GATEWAY LAYER<br/><b>Node.js + Express</b><br/>(JWT Auth | RBAC | Validation | Rate Limit)"]
+    Business["BUSINESS LOGIC LAYER<br/>(Batch Management | QR Engine | Trust Score | Alerts | Sync)"]
+    
+    AI["AI ENGINE<br/>(CNN + Similarity)<br/>Classification + Feature Matching"]
+    Blockchain["BLOCKCHAIN LAYER<br/><b>Hyperledger Fabric</b><br/>(Smart Contracts)<br/>FSM + Consensus"]
+    Storage["STORAGE LAYER<br/><b>IPFS + MongoDB + Redis</b><br/>(Photos | Data | Cache)"]
+    
+    Verification["VERIFICATION ENGINE<br/>(Trust Score + Batch Validation + Timeline)"]
+    Consumer["CONSUMER PORTAL<br/>(QR Scan → Truth Timeline Output)"]
+    Output(["FINAL USER OUTPUT<br/>(Photos + Lab Reports + Similarity + Trust Score)"])
 
-    %% API Gateway
-    subgraph Gateway ["API Gateway Layer (Express.js)"]
-        direction TB
-        Auth{"Auth & Security<br/>(JWT + RBAC + Limiter)"}
-        Router["API Router & Validation"]
-        Auth --> Router
-    end
-
-    %% Network Link
-    Frontend -- "HTTPS / REST" --> Gateway
-
-    %% Microservices Layer
-    subgraph Microservices ["Backend Microservices & Infrastructure"]
-        direction LR
-        DB[("MongoDB Atlas<br/>(Metadata)")]
-        Cache[("Redis Cache<br/>(Tokens/Limits)")]
-        BC{{"Hyperledger Fabric<br/>(Immutable Ledger)"}}
-        IPFS[("IPFS / Pinata<br/>(Decentralized Storage)")]
-        AI(("🤖 AI Service<br/>(MobileNetV2 + CNN)"))
-        Anomaly["Anomaly Engine<br/>(Geo, Rapid, Dup)"]
-    end
-
-    %% Connections from Router to Services
-    Router --> DB
-    Router --> Cache
-    Router --> BC
-    Router --> IPFS
-    Router --> AI
-    Router --> Anomaly
+    %% Connections
+    Client -- "API Requests (HTTPS)" --> Gateway
+    Gateway --> Business
+    
+    Business --> AI
+    Business --> Blockchain
+    Business --> Storage
+    
+    AI -- "Data Processing<br/>(Similarity Score | AI Output)" --> Verification
+    Blockchain -- "Event Listener<br/>(Blockchain → DB Sync)" --> Verification
+    Storage -.-> Verification
+    
+    Verification --> Consumer
+    Consumer --> Output
 
     %% Styling
-    classDef app fill:#e0f2fe,stroke:#0284c7,stroke-width:2px;
-    classDef api fill:#fdf4ff,stroke:#c026d3,stroke-width:2px;
-    classDef data fill:#ecfccb,stroke:#65a30d,stroke-width:2px;
-    classDef bc fill:#ffedd5,stroke:#ea580c,stroke-width:2px;
-    classDef ai fill:#fef3c7,stroke:#d97706,stroke-width:2px;
+    classDef yellowNode fill:#fef08a,stroke:#ca8a04,stroke-width:2px,color:#000;
+    classDef blueNode fill:#bfdbfe,stroke:#2563eb,stroke-width:2px,color:#000;
+    classDef grayNode fill:#e5e7eb,stroke:#4b5563,stroke-width:2px,color:#000;
+    classDef greenNode fill:#bbf7d0,stroke:#16a34a,stroke-width:2px,color:#000;
+    classDef redNode fill:#fecaca,stroke:#dc2626,stroke-width:2px,color:#000;
 
-    class F,L,M,A app;
-    class Auth,Router api;
-    class DB,Cache,IPFS data;
-    class BC bc;
-    class AI,Anomaly ai;
+    class Client,Output yellowNode;
+    class Gateway blueNode;
+    class Business,Consumer grayNode;
+    class AI,Blockchain,Storage greenNode;
+    class Verification redNode;
 ```
 
 ---

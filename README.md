@@ -37,140 +37,127 @@
 
 ## 🏗️ System Architecture (High-Level)
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        CLIENT LAYER                                 │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │
-│  │   Farmer UI  │  │    Lab UI    │  │Manufacturer  │  + Admin     │
-│  │  (Record +   │  │ (Test +      │  │(Verify +     │  + Regulator │
-│  │   Offline)   │  │  Certify)    │  │ Build + QR)  │  + Verify    │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘              │
-│         └──────────────────┼─────────────────┘                      │
-│                            ▼                                        │
-│              React 19 + Vite + TailwindCSS                         │
-│              TanStack Query + Zustand + Framer Motion              │
-└────────────────────────────┬────────────────────────────────────────┘
-                             │ HTTPS / REST API
-┌────────────────────────────▼────────────────────────────────────────┐
-│                      API GATEWAY LAYER                              │
-│           Express.js + Helmet + CORS + Rate Limiter                │
-│           JWT Auth (Access + Refresh) + RBAC Middleware             │
-│           Audit Logging + Request Validation (Zod)                 │
-└──┬──────────┬──────────┬──────────┬──────────┬─────────────────────┘
-   │          │          │          │          │
-   ▼          ▼          ▼          ▼          ▼
-┌──────┐  ┌──────┐  ┌──────┐  ┌──────┐  ┌──────────┐
-│Mongo │  │Redis │  │Fabric│  │ IPFS │  │AI Service│
-│ DB   │  │Cache │  │  BC  │  │Pinata│  │ (FastAPI) │
-│      │  │      │  │      │  │      │  │MobileNet │
-│Users │  │Rate  │  │Herb  │  │Photos│  │V2 + CNN  │
-│Batch │  │Limit │  │Batch │  │Certs │  │Species   │
-│Labs  │  │Token │  │Product│ │Report│  │Classify  │
-│Alerts│  │Cache │  │Events│  │Folder│  │Pre-valid │
-└──────┘  └──────┘  └──────┘  └──────┘  └──────────┘
+```mermaid
+graph TD
+    %% Client Layer
+    subgraph Client_Layer ["Client Layer (React 19 + Vite + TailwindCSS)"]
+        direction LR
+        F(("🧑‍🌾<br/>Farmer UI<br/>(Offline-First)"))
+        L(("🧪<br/>Lab UI<br/>(Certify)"))
+        M(("🏭<br/>Manufacturer<br/>(Verify + QR)"))
+        A(("🛡️<br/>Admin & Regulators<br/>(Governance)"))
+    end
+
+    %% API Gateway Layer
+    AG{{"API Gateway<br/>(Express.js + JWT + RBAC)"}}
+    
+    %% Connections
+    Client_Layer -- "HTTPS / REST" --> AG
+
+    %% Infrastructure Layer
+    subgraph Infrastructure_Layer ["Infrastructure & Core Services"]
+        direction LR
+        DB[("MongoDB Atlas<br/>(Metadata)")]
+        Cache[("Redis<br/>(Rate Limit/Auth)")]
+        BC{{"Hyperledger Fabric<br/>(Immutable Ledger)"}}
+        IPFS[("IPFS / Pinata<br/>(Decentralized Storage)")]
+        AI(("🤖<br/>AI Service<br/>(MobileNetV2 + CNN)"))
+    end
+
+    AG --> DB
+    AG --> Cache
+    AG --> BC
+    AG --> IPFS
+    AG --> AI
+
+    %% Styling
+    classDef primary fill:#e8f4f8,stroke:#0369a1,stroke-width:2px;
+    classDef gateway fill:#fdf4ff,stroke:#a21caf,stroke-width:2px;
+    classDef data fill:#f0fdf4,stroke:#15803d,stroke-width:2px;
+    classDef bc fill:#fffbeb,stroke:#b45309,stroke-width:2px;
+    
+    class F,L,M,A primary;
+    class AG gateway;
+    class DB,Cache,IPFS data;
+    class BC bc;
+    class AI gateway;
 ```
 
 ---
 
 ## 🔄 Complete Workflow Flowchart
 
-```
-                    ┌─────────────────┐
-                    │  Stakeholder    │
-                    │  Registration   │
-                    └────────┬────────┘
-                             │
-                    ┌────────▼────────┐
-                    │  AYUSH Admin    │
-                    │  Approval Gate  │◄──── Reject ──► Account Disabled
-                    └────────┬────────┘
-                             │ Approve
-              ┌──────────────┼──────────────┐
-              ▼              ▼              ▼
-        ┌───────────┐ ┌───────────┐ ┌──────────────┐
-        │  FARMER   │ │    LAB    │ │ MANUFACTURER │
-        └─────┬─────┘ └─────┬─────┘ └──────┬───────┘
-              │              │              │
-   ┌──────────▼──────────┐   │              │
-   │ Record Collection   │   │              │
-   │ • Capture 5 photos  │   │              │
-   │ • GPS coordinates   │   │              │
-   │ • Species + Qty     │   │              │
-   └──────────┬──────────┘   │              │
-              │              │              │
-   ┌──────────▼──────────┐   │              │
-   │ AI Verification     │   │              │
-   │ ┌────────────────┐  │   │              │
-   │ │ ImageNet Pre-  │  │   │              │
-   │ │ validation     │──┼── Not a plant? ──► REJECT
-   │ └───────┬────────┘  │   │              │
-   │ ┌───────▼────────┐  │   │              │
-   │ │ Custom CNN     │  │   │              │
-   │ │ (Ashw/Tulsi)   │  │   │              │
-   │ │ Confidence ≥85%│  │   │              │
-   │ └───────┬────────┘  │   │              │
-   └──────────┬──────────┘   │              │
-              │              │              │
-   ┌──────────▼──────────┐   │              │
-   │ Upload to IPFS      │   │              │
-   │ (Pinata folder CID) │   │              │
-   └──────────┬──────────┘   │              │
-              │              │              │
-   ┌──────────▼──────────┐   │              │
-   │ Anomaly Detection   │   │              │
-   │ • Duplicate photo?  │   │              │
-   │ • Geo inconsistency?│   │              │
-   │ • Rapid submissions?│   │              │
-   └──────────┬──────────┘   │              │
-              │              │              │
-   ┌──────────▼──────────┐   │              │
-   │ Anchor to Blockchain│   │              │
-   │ Status: PENDING     │   │              │
-   └──────────┬──────────┘   │              │
-              │              │              │
-              └──────────────▼              │
-                    ┌────────────────┐      │
-                    │ Lab Testing    │      │
-                    │ • Heavy metals │      │
-                    │ • Pesticides   │      │
-                    │ • Microbiology │      │
-                    │ • Moisture     │      │
-                    │ • Active ingr. │      │
-                    └────────┬───────┘      │
-                             │              │
-                    ┌────────▼───────┐      │
-                    │ Upload PDF to  │      │
-                    │ IPFS + Anchor  │      │
-                    │ Status: PASSED │      │
-                    └────────┬───────┘      │
-                             │              │
-              ┌──────────────┘              │
-              ▼                             ▼
-   ┌──────────────────┐      ┌──────────────────────┐
-   │ Farmer Dispatches │      │ Verify Arrivals      │
-   │ Status: IN_TRANSIT│─────►│ Photo Similarity     │
-   └──────────────────┘      │ Score ≥90% = GREEN   │
-                              │ 70-89%   = YELLOW   │
-                              │ <70%     = RED       │
-                              └──────────┬───────────┘
-                                         │
-                              ┌──────────▼───────────┐
-                              │ Build Product Batch   │
-                              │ Link herb batches     │
-                              │ Integrity check       │
-                              └──────────┬───────────┘
-                                         │
-                              ┌──────────▼───────────┐
-                              │ Generate QR Code      │
-                              │ HMAC-signed URL       │
-                              │ Status: QR_GENERATED  │
-                              └──────────┬───────────┘
-                                         │
-                              ┌──────────▼───────────┐
-                              │ PUBLIC VERIFY PORTAL  │
-                              │ Consumer scans QR     │
-                              │ Full provenance trail │
-                              └──────────────────────┘
+```mermaid
+flowchart TD
+    %% Stakeholders
+    Register(("Stakeholder<br/>Registration"))
+    AdminGate{"AYUSH Admin<br/>Approval Gate"}
+    AccountDisabled(("Account<br/>Disabled"))
+    
+    Register --> AdminGate
+    AdminGate -- "Reject" --> AccountDisabled
+    AdminGate -- "Approve" --> Roles
+    
+    subgraph Roles ["Participants"]
+        direction LR
+        Farmer(("🧑‍🌾<br/>Farmer"))
+        Lab(("🧪<br/>Lab"))
+        Manufacturer(("🏭<br/>Manufacturer"))
+    end
+    
+    Roles --> RecordCollection
+    
+    %% Farmer Flow
+    RecordCollection(["Record Collection<br/>(5 photos, GPS, Species, Qty)"])
+    AI_Verify{"AI Verification<br/>(MobileNetV2 + CNN)"}
+    AI_Reject(("Reject<br/>(Not a plant / <85%)"))
+    IPFS_Upload[("Upload to IPFS<br/>(Folder CID)")]
+    Anomaly{"Anomaly Detection<br/>(Geo/Rapid/Dup)"}
+    Blockchain1{{"Anchor to Blockchain<br/>(Status: PENDING)"}}
+    
+    RecordCollection --> AI_Verify
+    AI_Verify -- "Fail" --> AI_Reject
+    AI_Verify -- "Pass (≥85%)" --> IPFS_Upload
+    IPFS_Upload --> Anomaly
+    Anomaly --> Blockchain1
+    
+    %% Lab Flow
+    Lab_Test(["Lab Testing<br/>(Metals, Pesticides, Moisture)"])
+    IPFS_Cert[("Upload PDF to IPFS<br/>(Status: PASSED)")]
+    
+    Blockchain1 --> Lab_Test
+    Lab_Test --> IPFS_Cert
+    
+    %% Transit Flow
+    Dispatch(["Farmer Dispatches<br/>(Status: IN_TRANSIT)"])
+    IPFS_Cert --> Dispatch
+    
+    %% Manufacturer Flow
+    VerifyArrival{"Verify Arrivals<br/>(Photo Similarity Score)"}
+    BuildProduct(["Build Product Batch<br/>(Integrity Check)"])
+    GenQR{"Generate QR Code<br/>(HMAC-Signed URL)"}
+    PublicPortal(("Public Verify Portal<br/>(Full Provenance)"))
+    RejectAdulteration(("Reject<br/>(Adulteration)"))
+    
+    Dispatch --> VerifyArrival
+    VerifyArrival -- "≥90% (Green)<br/>or 70-89% (Yellow)" --> BuildProduct
+    VerifyArrival -- "<70% (Red)" --> RejectAdulteration
+    BuildProduct --> GenQR
+    GenQR --> PublicPortal
+
+    %% Styling
+    classDef role fill:#dbeafe,stroke:#1e40af,stroke-width:2px;
+    classDef process fill:#f3f4f6,stroke:#4b5563,stroke-width:2px;
+    classDef check fill:#fef3c7,stroke:#d97706,stroke-width:2px;
+    classDef db fill:#ecfdf5,stroke:#047857,stroke-width:2px;
+    classDef endnode fill:#fee2e2,stroke:#b91c1c,stroke-width:2px;
+    
+    class Farmer,Lab,Manufacturer role;
+    class RecordCollection,Lab_Test,Dispatch,BuildProduct process;
+    class AdminGate,AI_Verify,Anomaly,VerifyArrival,GenQR check;
+    class IPFS_Upload,IPFS_Cert,Blockchain1 db;
+    class AccountDisabled,AI_Reject,RejectAdulteration endnode;
+    class PublicPortal,Register role;
 ```
 
 ### 📝 Workflow Description (Step-by-Step)
@@ -266,17 +253,19 @@ Weighted stakeholder reputation: **Lab Pass Rate (40%) + AI Similarity (35%) + O
 
 ## 🏗️ Batch Lifecycle States
 
-```
-PENDING → LAB_TESTING → LAB_PASSED → IN_TRANSIT → RECEIVED
-                ↓                                      ↓
-           LAB_FAILED                         PENDING_QC_REVIEW
-                                                   ↓        ↓
-                                        MANUFACTURER    MANUFACTURER
-                                         _APPROVED       _REJECTED
-                                              ↓
-                                        QR_GENERATED
-                                              ↓
-                                          RECALLED (if needed)
+```mermaid
+stateDiagram-v2
+    [*] --> PENDING
+    PENDING --> LAB_TESTING
+    LAB_TESTING --> LAB_PASSED
+    LAB_TESTING --> LAB_FAILED
+    LAB_PASSED --> IN_TRANSIT
+    IN_TRANSIT --> RECEIVED
+    RECEIVED --> PENDING_QC_REVIEW
+    PENDING_QC_REVIEW --> MANUFACTURER_APPROVED
+    PENDING_QC_REVIEW --> MANUFACTURER_REJECTED
+    MANUFACTURER_APPROVED --> QR_GENERATED
+    QR_GENERATED --> RECALLED : (if needed)
 ```
 
 ---

@@ -83,27 +83,27 @@ flowchart TD
 
 ---
 
-## 🔄 Complete Workflow Flowchart
+## 🔄 Complete Workflow Block Diagram
 
 ```mermaid
 flowchart TD
     %% Phase 0: Setup
     subgraph Setup ["🛡️ Registration & Governance"]
-        Reg(("Stakeholder<br/>Registration")) --> Gate{"AYUSH Admin<br/>Approval"}
-        Gate -- Reject --> Disabled(("Account<br/>Disabled"))
+        Reg["Stakeholder<br/>Registration"] --> Gate["AYUSH Admin<br/>Approval"]
+        Gate -- Reject --> Disabled["Account<br/>Disabled"]
         Gate -- Approve --> Access["System Access"]
     end
 
     %% Phase 1: Farmer
     subgraph Farmer_Phase ["🧑‍🌾 Phase 1: Farmer Collection"]
         direction TB
-        Collection(["1. Record Collection<br/>(5 Photos, GPS, Qty)"])
-        AI_Check{"2. AI Verification<br/>(MobileNet + CNN)"}
-        AI_Fail(("Reject<br/>(< 85% Confidence)"))
-        IPFS_Upload[("3. Upload to IPFS<br/>(Deduplication Hash)")]
-        Anomaly{"4. Anomaly Detection<br/>(Geo, Time, Rapid)"}
-        BC_Pending{{"5. Anchor to Blockchain<br/>(Status: PENDING)"}}
-        Dispatch(["6. Dispatch Batch<br/>(Status: IN_TRANSIT)"])
+        Collection["1. Record Collection<br/>(5 Photos, GPS, Qty)"]
+        AI_Check["2. AI Verification<br/>(MobileNet + CNN)"]
+        AI_Fail["Reject<br/>(< 85% Confidence)"]
+        IPFS_Upload["3. Upload to IPFS<br/>(Deduplication Hash)"]
+        Anomaly["4. Anomaly Detection<br/>(Geo, Time, Rapid)"]
+        BC_Pending["5. Anchor to Blockchain<br/>(Status: PENDING)"]
+        Dispatch["6. Dispatch Batch<br/>(Status: IN_TRANSIT)"]
 
         Collection --> AI_Check
         AI_Check -- Fail --> AI_Fail
@@ -116,10 +116,10 @@ flowchart TD
     %% Phase 2: Lab
     subgraph Lab_Phase ["🧪 Phase 2: Lab Testing"]
         direction TB
-        ReceiveSample(["7. Receive Sample"])
+        ReceiveSample["7. Receive Sample"]
         TestSample["8. Comprehensive Test<br/>(Metals, Microbio)"]
-        UploadCert[("9. Upload Cert to IPFS")]
-        BC_Passed{{"10. Anchor Results<br/>(Status: LAB_PASSED)"}}
+        UploadCert["9. Upload Cert to IPFS"]
+        BC_Passed["10. Anchor Results<br/>(Status: LAB_PASSED)"]
 
         ReceiveSample --> TestSample
         TestSample --> UploadCert
@@ -129,11 +129,11 @@ flowchart TD
     %% Phase 3: Manufacturer
     subgraph Mfg_Phase ["🏭 Phase 3: Manufacturing"]
         direction TB
-        Arrival(["11. Verify Arrival Photos"])
-        Sim_Score{"12. Photo Similarity"}
-        Sim_Fail(("Reject<br/>(Adulteration)"))
-        Build(["13. Build Product Batch"])
-        Gen_QR{"14. Generate HMAC QR"}
+        Arrival["11. Verify Arrival Photos"]
+        Sim_Score["12. Photo Similarity"]
+        Sim_Fail["Reject<br/>(Adulteration)"]
+        Build["13. Build Product Batch"]
+        Gen_QR["14. Generate HMAC QR"]
         
         Arrival --> Sim_Score
         Sim_Score -- "< 70% (Red)" --> Sim_Fail
@@ -143,8 +143,8 @@ flowchart TD
 
     %% Phase 4: Consumer
     subgraph Consumer_Phase ["🛒 Consumer Verification"]
-        Scan(["15. Scan QR Code"])
-        Portal(("16. Public Verify Portal<br/>(Full Provenance)"))
+        Scan["15. Scan QR Code"]
+        Portal["16. Public Verify Portal<br/>(Full Provenance)"]
         Scan --> Portal
     end
 

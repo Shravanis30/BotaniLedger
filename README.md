@@ -38,49 +38,64 @@
 ## 🏗️ System Architecture (High-Level)
 
 ```mermaid
-graph TD
-    %% Client Layer
-    subgraph Client_Layer ["Client Layer (React 19 + Vite + TailwindCSS)"]
-        direction LR
-        F(("🧑‍🌾<br/>Farmer UI<br/>(Offline-First)"))
-        L(("🧪<br/>Lab UI<br/>(Certify)"))
-        M(("🏭<br/>Manufacturer<br/>(Verify + QR)"))
-        A(("🛡️<br/>Admin & Regulators<br/>(Governance)"))
+flowchart LR
+    %% Client Apps
+    subgraph Farmers ["🧑‍🌾 Farmer"]
+        F_App(("Farmer Mobile App<br/>(Zustand Offline Sync)"))
+    end
+
+    subgraph Labs ["🧪 Lab Tester"]
+        L_App(("Lab Web Portal<br/>(Certifications)"))
+    end
+
+    subgraph Manufacturers ["🏭 Manufacturer"]
+        M_App(("Manufacturer App<br/>(Batch Verification)"))
+    end
+
+    subgraph Governance ["🛡️ Admin & Regulator"]
+        A_App(("Governance Dashboard<br/>(RBAC & Audit)"))
     end
 
     %% API Gateway Layer
-    AG{{"API Gateway<br/>(Express.js + JWT + RBAC)"}}
-    
-    %% Connections
-    Client_Layer -- "HTTPS / REST" --> AG
-
-    %% Infrastructure Layer
-    subgraph Infrastructure_Layer ["Infrastructure & Core Services"]
-        direction LR
-        DB[("MongoDB Atlas<br/>(Metadata)")]
-        Cache[("Redis<br/>(Rate Limit/Auth)")]
-        BC{{"Hyperledger Fabric<br/>(Immutable Ledger)"}}
-        IPFS[("IPFS / Pinata<br/>(Decentralized Storage)")]
-        AI(("🤖<br/>AI Service<br/>(MobileNetV2 + CNN)"))
+    subgraph API_Gateway ["API Gateway & Core (Express.js)"]
+        Auth{"JWT / RBAC<br/>Rate Limiting"}
+        Router["Service Router"]
+        Auth --> Router
     end
 
-    AG --> DB
-    AG --> Cache
-    AG --> BC
-    AG --> IPFS
-    AG --> AI
+    Farmers -->|REST| Auth
+    Labs -->|REST| Auth
+    Manufacturers -->|REST| Auth
+    Governance -->|REST| Auth
+
+    %% Microservices
+    subgraph Microservices ["Backend Microservices"]
+        direction TB
+        AI_SVC(("🤖 AI Vision Service<br/>(MobileNetV2 + CNN)"))
+        BC_SVC{{"Blockchain Service<br/>(Fabric Client)"}}
+        IPFS_SVC[("IPFS Manager<br/>(Pinata Deduplication)")]
+        Data_SVC[("Data Service<br/>(MongoDB & Redis)")]
+        Anomaly_SVC["Anomaly Detection Engine<br/>(Geo, Rapid, Dup)"]
+    end
+
+    Router --> AI_SVC
+    Router --> BC_SVC
+    Router --> IPFS_SVC
+    Router --> Data_SVC
+    Router --> Anomaly_SVC
 
     %% Styling
-    classDef primary fill:#e8f4f8,stroke:#0369a1,stroke-width:2px;
-    classDef gateway fill:#fdf4ff,stroke:#a21caf,stroke-width:2px;
-    classDef data fill:#f0fdf4,stroke:#15803d,stroke-width:2px;
-    classDef bc fill:#fffbeb,stroke:#b45309,stroke-width:2px;
-    
-    class F,L,M,A primary;
-    class AG gateway;
-    class DB,Cache,IPFS data;
-    class BC bc;
-    class AI gateway;
+    classDef app fill:#e0f2fe,stroke:#0284c7,stroke-width:2px;
+    classDef gate fill:#fdf4ff,stroke:#c026d3,stroke-width:2px;
+    classDef svc fill:#fef3c7,stroke:#d97706,stroke-width:2px;
+    classDef data fill:#ecfccb,stroke:#65a30d,stroke-width:2px;
+    classDef bc fill:#ffedd5,stroke:#ea580c,stroke-width:2px;
+
+    class F_App,L_App,M_App,A_App app;
+    class Auth,Router gate;
+    class AI_SVC,Anomaly_SVC svc;
+    class IPFS_SVC,Data_SVC data;
+    class BC_SVC bc;
 ```
 
 ---
@@ -89,75 +104,92 @@ graph TD
 
 ```mermaid
 flowchart TD
-    %% Stakeholders
-    Register(("Stakeholder<br/>Registration"))
-    AdminGate{"AYUSH Admin<br/>Approval Gate"}
-    AccountDisabled(("Account<br/>Disabled"))
-    
-    Register --> AdminGate
-    AdminGate -- "Reject" --> AccountDisabled
-    AdminGate -- "Approve" --> Roles
-    
-    subgraph Roles ["Participants"]
-        direction LR
-        Farmer(("🧑‍🌾<br/>Farmer"))
-        Lab(("🧪<br/>Lab"))
-        Manufacturer(("🏭<br/>Manufacturer"))
+    %% Phase 0: Setup
+    subgraph Setup ["🛡️ Registration & Governance"]
+        Reg(("Stakeholder<br/>Registration")) --> Gate{"AYUSH Admin<br/>Approval"}
+        Gate -- Reject --> Disabled(("Account<br/>Disabled"))
+        Gate -- Approve --> Access["System Access"]
     end
-    
-    Roles --> RecordCollection
-    
-    %% Farmer Flow
-    RecordCollection(["Record Collection<br/>(5 photos, GPS, Species, Qty)"])
-    AI_Verify{"AI Verification<br/>(MobileNetV2 + CNN)"}
-    AI_Reject(("Reject<br/>(Not a plant / <85%)"))
-    IPFS_Upload[("Upload to IPFS<br/>(Folder CID)")]
-    Anomaly{"Anomaly Detection<br/>(Geo/Rapid/Dup)"}
-    Blockchain1{{"Anchor to Blockchain<br/>(Status: PENDING)"}}
-    
-    RecordCollection --> AI_Verify
-    AI_Verify -- "Fail" --> AI_Reject
-    AI_Verify -- "Pass (≥85%)" --> IPFS_Upload
-    IPFS_Upload --> Anomaly
-    Anomaly --> Blockchain1
-    
-    %% Lab Flow
-    Lab_Test(["Lab Testing<br/>(Metals, Pesticides, Moisture)"])
-    IPFS_Cert[("Upload PDF to IPFS<br/>(Status: PASSED)")]
-    
-    Blockchain1 --> Lab_Test
-    Lab_Test --> IPFS_Cert
-    
-    %% Transit Flow
-    Dispatch(["Farmer Dispatches<br/>(Status: IN_TRANSIT)"])
-    IPFS_Cert --> Dispatch
-    
-    %% Manufacturer Flow
-    VerifyArrival{"Verify Arrivals<br/>(Photo Similarity Score)"}
-    BuildProduct(["Build Product Batch<br/>(Integrity Check)"])
-    GenQR{"Generate QR Code<br/>(HMAC-Signed URL)"}
-    PublicPortal(("Public Verify Portal<br/>(Full Provenance)"))
-    RejectAdulteration(("Reject<br/>(Adulteration)"))
-    
-    Dispatch --> VerifyArrival
-    VerifyArrival -- "≥90% (Green)<br/>or 70-89% (Yellow)" --> BuildProduct
-    VerifyArrival -- "<70% (Red)" --> RejectAdulteration
-    BuildProduct --> GenQR
-    GenQR --> PublicPortal
+
+    %% Phase 1: Farmer
+    subgraph Farmer_Phase ["🧑‍🌾 Phase 1: Farmer Collection"]
+        direction TB
+        Collection(["1. Record Collection<br/>(5 Photos, GPS, Qty)"])
+        AI_Check{"2. AI Verification<br/>(MobileNet + CNN)"}
+        AI_Fail(("Reject<br/>(< 85% Confidence)"))
+        IPFS_Upload[("3. Upload to IPFS<br/>(Deduplication Hash)")]
+        Anomaly{"4. Anomaly Detection<br/>(Geo, Time, Rapid)"}
+        BC_Pending{{"5. Anchor to Blockchain<br/>(Status: PENDING)"}}
+        Dispatch(["6. Dispatch Batch<br/>(Status: IN_TRANSIT)"])
+
+        Collection --> AI_Check
+        AI_Check -- Fail --> AI_Fail
+        AI_Check -- Pass --> IPFS_Upload
+        IPFS_Upload --> Anomaly
+        Anomaly --> BC_Pending
+        BC_Pending --> Dispatch
+    end
+
+    %% Phase 2: Lab
+    subgraph Lab_Phase ["🧪 Phase 2: Lab Testing"]
+        direction TB
+        ReceiveSample(["7. Receive Sample"])
+        TestSample["8. Comprehensive Test<br/>(Metals, Microbio)"]
+        UploadCert[("9. Upload Cert to IPFS")]
+        BC_Passed{{"10. Anchor Results<br/>(Status: LAB_PASSED)"}}
+
+        ReceiveSample --> TestSample
+        TestSample --> UploadCert
+        UploadCert --> BC_Passed
+    end
+
+    %% Phase 3: Manufacturer
+    subgraph Mfg_Phase ["🏭 Phase 3: Manufacturing"]
+        direction TB
+        Arrival(["11. Verify Arrival Photos"])
+        Sim_Score{"12. Photo Similarity"}
+        Sim_Fail(("Reject<br/>(Adulteration)"))
+        Build(["13. Build Product Batch"])
+        Gen_QR{"14. Generate HMAC QR"}
+        
+        Arrival --> Sim_Score
+        Sim_Score -- "< 70% (Red)" --> Sim_Fail
+        Sim_Score -- "≥ 70% (Green/Yellow)" --> Build
+        Build --> Gen_QR
+    end
+
+    %% Phase 4: Consumer
+    subgraph Consumer_Phase ["🛒 Consumer Verification"]
+        Scan(["15. Scan QR Code"])
+        Portal(("16. Public Verify Portal<br/>(Full Provenance)"))
+        Scan --> Portal
+    end
+
+    %% Cross-phase connections
+    Access --> Collection
+    BC_Pending -.-> ReceiveSample
+    BC_Passed -.-> Dispatch
+    Dispatch -.-> Arrival
+    Gen_QR -.-> Scan
 
     %% Styling
-    classDef role fill:#dbeafe,stroke:#1e40af,stroke-width:2px;
-    classDef process fill:#f3f4f6,stroke:#4b5563,stroke-width:2px;
-    classDef check fill:#fef3c7,stroke:#d97706,stroke-width:2px;
-    classDef db fill:#ecfdf5,stroke:#047857,stroke-width:2px;
-    classDef endnode fill:#fee2e2,stroke:#b91c1c,stroke-width:2px;
-    
-    class Farmer,Lab,Manufacturer role;
-    class RecordCollection,Lab_Test,Dispatch,BuildProduct process;
-    class AdminGate,AI_Verify,Anomaly,VerifyArrival,GenQR check;
-    class IPFS_Upload,IPFS_Cert,Blockchain1 db;
-    class AccountDisabled,AI_Reject,RejectAdulteration endnode;
-    class PublicPortal,Register role;
+    classDef role fill:#f1f5f9,stroke:#475569,stroke-width:2px;
+    classDef farmer fill:#dcfce7,stroke:#166534,stroke-width:2px;
+    classDef lab fill:#dbeafe,stroke:#1e3a8a,stroke-width:2px;
+    classDef mfg fill:#fef3c7,stroke:#b45309,stroke-width:2px;
+    classDef consumer fill:#f3e8ff,stroke:#6b21a8,stroke-width:2px;
+    classDef check fill:#ffedd5,stroke:#c2410c,stroke-width:2px;
+    classDef db fill:#ecfccb,stroke:#4d7c0f,stroke-width:2px;
+    classDef bc fill:#fce7f3,stroke:#be185d,stroke-width:2px;
+
+    class Reg,Gate,Disabled,Access role;
+    class Collection,Dispatch farmer;
+    class ReceiveSample,TestSample lab;
+    class Arrival,Build mfg;
+    class Scan,Portal consumer;
+    class AI_Check,Anomaly,Sim_Score,Gen_QR check;
+    class IPFS_Upload,UploadCert db;
+    class BC_Pending,BC_Passed bc;
 ```
 
 ### 📝 Workflow Description (Step-by-Step)

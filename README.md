@@ -38,64 +38,58 @@
 ## 🏗️ System Architecture (High-Level)
 
 ```mermaid
-flowchart LR
-    %% Client Apps
-    subgraph Farmers ["🧑‍🌾 Farmer"]
-        F_App(("Farmer Mobile App<br/>(Zustand Offline Sync)"))
+flowchart TD
+    %% Frontend Layer
+    subgraph Frontend ["Frontend Layer (React 19)"]
+        direction LR
+        F(("🧑‍🌾<br/>Farmer UI<br/>(Offline-First)"))
+        L(("🧪<br/>Lab UI<br/>(Certify)"))
+        M(("🏭<br/>Manufacturer<br/>(Verify + QR)"))
+        A(("🛡️<br/>Admin & Regulators<br/>(Governance)"))
     end
 
-    subgraph Labs ["🧪 Lab Tester"]
-        L_App(("Lab Web Portal<br/>(Certifications)"))
-    end
-
-    subgraph Manufacturers ["🏭 Manufacturer"]
-        M_App(("Manufacturer App<br/>(Batch Verification)"))
-    end
-
-    subgraph Governance ["🛡️ Admin & Regulator"]
-        A_App(("Governance Dashboard<br/>(RBAC & Audit)"))
-    end
-
-    %% API Gateway Layer
-    subgraph API_Gateway ["API Gateway & Core (Express.js)"]
-        Auth{"JWT / RBAC<br/>Rate Limiting"}
-        Router["Service Router"]
+    %% API Gateway
+    subgraph Gateway ["API Gateway Layer (Express.js)"]
+        direction TB
+        Auth{"Auth & Security<br/>(JWT + RBAC + Limiter)"}
+        Router["API Router & Validation"]
         Auth --> Router
     end
 
-    Farmers -->|REST| Auth
-    Labs -->|REST| Auth
-    Manufacturers -->|REST| Auth
-    Governance -->|REST| Auth
+    %% Network Link
+    Frontend -- "HTTPS / REST" --> Gateway
 
-    %% Microservices
-    subgraph Microservices ["Backend Microservices"]
-        direction TB
-        AI_SVC(("🤖 AI Vision Service<br/>(MobileNetV2 + CNN)"))
-        BC_SVC{{"Blockchain Service<br/>(Fabric Client)"}}
-        IPFS_SVC[("IPFS Manager<br/>(Pinata Deduplication)")]
-        Data_SVC[("Data Service<br/>(MongoDB & Redis)")]
-        Anomaly_SVC["Anomaly Detection Engine<br/>(Geo, Rapid, Dup)"]
+    %% Microservices Layer
+    subgraph Microservices ["Backend Microservices & Infrastructure"]
+        direction LR
+        DB[("MongoDB Atlas<br/>(Metadata)")]
+        Cache[("Redis Cache<br/>(Tokens/Limits)")]
+        BC{{"Hyperledger Fabric<br/>(Immutable Ledger)"}}
+        IPFS[("IPFS / Pinata<br/>(Decentralized Storage)")]
+        AI(("🤖 AI Service<br/>(MobileNetV2 + CNN)"))
+        Anomaly["Anomaly Engine<br/>(Geo, Rapid, Dup)"]
     end
 
-    Router --> AI_SVC
-    Router --> BC_SVC
-    Router --> IPFS_SVC
-    Router --> Data_SVC
-    Router --> Anomaly_SVC
+    %% Connections from Router to Services
+    Router --> DB
+    Router --> Cache
+    Router --> BC
+    Router --> IPFS
+    Router --> AI
+    Router --> Anomaly
 
     %% Styling
     classDef app fill:#e0f2fe,stroke:#0284c7,stroke-width:2px;
-    classDef gate fill:#fdf4ff,stroke:#c026d3,stroke-width:2px;
-    classDef svc fill:#fef3c7,stroke:#d97706,stroke-width:2px;
+    classDef api fill:#fdf4ff,stroke:#c026d3,stroke-width:2px;
     classDef data fill:#ecfccb,stroke:#65a30d,stroke-width:2px;
     classDef bc fill:#ffedd5,stroke:#ea580c,stroke-width:2px;
+    classDef ai fill:#fef3c7,stroke:#d97706,stroke-width:2px;
 
-    class F_App,L_App,M_App,A_App app;
-    class Auth,Router gate;
-    class AI_SVC,Anomaly_SVC svc;
-    class IPFS_SVC,Data_SVC data;
-    class BC_SVC bc;
+    class F,L,M,A app;
+    class Auth,Router api;
+    class DB,Cache,IPFS data;
+    class BC bc;
+    class AI,Anomaly ai;
 ```
 
 ---

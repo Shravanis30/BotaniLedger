@@ -44,28 +44,28 @@ flowchart TD
 
     subgraph Clients [" "]
         direction LR
-        Farmer[" "]
-        Lab[" "]
-        Mfg[" "]
-        Admin[" "]
+        Farmer["100"]
+        Lab["101"]
+        Mfg["102"]
+        Admin["103"]
     end
 
-    Gateway[" "]
-    Business[" "]
+    Gateway["104"]
+    Business["105"]
 
     subgraph Core [" "]
         direction LR
-        AI[" "]
-        BC[" "]
-        Storage[" "]
+        AI["106"]
+        BC["107"]
+        Storage["108"]
     end
 
-    Verify[" "]
+    Verify["109"]
     
     subgraph OutputLayer [" "]
         direction LR
-        Portal[" "]
-        FinalOut[" "]
+        Portal["110"]
+        FinalOut["111"]
     end
 
     %% Connections

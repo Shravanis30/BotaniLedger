@@ -42,30 +42,30 @@ flowchart TD
     %% Block Diagram Routing
     %%{init: {'flowchart': {'curve': 'stepBefore'}}}%%
 
-    subgraph Clients ["Client Applications"]
+    subgraph Clients [" "]
         direction LR
-        Farmer["Farmer / Harvester<br/>client application"]
-        Lab["Independent Lab Tester<br/>client application"]
-        Mfg["Manufacturer<br/>client application"]
-        Admin["Regulatory Admin<br/>dashboard"]
+        Farmer[" "]
+        Lab[" "]
+        Mfg[" "]
+        Admin[" "]
     end
 
-    Gateway["API Gateway Layer"]
-    Business["Business Logic Layer"]
+    Gateway[" "]
+    Business[" "]
 
-    subgraph Core ["Core Systems"]
+    subgraph Core [" "]
         direction LR
-        AI["Artificial Intelligence (AI) Engine"]
-        BC["permissioned Blockchain Layer"]
-        Storage["hybrid Storage Layer"]
+        AI[" "]
+        BC[" "]
+        Storage[" "]
     end
 
-    Verify["Verification Engine"]
+    Verify[" "]
     
-    subgraph OutputLayer ["End User Delivery"]
+    subgraph OutputLayer [" "]
         direction LR
-        Portal["Consumer Portal"]
-        FinalOut["Final User Output"]
+        Portal[" "]
+        FinalOut[" "]
     end
 
     %% Connections

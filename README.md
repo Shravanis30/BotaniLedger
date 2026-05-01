@@ -48,7 +48,6 @@ flowchart TD
         Lab["Independent Lab Tester<br/>client application"]
         Mfg["Manufacturer<br/>client application"]
         Admin["Regulatory Admin<br/>dashboard"]
-        Mobile["Consumer mobile<br/>application"]
     end
 
     Gateway["API Gateway Layer"]
@@ -74,7 +73,6 @@ flowchart TD
     Lab --> Gateway
     Mfg --> Gateway
     Admin --> Gateway
-    Mobile --> Gateway
 
     Gateway --> Business
 
@@ -98,7 +96,7 @@ flowchart TD
     classDef client fill:#ffedd5,stroke:#c2410c,stroke-width:2px;
     classDef delivery fill:#f3e8ff,stroke:#9333ea,stroke-width:2px;
 
-    class Farmer,Lab,Mfg,Admin,Mobile client;
+    class Farmer,Lab,Mfg,Admin client;
     class Gateway gateway;
     class Business logic;
     class AI,BC,Storage core;

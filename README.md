@@ -39,46 +39,71 @@
 
 ```mermaid
 flowchart TD
-    %% Nodes
-    Client(["Client Side<br/><b>React Web + Mobile App</b><br/>(Farmer | Lab | Manufacturer | Admin | Consumer)"])
-    Gateway["API GATEWAY LAYER<br/><b>Node.js + Express</b><br/>(JWT Auth | RBAC | Validation | Rate Limit)"]
-    Business["BUSINESS LOGIC LAYER<br/>(Batch Management | QR Engine | Trust Score | Alerts | Sync)"]
+    %% Block Diagram Routing
+    %%{init: {'flowchart': {'curve': 'stepBefore'}}}%%
+
+    subgraph Clients ["Client Applications"]
+        direction LR
+        Farmer["Farmer / Harvester<br/>client application"]
+        Lab["Independent Lab Tester<br/>client application"]
+        Mfg["Manufacturer<br/>client application"]
+        Admin["Regulatory Admin<br/>dashboard"]
+        Mobile["Consumer mobile<br/>application"]
+    end
+
+    Gateway["API Gateway Layer"]
+    Business["Business Logic Layer"]
+
+    subgraph Core ["Core Systems"]
+        direction LR
+        AI["Artificial Intelligence (AI) Engine"]
+        BC["permissioned Blockchain Layer"]
+        Storage["hybrid Storage Layer"]
+    end
+
+    Verify["Verification Engine"]
     
-    AI["AI ENGINE<br/>(CNN + Similarity)<br/>Classification + Feature Matching"]
-    Blockchain["BLOCKCHAIN LAYER<br/><b>Hyperledger Fabric</b><br/>(Smart Contracts)<br/>FSM + Consensus"]
-    Storage["STORAGE LAYER<br/><b>IPFS + MongoDB + Redis</b><br/>(Photos | Data | Cache)"]
-    
-    Verification["VERIFICATION ENGINE<br/>(Trust Score + Batch Validation + Timeline)"]
-    Consumer["CONSUMER PORTAL<br/>(QR Scan → Truth Timeline Output)"]
-    Output(["FINAL USER OUTPUT<br/>(Photos + Lab Reports + Similarity + Trust Score)"])
+    subgraph OutputLayer ["End User Delivery"]
+        direction LR
+        Portal["Consumer Portal"]
+        FinalOut["Final User Output"]
+    end
 
     %% Connections
-    Client -- "API Requests (HTTPS)" --> Gateway
+    Farmer --> Gateway
+    Lab --> Gateway
+    Mfg --> Gateway
+    Admin --> Gateway
+    Mobile --> Gateway
+
     Gateway --> Business
-    
+
     Business --> AI
-    Business --> Blockchain
+    Business --> BC
     Business --> Storage
-    
-    AI -- "Data Processing<br/>(Similarity Score | AI Output)" --> Verification
-    Blockchain -- "Event Listener<br/>(Blockchain → DB Sync)" --> Verification
-    Storage -.-> Verification
-    
-    Verification --> Consumer
-    Consumer --> Output
+
+    AI --> Verify
+    BC --> Verify
+    Storage --> Verify
+
+    Verify --> Portal
+    Portal --> FinalOut
 
     %% Styling
-    classDef yellowNode fill:#fef08a,stroke:#ca8a04,stroke-width:2px,color:#000;
-    classDef blueNode fill:#bfdbfe,stroke:#2563eb,stroke-width:2px,color:#000;
-    classDef grayNode fill:#e5e7eb,stroke:#4b5563,stroke-width:2px,color:#000;
-    classDef greenNode fill:#bbf7d0,stroke:#16a34a,stroke-width:2px,color:#000;
-    classDef redNode fill:#fecaca,stroke:#dc2626,stroke-width:2px,color:#000;
+    classDef default fill:#f8fafc,stroke:#94a3b8,stroke-width:2px,color:#0f172a,rx:4px,ry:4px;
+    classDef gateway fill:#bfdbfe,stroke:#2563eb,stroke-width:2px;
+    classDef logic fill:#e2e8f0,stroke:#475569,stroke-width:2px;
+    classDef core fill:#bbf7d0,stroke:#16a34a,stroke-width:2px;
+    classDef verify fill:#fef08a,stroke:#ca8a04,stroke-width:2px;
+    classDef client fill:#ffedd5,stroke:#c2410c,stroke-width:2px;
+    classDef delivery fill:#f3e8ff,stroke:#9333ea,stroke-width:2px;
 
-    class Client,Output yellowNode;
-    class Gateway blueNode;
-    class Business,Consumer grayNode;
-    class AI,Blockchain,Storage greenNode;
-    class Verification redNode;
+    class Farmer,Lab,Mfg,Admin,Mobile client;
+    class Gateway gateway;
+    class Business logic;
+    class AI,BC,Storage core;
+    class Verify verify;
+    class Portal,FinalOut delivery;
 ```
 
 ---

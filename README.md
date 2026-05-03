@@ -569,14 +569,10 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 ---
 
-## 👥 Contributors
-
-- **Shravani S.** — Project Lead & Full-Stack Development
-- **Prathamesh** — Backend & Blockchain Integration
 
 ---
 
 <p align="center">
   Developed with ❤️ for the <strong>Botanical Transparency Initiative</strong><br/>
-  <sub>SY IoT — Semester 4 — EDI Project</sub>
+  
 </p>

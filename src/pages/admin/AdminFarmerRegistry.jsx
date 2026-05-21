@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/shared/AdminLayout';
 import { Card, StatusBadge } from '@/components/shared/UI';
-import { Users, Search, MapPin, Activity, Shield, Database, AlertCircle, Phone, Mail, Filter, Loader2, X, Clock, Terminal, ChevronRight } from 'lucide-react';
+import { Users, Search, MapPin, Activity, Shield, Database, AlertCircle, Phone, Mail, Filter, Loader2, X, Clock, Terminal, ChevronRight, CheckCircle } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { cn } from '@/lib/utils';
@@ -145,28 +145,28 @@ const AdminFarmerRegistry = () => {
                             </div>
                         </div>
                         
-                        <div className="space-y-2 mb-10">
-                            <div className="text-[10px] font-mono font-bold text-primary/40 tracking-tighter uppercase mb-1">NODE::{farmer._id.slice(-12).toUpperCase()}</div>
-                            <h3 className="text-3xl font-black text-gray-900 leading-none tracking-tighter group-hover:text-primary transition-colors cursor-default">{farmer.organization || farmer.name}</h3>
+                        <div className="space-y-2 mb-10 min-w-0">
+                            <div className="text-[10px] font-mono font-bold text-primary/40 tracking-tighter uppercase mb-1 truncate">NODE::{farmer._id.slice(-12).toUpperCase()}</div>
+                            <h3 className="text-3xl font-black text-gray-900 leading-none tracking-tighter group-hover:text-primary transition-colors cursor-default truncate">{farmer.organization || farmer.name}</h3>
                             <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-50">
                                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{farmer.role}</span>
-                                <div className="w-1 h-1 rounded-full bg-gray-300" />
-                                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest italic">Verified Peer</span>
+                                <div className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
+                                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest italic truncate">Verified Peer</span>
                             </div>
                         </div>
 
-                        <div className="space-y-4 mb-10">
-                            <div className="flex items-center gap-4 text-gray-600">
-                                <div className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                        <div className="space-y-4 mb-10 min-w-0">
+                            <div className="flex items-center gap-4 text-gray-600 min-w-0">
+                                <div className="w-8 h-8 shrink-0 rounded-xl bg-gray-50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
                                     <MapPin size={14} />
                                 </div>
-                                <span className="text-xs font-black uppercase tracking-tight text-gray-500">{farmer.location || farmer.address || 'Central Highlands'}</span>
+                                <span className="text-xs font-black uppercase tracking-tight text-gray-500 truncate block">{farmer.location || farmer.address || 'Central Highlands'}</span>
                             </div>
-                            <div className="flex items-center gap-4 text-gray-600">
-                                <div className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                            <div className="flex items-center gap-4 text-gray-600 min-w-0">
+                                <div className="w-8 h-8 shrink-0 rounded-xl bg-gray-50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
                                     <Mail size={14} />
                                 </div>
-                                <span className="text-xs font-black tracking-tighter truncate text-gray-500">{farmer.email}</span>
+                                <span className="text-xs font-black tracking-tighter truncate text-gray-500 block">{farmer.email}</span>
                             </div>
                         </div>
 
@@ -206,121 +206,131 @@ const AdminFarmerRegistry = () => {
 
         {/* Cinematic Node History Modal */}
         {selectedNode && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-primary-dark/80 backdrop-blur-2xl animate-in fade-in duration-500">
-                <Card className="max-w-5xl w-full bg-white border-none shadow-[0_0_150px_rgba(0,0,0,0.4)] overflow-hidden scale-in animate-in zoom-in duration-500 rounded-[3rem]">
-                    <div className="flex flex-col lg:flex-row h-[750px] divide-y lg:divide-y-0 lg:divide-x divide-gray-100">
-                        {/* Sidebar */}
-                        <div className="w-full lg:w-96 bg-gray-50/80 p-10 flex flex-col">
-                            <div className="flex justify-between items-start mb-12">
-                                <div className="p-5 bg-primary text-white rounded-3xl shadow-2xl shadow-green-900/30 transform -rotate-3 hover:rotate-0 transition-transform cursor-pointer">
-                                    <Terminal size={28} />
-                                </div>
-                                <button onClick={() => setSelectedNode(null)} className="p-3 bg-white border border-gray-100 text-gray-400 hover:text-primary hover:shadow-xl transition-all rounded-2xl">
-                                    <X size={24} />
-                                </button>
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-gray-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+                <Card className="max-w-6xl w-full max-h-[90vh] bg-white border border-gray-200 shadow-2xl overflow-hidden flex flex-col rounded-2xl">
+                    
+                    {/* Modal Header */}
+                    <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                        <div className="flex items-center gap-4">
+                            <div className="p-2.5 bg-primary/10 text-primary rounded-lg">
+                                <Terminal size={20} />
                             </div>
-                            
-                            <div className="space-y-2 mb-10">
-                                <h2 className="text-4xl font-black text-gray-900 tracking-tighter leading-none italic">{selectedNode.organization || selectedNode.name}</h2>
-                                <div className="text-[10px] font-black text-primary uppercase tracking-[0.3em] pl-1">Network Infrastructure Portal</div>
-                                <div className="py-2 px-4 bg-primary/5 rounded-xl border border-primary/10 inline-block mt-4">
-                                    <span className="text-[10px] font-mono font-black text-primary">{selectedNode._id}</span>
-                                </div>
+                            <div>
+                                <h2 className="text-xl font-bold text-gray-900">{selectedNode.organization || selectedNode.name}</h2>
+                                <div className="text-xs font-medium text-gray-500 mt-0.5">Node ID: {selectedNode._id}</div>
                             </div>
+                        </div>
+                        <button 
+                            onClick={() => setSelectedNode(null)} 
+                            className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                            <X size={20} />
+                        </button>
+                    </div>
 
-                            <div className="space-y-6 mt-auto">
-                                <div className="p-6 bg-white rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden group">
-                                    <div className="absolute -right-4 -bottom-4 text-emerald-50 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Activity size={80} />
-                                    </div>
-                                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                                        Peer Connectivity <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                    </div>
-                                    <div className="flex items-end gap-3">
-                                        <div className="text-3xl font-black text-gray-900">98.4<span className="text-gray-300 text-lg">%</span></div>
-                                        <div className="h-1.5 flex-1 bg-gray-50 rounded-full overflow-hidden mb-2">
+                    <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
+                        {/* Sidebar Information */}
+                        <div className="w-full lg:w-80 border-r border-gray-100 bg-gray-50/30 overflow-y-auto p-6 space-y-6">
+                            
+                            <div>
+                                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Node Analytics</h3>
+                                <div className="space-y-4">
+                                    <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-xs font-semibold text-gray-500 flex items-center gap-2">
+                                                <Activity size={14} className="text-emerald-500" />
+                                                Connectivity
+                                            </span>
+                                            <span className="text-sm font-bold text-gray-900">98.4%</span>
+                                        </div>
+                                        <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
                                             <div className="h-full bg-emerald-500 w-[98.4%]" />
                                         </div>
                                     </div>
-                                </div>
-                                <div className="p-6 bg-white rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden group">
-                                    <div className="absolute -right-4 -bottom-4 text-blue-50 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Clock size={80} />
+
+                                    <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-xs font-semibold text-gray-500 flex items-center gap-2">
+                                                <Clock size={14} className="text-blue-500" />
+                                                Uptime
+                                            </span>
+                                        </div>
+                                        <div className="text-xl font-bold text-gray-900">242.08 Days</div>
+                                        <div className="text-xs font-medium text-emerald-600 mt-1">99.99% Availability</div>
                                     </div>
-                                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Node Uptime Analysis</div>
-                                    <div className="text-3xl font-black text-gray-900 tracking-tighter italic">242.08 Days</div>
-                                    <div className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mt-1 italic">99.99% Availability</div>
                                 </div>
                             </div>
+
+                            <div>
+                                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Network Security</h3>
+                                <div className="p-4 bg-gray-900 rounded-xl text-emerald-400 font-mono text-[10px] border border-gray-800 shadow-inner">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                        <span className="font-bold">SECURE_TUNNEL_ESTABLISHED</span>
+                                    </div>
+                                    <div className="text-gray-400 truncate">Standard: v4.0.12</div>
+                                    <div className="text-emerald-600/80 mt-2 truncate">AUTH: NODE_VERIFIED</div>
+                                </div>
+                            </div>
+
                         </div>
 
-                        {/* History Feed */}
-                        <div className="flex-1 p-12 flex flex-col h-full bg-white relative">
-                            <div className="absolute top-0 right-0 p-12 opacity-[0.02] pointer-events-none">
-                                <Shield size={300} />
-                            </div>
-                            
-                            <div className="flex items-center justify-between mb-12 relative z-10">
+                        {/* History Feed Main Content */}
+                        <div className="flex-1 flex flex-col bg-white overflow-hidden">
+                            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white z-10">
                                 <div>
-                                    <h3 className="text-2xl font-black text-gray-900 italic tracking-tight uppercase flex items-center gap-4 font-black">
-                                        <div className="p-2 bg-primary/10 rounded-xl"><Clock size={24} className="text-primary" /></div> Network Audit Trail
+                                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                        Network Audit Trail
                                     </h3>
-                                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-2 italic">Immutable ledger synchronization history</p>
+                                    <p className="text-xs text-gray-500 mt-1">Immutable ledger synchronization history</p>
                                 </div>
-                                <div className="flex items-center gap-3 bg-emerald-50 px-5 py-2.5 rounded-2xl border border-emerald-100">
-                                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_#10b981]" />
-                                    <div className="text-[10px] font-black text-emerald-700 uppercase tracking-widest">Global Mainnet Sync Active</div>
+                                <div className="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-md border border-emerald-100">
+                                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                                    <div className="text-xs font-bold text-emerald-700">Mainnet Sync Active</div>
                                 </div>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto pr-6 custom-scrollbar space-y-6 relative z-10">
+                            <div className="flex-1 overflow-y-auto p-6 bg-gray-50/20">
                                 {historyLoading ? (
-                                    <div className="h-full flex flex-col items-center justify-center text-gray-400 italic">
-                                        <div className="relative mb-8">
-                                            <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping" />
-                                            <Loader2 className="animate-spin text-primary relative z-10" size={48} />
-                                        </div>
-                                        <p className="text-[10px] uppercase tracking-[0.4em] font-black text-gray-300">Decrypting Consensus Logs...</p>
+                                    <div className="h-full flex flex-col items-center justify-center text-gray-500">
+                                        <Loader2 className="animate-spin text-primary mb-4" size={32} />
+                                        <p className="text-sm font-medium">Fetching consensus logs...</p>
                                     </div>
                                 ) : nodeHistory?.length === 0 ? (
-                                    <div className="h-full flex flex-col items-center justify-center text-gray-200 bg-gray-50 rounded-[3rem] border-2 border-dashed border-gray-100">
-                                        <AlertCircle className="mb-6 opacity-30" size={60} />
-                                        <p className="text-[10px] uppercase tracking-[0.4em] font-black text-gray-400 italic font-black">No Audit Data Found on Ledger</p>
+                                    <div className="h-full flex flex-col items-center justify-center text-gray-400 bg-white rounded-xl border border-dashed border-gray-200">
+                                        <AlertCircle className="mb-4" size={40} />
+                                        <p className="text-sm font-medium">No audit data found on ledger</p>
                                     </div>
-                                ) : nodeHistory.map((log, i) => (
-                                    <div key={i} className="group p-8 bg-gray-50 rounded-[2.5rem] border-2 border-transparent hover:border-primary/20 hover:bg-white transition-all duration-500 flex items-start gap-8 shadow-sm hover:shadow-2xl hover:shadow-primary/5">
-                                        <div className="shrink-0">
-                                            <div className="w-14 h-14 rounded-2xl bg-white border border-gray-100 text-primary flex items-center justify-center font-black text-lg shadow-sm group-hover:bg-primary group-hover:text-white transition-all transform group-hover:rotate-6">
-                                                {String(i + 1).padStart(2, '0')}
-                                            </div>
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="flex justify-between items-center mb-2">
-                                                <div className="flex items-center gap-3">
-                                                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">{log.action || 'CONSENSUS_OP'}</span>
-                                                    <div className="w-1 h-1 rounded-full bg-gray-300" />
-                                                    <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest italic">Verified Block</span>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {nodeHistory.map((log, i) => (
+                                            <div key={i} className="bg-white p-4 rounded-xl border border-gray-200 hover:border-primary/30 transition-colors shadow-sm flex items-start gap-4">
+                                                <div className="w-10 h-10 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-sm font-bold text-gray-500 shrink-0">
+                                                    {i + 1}
                                                 </div>
-                                                <span className="text-[10px] font-black text-gray-300 bg-white px-3 py-1 rounded-full">{new Date(log.timestamp).toLocaleString()}</span>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex justify-between items-start mb-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-xs font-bold text-gray-900 bg-gray-100 px-2 py-0.5 rounded">{log.action || 'CONSENSUS_OP'}</span>
+                                                            <span className="text-xs font-medium text-emerald-600 flex items-center gap-1">
+                                                                <CheckCircle size={12} /> Verified
+                                                            </span>
+                                                        </div>
+                                                        <span className="text-xs text-gray-500">{new Date(log.timestamp).toLocaleString()}</span>
+                                                    </div>
+                                                    <p className="text-sm text-gray-700 mt-2 font-medium">
+                                                        {log.resource} identification verified on-chain via AI satellite sync.
+                                                    </p>
+                                                    <div className="mt-3 flex items-center gap-2">
+                                                        <span className="text-[10px] font-mono text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-100 truncate max-w-full">
+                                                            TXID: {log._id.toUpperCase()}
+                                                        </span>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <p className="text-lg font-black text-gray-700 tracking-tight italic leading-snug group-hover:text-gray-900 transition-colors uppercase">{log.resource} identification verified on-chain via AI satellite sync.</p>
-                                            <div className="flex items-center gap-4 mt-6">
-                                                <div className="text-[9px] font-mono font-black text-gray-400 bg-white px-3 py-1.5 rounded-lg border border-gray-100 group-hover:border-primary/10 group-hover:text-primary transition-all">TXID::{log._id.toUpperCase()}</div>
-                                                <div className="flex-1 h-[1px] bg-gray-100 group-hover:bg-primary/10 transition-colors" />
-                                                <ChevronRight size={14} className="text-gray-200 group-hover:text-primary transition-colors transform group-hover:translate-x-2" />
-                                            </div>
-                                        </div>
+                                        ))}
                                     </div>
-                                ))}
-                            </div>
-
-                            <div className="mt-12 p-8 bg-gray-950 rounded-[2.5rem] text-emerald-400 font-mono text-[11px] flex items-center justify-between border-4 border-gray-900 shadow-2xl overflow-hidden relative group">
-                                <div className="absolute inset-0 bg-emerald-500 opacity-0 group-hover:opacity-[0.02] transition-opacity duration-300" />
-                                <div className="flex items-center gap-4 relative z-10">
-                                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]" />
-                                    <span className="tracking-[0.2em] font-black italic uppercase">Encryption Standard v4.0.12 :: SECURE_TUNNEL_ESTABLISHED</span>
-                                </div>
-                                <span className="opacity-40 italic font-black relative z-10 px-4 py-1 bg-white/5 rounded-lg uppercase tracking-tighter">NODE_VERIFIED_AUTH_PASS</span>
+                                )}
                             </div>
                         </div>
                     </div>

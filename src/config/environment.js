@@ -10,8 +10,9 @@ const envSchema = z.object({
   JWT_ACCESS_SECRET: z.string().min(32),
   JWT_REFRESH_SECRET: z.string().min(32),
   PINATA_JWT: z.string(),
-  FABRIC_CHANNEL: z.string().default('botanyledger-channel'),
-  FABRIC_CHAINCODE: z.string().default('botanyledger'),
+  CONTRACT_ADDRESS: z.string().min(42),
+  PRIVATE_KEY: z.string().min(64),
+  SEPOLIA_RPC_URL: z.string().url(),
   AI_SERVICE_URL: z.string().url().default('http://localhost:8000'),
 });
 

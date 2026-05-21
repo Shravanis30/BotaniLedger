@@ -1,0 +1,40 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/Users/shravani/Desktop/VIT/BotaniLedger/blockchain/solidity/contracts/BotaniLedger.sol": {
+      "lastModificationDate": 1779285517805,
+      "contentHash": "677bf27e78328ee2bcbd3289e214f427",
+      "sourceName": "contracts/BotaniLedger.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "BotaniLedger"
+      ]
+    }
+  }
+}

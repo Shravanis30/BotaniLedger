@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
-import { LayoutDashboard, PlusCircle, List, RefreshCw, Settings } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, List, RefreshCw } from 'lucide-react';
 
 const FarmerLayout = ({ children, portalName = "Farmer Portal" }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -12,7 +12,6 @@ const FarmerLayout = ({ children, portalName = "Farmer Portal" }) => {
     { label: 'My Batches', to: '/farmer/batches', icon: List },
     { label: 'Certificates', to: '/lab/certificates', icon: RefreshCw },
     { label: 'Sync Status', to: '/farmer/sync', icon: RefreshCw },
-    { label: 'Settings', to: '/farmer/settings', icon: Settings },
   ];
 
   return (

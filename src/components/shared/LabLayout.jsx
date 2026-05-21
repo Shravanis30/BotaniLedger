@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
-import { LayoutDashboard, FlaskConical, BarChart3, Settings } from 'lucide-react';
+import { LayoutDashboard, FlaskConical, BarChart3 } from 'lucide-react';
 
 const LabLayout = ({ children, portalName = "Lab Analytics Node" }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -10,7 +10,6 @@ const LabLayout = ({ children, portalName = "Lab Analytics Node" }) => {
     { label: 'Dashboard', to: '/lab', icon: LayoutDashboard, end: true },
     { label: 'Certificates', to: '/lab/certificates', icon: FlaskConical },
     { label: 'Analytics', to: '/lab/analytics', icon: BarChart3 },
-    { label: 'Settings', to: '/lab/settings', icon: Settings },
   ];
 
   return (

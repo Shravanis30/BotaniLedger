@@ -62,12 +62,12 @@ const BuildProduct = () => {
         <ManufacturerLayout portalName="Synthesis Plant Hub">
             <header className="mb-12">
                 <h1 className="text-4xl font-black text-gray-900 tracking-tight">Production Line</h1>
-                <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-2 italic">Converting verified biological assets into consumer formulations.</p>
+                <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-2">Converting verified biological assets into consumer formulations.</p>
             </header>
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-12">
-                <Card className="p-6 md:p-10 border-none shadow-xl bg-white relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-[100px] -mr-16 -mt-16"></div>
+                <Card className="p-6 md:p-10 border border-gray-200 shadow-sm bg-white relative overflow-hidden rounded-xl">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-3xl -mr-16 -mt-16"></div>
                     <h3 className="text-xl font-black mb-10 flex items-center gap-3">
                         <PlusCircle className="text-primary" size={24} /> New Production Batch
                     </h3>
@@ -79,7 +79,7 @@ const BuildProduct = () => {
                                 <input 
                                     type="text" 
                                     required 
-                                    className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 ring-primary/20 font-bold text-sm"
+                                    className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 ring-primary/20 font-bold text-sm"
                                     placeholder="e.g. Immunity Formula v4"
                                     value={formData.productName}
                                     onChange={e => setFormData({...formData, productName: e.target.value})}
@@ -92,7 +92,7 @@ const BuildProduct = () => {
                                     <input 
                                         type="number" 
                                         required 
-                                        className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 ring-primary/20 font-bold text-sm"
+                                        className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 ring-primary/20 font-bold text-sm"
                                         placeholder="5000"
                                         value={formData.quantity}
                                         onChange={e => setFormData({...formData, quantity: e.target.value})}
@@ -103,7 +103,7 @@ const BuildProduct = () => {
                                     <input 
                                         type="date" 
                                         required 
-                                        className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 ring-primary/20 font-bold text-sm"
+                                        className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 ring-primary/20 font-bold text-sm"
                                         value={formData.expiryDate}
                                         onChange={e => setFormData({...formData, expiryDate: e.target.value})}
                                     />
@@ -120,9 +120,9 @@ const BuildProduct = () => {
                                             key={batch._id}
                                             onClick={() => toggleBatchSelection(batch.batchId)}
                                             className={cn(
-                                                "p-5 rounded-2xl border-2 transition-all cursor-pointer flex justify-between items-center group",
+                                                "p-5 rounded-xl border transition-all cursor-pointer flex justify-between items-center group",
                                                 formData.linkedHerbBatches.includes(batch.batchId)
-                                                    ? "border-primary bg-primary/[0.03] shadow-md shadow-green-900/5 scale-[1.01]"
+                                                    ? "border-primary bg-primary/[0.03] shadow-sm"
                                                     : "border-gray-50 bg-white hover:border-gray-200"
                                             )}
                                         >
@@ -135,7 +135,7 @@ const BuildProduct = () => {
                                                 </div>
                                                 <div>
                                                     <div className="text-xs font-black text-gray-900">{batch.batchId}</div>
-                                                    <div className="text-[10px] font-bold text-gray-400 italic">{batch.herbSpecies?.common}</div>
+                                                    <div className="text-[10px] font-bold text-gray-400">{batch.herbSpecies?.common}</div>
                                                 </div>
                                             </div>
                                             {formData.linkedHerbBatches.includes(batch.batchId) && (
@@ -144,7 +144,7 @@ const BuildProduct = () => {
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="text-center py-10 bg-gray-50 rounded-2xl italic text-xs font-bold text-gray-400">
+                                    <div className="text-center py-10 bg-gray-50 rounded-xl text-xs font-bold text-gray-400">
                                         No verified herb inventory available for production.
                                     </div>
                                 )}
@@ -154,7 +154,7 @@ const BuildProduct = () => {
                         <button 
                             type="submit" 
                             disabled={createMutation.isPending || availableBatches.length === 0}
-                            className="w-full py-5 bg-primary text-white rounded-2xl font-black uppercase tracking-[0.2em] shadow-2xl shadow-green-900/20 hover:bg-primary-mid transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed group"
+                            className="w-full py-5 bg-primary text-white rounded-xl font-black uppercase tracking-[0.2em] shadow-sm hover:bg-primary-mid transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
                         >
                             {createMutation.isPending ? (
                                 <Loader2 size={24} className="animate-spin mx-auto" />
@@ -169,8 +169,8 @@ const BuildProduct = () => {
                 </Card>
 
                 <div className="space-y-8">
-                    <Card className="p-8 border-none shadow-sm bg-gray-900 text-white min-h-[300px] flex flex-col justify-between">
-                        <h3 className="text-lg font-black italic text-emerald-400">Ledger Transparency Protocol</h3>
+                    <Card className="p-8 border border-gray-800 shadow-sm bg-gray-900 text-white min-h-[300px] flex flex-col justify-between rounded-xl">
+                        <h3 className="text-lg font-black text-emerald-400">Ledger Transparency Protocol</h3>
                         <p className="text-sm font-medium leading-relaxed opacity-60">
                             "Every production batch created here is cryptographically linked to its source biological assets. The Hyperledger fabric maintains a permanent, immutable record of this transformation, ensuring full upstream tracebility for regulators and consumers."
                         </p>

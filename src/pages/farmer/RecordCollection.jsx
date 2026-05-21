@@ -63,6 +63,7 @@ const RecordCollection = () => {
   });
 
   const [aiResults, setAiResults] = useState({});
+  const [isFetchingLocation, setIsFetchingLocation] = useState(false);
 
   const [scanning, setScanning] = useState({});
   const navigate = useNavigate();
@@ -71,6 +72,44 @@ const RecordCollection = () => {
 
   const handleNext = () => setCurrentStep(prev => Math.min(prev + 1, 4));
   const handleBack = () => setCurrentStep(prev => Math.max(prev - 1, 1));
+
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser');
+      return;
+    }
+    setIsFetchingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude, accuracy } = position.coords;
+        setFormData(prev => ({
+          ...prev,
+          location: { lat: latitude, lng: longitude, accuracy: Math.round(accuracy) },
+          zone: `${latitude.toFixed(4)}°N, ${longitude.toFixed(4)}°E` 
+        }));
+        
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+          const data = await res.json();
+          if (data && data.address) {
+             const zoneName = data.address.state_district || data.address.county || data.address.city || data.address.town || data.address.village || data.address.state || "Local Herb Belt";
+             setFormData(prev => ({
+               ...prev,
+               zone: zoneName
+             }));
+          }
+        } catch(e) {
+          console.error(e);
+        }
+
+        setIsFetchingLocation(false);
+      },
+      (error) => {
+        alert('Unable to retrieve your location: ' + error.message);
+        setIsFetchingLocation(false);
+      }
+    );
+  };
 
   const handlePhotoUpload = async (key, file) => {
     if (!file) return;
@@ -218,7 +257,7 @@ const RecordCollection = () => {
             <div className="flex justify-between relative">
                 <div className="absolute top-1/2 left-0 w-full h-1.5 bg-gray-100 -translate-y-1/2 rounded-full overflow-hidden">
                     <div 
-                        className="h-full bg-primary transition-all duration-700 ease-out shadow-[0_0_15px_rgba(45,106,79,0.3)]"
+                        className="h-full bg-primary transition-all duration-700 ease-out"
                         style={{ width: `${(currentStep - 1) * 33.33}%` }}
                     ></div>
                 </div>
@@ -226,9 +265,9 @@ const RecordCollection = () => {
                 {STEPS.map((step) => (
                     <div key={step.id} className="relative z-10 flex flex-col items-center">
                         <div className={cn(
-                            "w-12 h-12 sm:w-14 sm:h-14 rounded-[20px] flex items-center justify-center border-4 transition-all duration-500",
+                            "w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center border-2 transition-all duration-500",
                             currentStep > step.id ? "bg-primary border-primary text-white scale-90" : 
-                            currentStep === step.id ? "bg-white border-primary text-primary shadow-2xl shadow-green-900/20 scale-110" : 
+                            currentStep === step.id ? "bg-white border-primary text-primary scale-110" : 
                             "bg-white border-gray-100 text-gray-300"
                         )}>
                             {currentStep > step.id ? <CheckCircle size={24} strokeWidth={2.5} /> : <step.icon size={22} />}
@@ -250,7 +289,7 @@ const RecordCollection = () => {
 
         {/* Step Content */}
         <Card className={cn(
-            "max-w-5xl mx-auto border-none shadow-2xl shadow-green-900/5 mb-12 p-0 overflow-hidden transition-all duration-500",
+            "max-w-5xl mx-auto border border-white/10 mb-12 p-0 overflow-hidden transition-all duration-500 rounded-xl",
             isSubmitting && "opacity-50 pointer-events-none scale-[0.98]"
         )}>
             <div className="p-12 min-h-[500px]">
@@ -264,7 +303,7 @@ const RecordCollection = () => {
                                         <Search size={18} />
                                     </div>
                                     <input 
-                                        className="w-full pl-12 pr-5 py-5 border-2 border-gray-50 rounded-2xl bg-gray-50 focus:bg-white focus:border-primary transition-all outline-none font-bold text-gray-800"
+                                        className="w-full pl-12 pr-5 py-3 border border-gray-200 rounded-xl bg-white focus:border-primary transition-all outline-none font-bold text-gray-800"
                                         placeholder="Search species..."
                                         value={searchTerm || formData.species}
                                         onChange={(e) => {
@@ -274,7 +313,7 @@ const RecordCollection = () => {
                                         onFocus={() => setShowHerbList(true)}
                                     />
                                     {showHerbList && (
-                                        <div className="absolute top-full left-0 w-full mt-2 bg-white border-2 border-gray-50 rounded-2xl shadow-2xl z-50 max-h-60 overflow-y-auto p-2">
+                                        <div className="absolute top-full left-0 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-60 overflow-y-auto p-2">
                                             {filteredHerbs.map(h => (
                                                 <button 
                                                     key={h}
@@ -296,7 +335,7 @@ const RecordCollection = () => {
                                 <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Quantity (kg)</label>
                                 <input 
                                     type="number"
-                                    className="w-full px-6 py-5 border-2 border-gray-50 rounded-2xl bg-gray-50 focus:bg-white focus:border-primary transition-all outline-none font-black text-gray-800"
+                                    className="w-full px-6 py-3 border border-gray-200 rounded-xl bg-white focus:border-primary transition-all outline-none font-black text-gray-800"
                                     placeholder="0.00"
                                     value={formData.quantity}
                                     onChange={(e) => setFormData({...formData, quantity: e.target.value})}
@@ -308,23 +347,34 @@ const RecordCollection = () => {
                                 <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Collector Name</label>
                                 <input 
                                     readOnly
-                                    className="w-full px-6 py-5 border-2 border-gray-50 rounded-2xl bg-gray-100 font-bold text-gray-500 cursor-not-allowed"
+                                    className="w-full px-6 py-3 border border-gray-200 rounded-xl bg-gray-50 font-bold text-gray-500 cursor-not-allowed"
                                     value={formData.collector}
                                 />
                             </div>
                             <div className="space-y-3">
                                 <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Collection Zone</label>
-                                <input 
-                                    className="w-full px-6 py-5 border-2 border-gray-50 rounded-2xl bg-gray-50 focus:bg-white focus:border-primary transition-all outline-none font-bold text-gray-800"
-                                    value={formData.zone}
-                                    onChange={(e) => setFormData({...formData, zone: e.target.value})}
-                                />
+                                <div className="flex gap-2">
+                                    <input 
+                                        className="w-full px-6 py-3 border border-gray-200 rounded-xl bg-white focus:border-primary transition-all outline-none font-bold text-gray-800"
+                                        value={formData.zone}
+                                        onChange={(e) => setFormData({...formData, zone: e.target.value})}
+                                    />
+                                    <button 
+                                        type="button"
+                                        onClick={handleGetLocation}
+                                        disabled={isFetchingLocation}
+                                        className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors"
+                                        title="Use Current Location"
+                                    >
+                                        {isFetchingLocation ? <Loader2 size={20} className="animate-spin text-primary" /> : <MapPin size={20} className="text-gray-500" />}
+                                    </button>
+                                </div>
                             </div>
                             <div className="space-y-3">
                                 <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Date</label>
                                 <input 
                                     type="date"
-                                    className="w-full px-6 py-5 border-2 border-gray-50 rounded-2xl bg-gray-50 focus:bg-white focus:border-primary transition-all outline-none font-bold text-gray-800 appearance-none"
+                                    className="w-full px-6 py-3 border border-gray-200 rounded-xl bg-white focus:border-primary transition-all outline-none font-bold text-gray-800 appearance-none"
                                     value={formData.date}
                                     onChange={(e) => setFormData({...formData, date: e.target.value})}
                                 />
@@ -334,7 +384,7 @@ const RecordCollection = () => {
                             <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Collector Notes</label>
                             <textarea 
                                 rows={4}
-                                className="w-full px-6 py-5 border-2 border-gray-50 rounded-2xl bg-gray-50 focus:bg-white focus:border-primary transition-all outline-none font-bold text-gray-800"
+                                className="w-full px-6 py-3 border border-gray-200 rounded-xl bg-white focus:border-primary transition-all outline-none font-bold text-gray-800"
                                 placeholder="Describe weather conditions, soil moisture or visible quality..."
                                 value={formData.notes}
                                 onChange={(e) => setFormData({...formData, notes: e.target.value})}
@@ -345,13 +395,13 @@ const RecordCollection = () => {
 
                 {currentStep === 2 && (
                     <div className="space-y-10 animate-fade-in">
-                        <div className="p-8 bg-primary/5 rounded-[32px] flex items-center gap-6 border border-primary/10">
-                            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-primary shadow-sm shrink-0">
+                        <div className="p-8 bg-primary/5 rounded-xl flex items-center gap-6 border border-primary/10">
+                            <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center text-primary shadow-sm shrink-0">
                                 <Camera size={32} />
                             </div>
                             <div>
                                 <h4 className="font-bold text-xl text-gray-900 mb-1">5-Point Protocol Authentication</h4>
-                                <p className="text-sm text-gray-600 leading-relaxed italic opacity-70">AI botanical fingerprinting requires all 5 macro-perspectives. Protocol v1.4.2 active.</p>
+                                <p className="text-sm text-gray-600 leading-relaxed opacity-70">AI botanical fingerprinting requires all 5 macro-perspectives. Protocol v1.4.2 active.</p>
                             </div>
                         </div>
                         
@@ -368,7 +418,7 @@ const RecordCollection = () => {
                                         />
                                         <div 
                                             className={cn(
-                                                "w-full aspect-square rounded-[32px] border-4 border-dashed flex flex-col items-center justify-center p-6 transition-all duration-300 group overflow-hidden relative",
+                                                "w-full aspect-square rounded-xl border border-dashed flex flex-col items-center justify-center p-6 transition-all duration-300 group overflow-hidden relative",
                                                 value ? "bg-success/5 border-success/20" : "bg-gray-50 border-gray-100 hover:border-primary hover:bg-white hover:shadow-xl"
                                             )}
                                         >
@@ -422,16 +472,16 @@ const RecordCollection = () => {
                         </div>
 
                         {Object.values(aiResults).filter(r => r.status === 'verified').length === 5 ? (
-                            <div className="p-6 bg-success text-white rounded-[24px] flex items-center justify-center gap-4 shadow-xl shadow-success/20 animate-bounce-subtle">
+                            <div className="p-6 bg-success text-white rounded-xl flex items-center justify-center gap-4 shadow-sm border border-success/20">
                                 <CheckCircle size={24} />
                                 <span className="text-sm font-black uppercase tracking-widest">
                                     Protocol Success: All 5 Photos Verified as {formData.species.split(' (')[0]}
                                 </span>
                             </div>
                         ) : (
-                            <div className="p-6 bg-gray-50 rounded-[24px] border border-gray-100 flex items-center justify-center gap-4 text-gray-400">
+                            <div className="p-6 bg-gray-50 rounded-xl border border-gray-200 flex items-center justify-center gap-4 text-gray-400">
                                 <AlertCircle size={24} />
-                                <span className="text-sm font-bold uppercase tracking-widest italic tracking-wider">
+                                <span className="text-sm font-bold uppercase tracking-widest">
                                     {Object.values(aiResults).some(r => r.status === 'failed') 
                                         ? "Validation errors detected. Replace failed images to proceed." 
                                         : "Awaiting Photos for AI Fingerprinting..."}
@@ -443,10 +493,10 @@ const RecordCollection = () => {
 
                 {currentStep === 3 && (
                     <div className="space-y-10 animate-fade-in text-center py-12">
-                        <div className="inline-flex w-32 h-32 bg-primary/5 rounded-[40px] items-center justify-center text-primary mb-10 shadow-inner relative group">
+                        <div className="inline-flex w-32 h-32 bg-primary/5 rounded-xl items-center justify-center text-primary mb-10 border border-primary/10 relative group">
                             <MapPin className="w-14 h-14 group-hover:scale-110 transition-transform duration-500" />
-                            <div className="absolute inset-0 border-4 border-primary/20 rounded-[40px] animate-ping opacity-20"></div>
-                            <div className="absolute -top-2 -right-2 w-10 h-10 bg-success rounded-2xl flex items-center justify-center text-white shadow-lg border-4 border-white">
+                            <div className="absolute inset-0 border border-primary/20 rounded-xl opacity-20"></div>
+                            <div className="absolute -top-2 -right-2 w-10 h-10 bg-success rounded-lg flex items-center justify-center text-white shadow-sm border border-white">
                                 <PlusCircle size={18} />
                             </div>
                         </div>
@@ -457,7 +507,7 @@ const RecordCollection = () => {
                         </p>
                         
                         <div className="max-w-xl mx-auto grid grid-cols-2 gap-6 mb-12">
-                            <div className="p-8 bg-gray-50 rounded-[32px] border-2 border-white shadow-sm flex flex-col items-center">
+                            <div className="p-8 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col items-center">
                                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Coordinates</span>
                                 <div className="space-y-1">
                                     <div className="text-xl font-mono font-black text-primary">{formData.location.lat}° N</div>
@@ -468,7 +518,7 @@ const RecordCollection = () => {
                                     <span className="text-[9px] font-black text-success uppercase">Accuracy ±{formData.location.accuracy}m</span>
                                 </div>
                             </div>
-                            <div className="p-8 bg-gray-50 rounded-[32px] border-2 border-white shadow-sm flex flex-col items-center justify-between">
+                            <div className="p-8 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-between">
                                 <div className="space-y-4 w-full">
                                     <div>
                                         <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Timestamp</span>
@@ -477,14 +527,17 @@ const RecordCollection = () => {
                                             {formData.timestamp}
                                         </div>
                                     </div>
-                                    <button className="w-full py-4 bg-white border-2 border-primary/20 text-primary rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all">
-                                        Update Position
+                                    <button 
+                                        onClick={handleGetLocation}
+                                        disabled={isFetchingLocation}
+                                        className="w-full py-4 bg-white border border-primary/20 text-primary rounded-xl font-black text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                        {isFetchingLocation ? 'Updating...' : 'Update Position'}
                                     </button>
                                 </div>
                             </div>
                         </div>
                         
-                        <div className="inline-flex items-center gap-3 px-8 py-3 bg-success/10 text-success rounded-full text-xs font-black border-2 border-success/20 shadow-xl shadow-success/5">
+                        <div className="inline-flex items-center gap-3 px-8 py-3 bg-success/10 text-success rounded-xl text-xs font-black border border-success/20 shadow-sm">
                             <CheckCircle size={18} />
                             <span className="uppercase tracking-widest">Origin Validated: Within Forest-Belt Cluster #84</span>
                         </div>
@@ -495,10 +548,10 @@ const RecordCollection = () => {
                     <div className="space-y-10 animate-fade-in">
                          <div className="grid md:grid-cols-3 gap-10">
                             <div className="md:col-span-2 space-y-8">
-                                <div className="p-10 bg-gray-50 rounded-[40px] border-2 border-white shadow-sm space-y-8">
+                                <div className="p-10 bg-white rounded-xl border border-gray-200 shadow-sm space-y-8">
                                     <div className="flex justify-between items-start">
                                         <h4 className="font-black text-2xl text-primary-dark tracking-tight">Batch Manifest</h4>
-                                        <div className="bg-primary/10 text-primary text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest">
+                                        <div className="bg-primary/10 text-primary text-[10px] font-black px-4 py-1.5 rounded-lg uppercase tracking-widest">
                                             ID: BL-2025-XXXXX
                                         </div>
                                     </div>
@@ -523,7 +576,7 @@ const RecordCollection = () => {
                                 </div>
                                 <div className="grid grid-cols-5 gap-4">
                                      {Object.entries(formData.photos).map(([k, file]) => (
-                                         <div key={k} className="aspect-square bg-gray-100 rounded-2xl overflow-hidden border-2 border-white shadow-sm">
+                                         <div key={k} className="aspect-square bg-gray-100 rounded-xl overflow-hidden border border-gray-200 shadow-sm">
                                              {file instanceof File ? (
                                                  <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" />
                                              ) : (
@@ -534,17 +587,17 @@ const RecordCollection = () => {
                                 </div>
                             </div>
                             <div className="space-y-8">
-                                <div className="aspect-[4/5] bg-white rounded-[40px] border-4 border-gray-50 flex flex-col items-center justify-center relative overflow-hidden shadow-2xl shadow-green-900/5">
+                                <div className="aspect-[4/5] bg-white rounded-xl border border-gray-200 flex flex-col items-center justify-center relative overflow-hidden shadow-sm">
                                     <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=400&q=80')] bg-cover opacity-10"></div>
                                     <MapPin className="w-16 h-16 text-primary mb-6 relative z-10" />
                                     <span className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] relative z-10">Blockchain Anchor</span>
-                                    <span className="text-xl font-black text-primary italic mt-4 relative z-10">READY TO COMMIT</span>
+                                    <span className="text-xl font-black text-primary mt-4 relative z-10">READY TO COMMIT</span>
                                     
-                                    <div className="mt-8 bg-success/10 px-4 py-2 rounded-full relative z-10">
+                                    <div className="mt-8 bg-success/10 px-4 py-2 rounded-lg relative z-10 border border-success/20">
                                         <div className="text-[10px] font-black text-success uppercase tracking-widest">Accuracy Verified</div>
                                     </div>
                                 </div>
-                                <div className="p-6 bg-primary-dark/5 rounded-[24px] text-[10px] leading-relaxed italic text-gray-500 text-center font-bold">
+                                <div className="p-6 bg-primary-dark/5 rounded-xl text-[10px] leading-relaxed text-gray-500 text-center font-bold">
                                     Verification Protocol v1.4.2: Records are cryptographically signed and immutable post-submission.
                                 </div>
                             </div>
@@ -558,8 +611,8 @@ const RecordCollection = () => {
                     onClick={handleBack}
                     disabled={currentStep === 1}
                     className={cn(
-                        "px-10 py-5 rounded-2xl font-black flex items-center gap-3 transition-all uppercase text-[11px] tracking-widest",
-                        currentStep === 1 ? "bg-gray-100 text-gray-300" : "bg-white border-2 border-gray-100 text-gray-600 hover:border-primary hover:text-primary shadow-sm"
+                        "px-10 py-5 rounded-xl font-black flex items-center gap-3 transition-all uppercase text-[11px] tracking-widest",
+                        currentStep === 1 ? "bg-gray-100 text-gray-400 border border-gray-200" : "bg-white border border-gray-200 text-gray-600 hover:border-primary hover:text-primary shadow-sm"
                     )}
                 >
                     <ChevronLeft size={20} />
@@ -572,10 +625,10 @@ const RecordCollection = () => {
                             onClick={handleNext}
                             disabled={currentStep === 2 && Object.values(aiResults).filter(r => r.status === 'verified').length < 5}
                             className={cn(
-                                "px-12 py-5 text-white rounded-2xl font-black flex items-center gap-3 transition-all shadow-xl uppercase text-[11px] tracking-widest",
+                                "px-12 py-5 text-white rounded font-black flex items-center gap-3 transition-all uppercase text-[11px] tracking-widest",
                                 currentStep === 2 && Object.values(aiResults).filter(r => r.status === 'verified').length < 5
-                                    ? "bg-gray-300 cursor-not-allowed shadow-none"
-                                    : "bg-primary hover:bg-primary-mid shadow-green-900/20"
+                                    ? "bg-gray-300 cursor-not-allowed"
+                                    : "bg-primary hover:bg-primary-mid"
                             )}
                         >
                             Next Step
@@ -585,13 +638,13 @@ const RecordCollection = () => {
                         <>
                             <button 
                                 onClick={() => handleSubmit('OFFLINE')}
-                                className="px-10 py-5 border-2 border-primary text-primary rounded-2xl font-black transition-all hover:bg-primary/5 uppercase text-[11px] tracking-widest"
+                                className="px-10 py-5 border border-primary text-primary rounded-xl font-black transition-all hover:bg-primary/5 uppercase text-[11px] tracking-widest"
                             >
                                 Save Offline
                             </button>
                             <button 
                                 onClick={() => handleSubmit('BLOCKCHAIN')}
-                                className="px-12 py-5 bg-primary text-white rounded-2xl font-black flex items-center gap-3 hover:bg-primary-mid transition-all shadow-2xl shadow-green-900/30 uppercase text-[11px] tracking-[0.1em]"
+                                className="px-12 py-5 bg-primary text-white rounded-xl font-black flex items-center gap-3 hover:bg-primary-mid transition-all shadow-sm uppercase text-[11px] tracking-[0.1em]"
                             >
                                 Commit to Blockchain
                                 <CheckCircle size={20} />

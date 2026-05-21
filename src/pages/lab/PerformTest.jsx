@@ -180,42 +180,38 @@ const PerformTest = () => {
                     </div>
                 </div>
             )}
-            <header className="mb-10">
+            <div className="mb-6">
                 <button 
                     onClick={() => navigate('/lab')}
-                    className="flex items-center gap-2 text-gray-400 hover:text-primary transition-colors text-xs font-bold uppercase tracking-widest mb-6"
+                    className="flex items-center gap-2 text-gray-500 hover:text-primary transition-colors text-sm font-medium mb-4"
                 >
-                    <ArrowLeft size={14} /> Back to Queue
+                    <ArrowLeft size={16} /> Back to Queue
                 </button>
-                <div className="flex justify-between items-end">
+                <header className="flex flex-col md:flex-row md:justify-between md:items-end border-b border-gray-200 pb-4">
                     <div>
-                        <div className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-2">Molecular Analysis Phase</div>
-                        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight leading-none italic">
-                            Perform <span className="text-primary font-light not-italic">Testing</span>
-                        </h1>
-                        <p className="text-gray-500 font-medium mt-3 italic text-sm">Target Batch: <span className="text-primary font-mono font-bold not-italic">#{batchId}</span></p>
+                        <h1 className="text-2xl font-bold text-gray-900">Perform Testing</h1>
+                        <p className="text-sm text-gray-500 mt-1">Target Batch: <span className="font-mono font-medium text-primary">#{batchId}</span></p>
                     </div>
-                </div>
-            </header>
+                </header>
+            </div>
 
             <form onSubmit={handleSubmit} className="grid grid-cols-1 xl:grid-cols-3 gap-10">
                 <div className="xl:col-span-2 space-y-10">
                     {/* Active Ingredient Pass Percentage */}
-                    <Card className="p-10 border-none shadow-2xl shadow-black/5 bg-white relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
-                        <div className="flex items-center justify-between mb-8">
+                    <Card className="p-6 border border-gray-200 shadow-sm bg-white rounded-xl relative overflow-hidden">
+                        <div className="flex justify-between mb-8">
                             <div className="flex items-center gap-4">
-                                <div className="p-3 bg-primary/10 rounded-2xl text-primary">
-                                    <Zap size={24} />
+                                <div className="p-3 bg-primary/10 rounded-lg text-primary">
+                                    <Zap size={20} />
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight italic">Bioactive Content</h3>
-                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Main pass percentage of the botanical batch</p>
+                                    <h3 className="text-lg font-bold text-gray-900">Bioactive Content</h3>
+                                    <p className="text-xs text-gray-500 mt-1">Main pass percentage of the botanical batch</p>
                                 </div>
                             </div>
                             <div className="text-right">
-                                <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Collection Date</div>
-                                <div className="text-sm font-bold text-gray-900 italic">
+                                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Collection Date</div>
+                                <div className="text-sm font-medium text-gray-900">
                                     {batch?.collectionDate ? new Date(batch.collectionDate).toLocaleDateString('en-IN', {
                                         day: '2-digit',
                                         month: 'short',
@@ -225,37 +221,37 @@ const PerformTest = () => {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <Input 
                                     label="Measured Percentage (%)"
                                     type="number" 
                                     step="0.1" 
                                     required
-                                    className="text-2xl"
+                                    className="text-xl"
                                     value={results.activeIngredient.measured}
                                     onChange={(e) => handleInputChange('activeIngredient', 'measured', parseFloat(e.target.value))}
                                 />
                             </div>
-                            <div className="p-8 bg-primary/[0.03] rounded-3xl border-2 border-primary/5 flex flex-col justify-center">
-                                <span className="text-[10px] font-black text-primary/40 uppercase tracking-widest mb-2 text-center">Protocol Reference</span>
-                                <div className="flex justify-between items-center text-sm font-bold text-gray-600 px-4">
+                            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 flex flex-col justify-center">
+                                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 text-center">Protocol Reference</span>
+                                <div className="flex justify-between items-center text-sm font-medium text-gray-700 px-4">
                                     <span>Expected:</span>
-                                    <span className="text-primary">{results.activeIngredient.expectedMin}% - {results.activeIngredient.expectedMax}%</span>
+                                    <span className="text-primary font-semibold">{results.activeIngredient.expectedMin}% - {results.activeIngredient.expectedMax}%</span>
                                 </div>
                             </div>
                         </div>
                     </Card>
 
                     {/* Secondary Testing Matrix */}
-                    <Card className="p-10 border-none shadow-2xl shadow-black/5 bg-white">
-                        <div className="flex items-center gap-4 mb-10">
-                            <div className="p-3 bg-sky-100 rounded-2xl text-sky-600">
-                                <Beaker size={24} />
+                    <Card className="p-6 border border-gray-200 shadow-sm bg-white rounded-xl">
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="p-3 bg-sky-100 rounded-lg text-sky-600">
+                                <Beaker size={20} />
                             </div>
                             <div>
-                                <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight italic">Testing Matrix</h3>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Pharmacopeia Compliance Standards</p>
+                                <h3 className="text-lg font-bold text-gray-900">Testing Matrix</h3>
+                                <p className="text-xs text-gray-500 mt-1">Pharmacopeia Compliance Standards</p>
                             </div>
                         </div>
 
@@ -372,14 +368,14 @@ const PerformTest = () => {
                     </Card>
 
                     {/* Physicochemical Analysis */}
-                    <Card className="p-10 border-none shadow-2xl shadow-black/5 bg-white">
-                        <div className="flex items-center gap-4 mb-10">
-                            <div className="p-3 bg-purple-100 rounded-2xl text-purple-600">
-                                <FlaskConical size={24} />
+                    <Card className="p-6 border border-gray-200 shadow-sm bg-white rounded-xl">
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="p-3 bg-purple-100 rounded-lg text-purple-600">
+                                <FlaskConical size={20} />
                             </div>
                             <div>
-                                <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight italic">Physicochemical Analysis</h3>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Purity and Quality Metrics</p>
+                                <h3 className="text-lg font-bold text-gray-900">Physicochemical Analysis</h3>
+                                <p className="text-xs text-gray-500 mt-1">Purity and Quality Metrics</p>
                             </div>
                         </div>
 
@@ -465,14 +461,14 @@ const PerformTest = () => {
                         </div>
                     </Card>
                     {/* Organoleptic Evaluation */}
-                    <Card className="p-10 border-none shadow-2xl shadow-black/5 bg-white">
-                        <div className="flex items-center gap-4 mb-10">
-                            <div className="p-3 bg-amber-100 rounded-2xl text-amber-600">
-                                <Microscope size={24} />
+                    <Card className="p-6 border border-gray-200 shadow-sm bg-white rounded-xl">
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="p-3 bg-amber-100 rounded-lg text-amber-600">
+                                <Microscope size={20} />
                             </div>
                             <div>
-                                <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight italic">Organoleptic Evaluation</h3>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Sensory Analysis Standards</p>
+                                <h3 className="text-lg font-bold text-gray-900">Organoleptic Evaluation</h3>
+                                <p className="text-xs text-gray-500 mt-1">Sensory Analysis Standards</p>
                             </div>
                         </div>
 
@@ -493,14 +489,14 @@ const PerformTest = () => {
                     </Card>
 
                     {/* Image Verification Section */}
-                    <Card className="p-10 border-none shadow-2xl shadow-black/5 bg-white overflow-hidden">
+                    <Card className="p-6 border border-gray-200 shadow-sm bg-white rounded-xl overflow-hidden">
                         <div className="flex items-center gap-4 mb-8">
-                            <div className="p-3 bg-emerald-100 rounded-2xl text-emerald-600">
-                                <ShieldCheck size={24} />
+                            <div className="p-3 bg-emerald-100 rounded-lg text-emerald-600">
+                                <ShieldCheck size={20} />
                             </div>
                             <div>
-                                <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight italic">Botanical Verification</h3>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Verify physical specimen against blockchain records</p>
+                                <h3 className="text-lg font-bold text-gray-900">Botanical Verification</h3>
+                                <p className="text-xs text-gray-500 mt-1">Verify physical specimen against blockchain records</p>
                             </div>
                         </div>
 
@@ -555,16 +551,17 @@ const PerformTest = () => {
                     </Card>
                 </div>
 
-                <div className="space-y-10">
-                    <Card className="p-8 border-none shadow-2xl shadow-black/5 bg-[#0d1f18] text-white overflow-hidden relative">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[60px]" />
-                        <h3 className="text-sm font-black uppercase tracking-[0.2em] mb-8 text-primary italic">Document Sovereignty</h3>
+                <div className="space-y-6">
+                    <Card className="p-6 border border-gray-200 shadow-sm bg-gray-50 rounded-xl">
+                        <h3 className="text-sm font-semibold uppercase text-gray-700 mb-6 flex items-center gap-2">
+                            <FileText size={16} /> Document Sovereignty
+                        </h3>
                         
-                        <div className="space-y-6 relative z-10">
+                        <div className="space-y-6">
                             <div 
                                 className={cn(
-                                    "border-2 border-dashed rounded-[2.5rem] p-10 text-center transition-all cursor-pointer group",
-                                    file ? "border-primary/40 bg-primary/5" : "border-white/10 hover:border-primary/40 hover:bg-white/5"
+                                    "border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer group bg-white",
+                                    file ? "border-primary/40 bg-primary/5" : "border-gray-300 hover:border-primary/40"
                                 )}
                                 onClick={() => document.getElementById('file-upload').click()}
                             >
@@ -577,36 +574,36 @@ const PerformTest = () => {
                                 />
                                 {file ? (
                                     <div className="space-y-4">
-                                        <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center text-primary mx-auto shadow-2xl">
-                                            <FileText size={32} />
+                                        <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center text-primary mx-auto">
+                                            <FileText size={24} />
                                         </div>
-                                        <div className="text-xs font-bold text-white italic truncate px-4">{file.name}</div>
-                                        <button onClick={(e) => {e.stopPropagation(); setFile(null);}} className="text-[9px] text-red-400 font-bold uppercase tracking-widest hover:text-red-300">Change Document</button>
+                                        <div className="text-sm font-semibold text-gray-900 truncate px-4">{file.name}</div>
+                                        <button onClick={(e) => {e.stopPropagation(); setFile(null);}} className="text-xs text-red-500 font-medium hover:text-red-600">Change Document</button>
                                     </div>
                                 ) : (
                                     <div className="space-y-4">
-                                        <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center text-white/40 mx-auto group-hover:scale-110 transition-transform">
-                                            <Upload size={32} />
+                                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 mx-auto group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                                            <Upload size={24} />
                                         </div>
                                         <div className="space-y-1">
-                                            <div className="text-xs font-black uppercase tracking-widest">Upload Physical Cert</div>
-                                            <div className="text-[9px] text-white/20 uppercase tracking-[0.2em]">PDF Format Required</div>
+                                            <div className="text-sm font-semibold text-gray-900">Upload Physical Cert</div>
+                                            <div className="text-xs text-gray-500">PDF Format Required</div>
                                         </div>
                                     </div>
                                 )}
                             </div>
 
-                            <div className="space-y-1 pt-4">
-                                <div className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] mb-4">Consensus Overview</div>
-                                <div className="flex justify-between items-center px-2">
-                                    <span className="text-[10px] font-bold text-white/40 uppercase">Overall Result:</span>
+                            <div className="space-y-2 pt-4">
+                                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Consensus Overview</div>
+                                <div className="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-lg">
+                                    <span className="text-sm font-medium text-gray-700">Overall Result:</span>
                                     <select 
-                                        className="bg-transparent text-primary font-black uppercase tracking-widest outline-none cursor-pointer"
+                                        className="bg-transparent text-primary font-semibold outline-none cursor-pointer"
                                         value={results.overallResult}
                                         onChange={(e) => handleInputChange('overallResult', null, e.target.value)}
                                     >
-                                        <option value="PASS" className="bg-[#0d1f18]">PASS</option>
-                                        <option value="FAIL" className="bg-[#0d1f18]">FAIL</option>
+                                        <option value="PASS">PASS</option>
+                                        <option value="FAIL">FAIL</option>
                                     </select>
                                 </div>
                             </div>
@@ -614,21 +611,21 @@ const PerformTest = () => {
                             <Button 
                                 type="submit"
                                 disabled={mutation.isPending}
-                                className="w-full py-6 rounded-[2rem] gold-gradient text-primary-dark font-black uppercase tracking-widest mt-8 shadow-2xl flex items-center justify-center gap-3 disabled:opacity-50"
+                                className="w-full py-3 rounded-lg bg-primary text-white font-semibold flex items-center justify-center gap-2 hover:bg-primary-dark transition-colors shadow-sm disabled:opacity-50"
                             >
                                 {mutation.isPending ? (
-                                    <><Loader2 className="animate-spin" size={20} /> <span className="animate-pulse">Anchoring Truth...</span></>
+                                    <><Loader2 className="animate-spin" size={18} /> <span>Anchoring Truth...</span></>
                                 ) : (
-                                    <><ShieldCheck size={20} /> Generate Certificate</>
+                                    <><ShieldCheck size={18} /> Generate Certificate</>
                                 )}
                             </Button>
                         </div>
                     </Card>
 
-                    <Card className="p-8 border-none shadow-xl shadow-black/5 bg-gray-50 flex flex-col gap-6">
-                        <div className="flex items-center gap-3">
-                            <FlaskConical className="text-primary" size={18} />
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Batch Identity DNA</span>
+                    <Card className="p-6 border border-gray-200 shadow-sm bg-white rounded-xl flex flex-col gap-6">
+                        <div className="flex items-center gap-2 border-b border-gray-100 pb-4">
+                            <FlaskConical className="text-gray-400" size={18} />
+                            <span className="text-xs font-semibold uppercase text-gray-500">Batch Identity DNA</span>
                         </div>
                         <div className="space-y-4">
                             <div className="flex justify-between items-center border-b border-gray-100 pb-4">

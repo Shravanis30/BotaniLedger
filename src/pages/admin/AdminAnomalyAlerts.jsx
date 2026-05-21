@@ -37,106 +37,90 @@ const AdminAnomalyAlerts = () => {
 
   return (
     <AdminLayout portalName="Admin Portal">
-        <header className="mb-12 flex flex-col xl:flex-row xl:items-end justify-between gap-8">
+        <header className="mb-8 flex flex-col xl:flex-row xl:items-end justify-between gap-6">
             <div>
-                <div className="text-xs font-black text-primary uppercase tracking-[0.3em] mb-3 flex items-center gap-2">
-                    <div className="w-10 h-[1px] bg-primary/20" /> Threat Intelligence Response
+                <div className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">
+                    Threat Intelligence Response
                 </div>
-                <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tighter leading-none italic uppercase">
-                    Anomaly <span className="text-red-500 font-light not-italic underline decoration-red-500/20 underline-offset-4">Intelligence</span>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                    Anomaly Intelligence
                 </h1>
-                <p className="text-gray-400 font-bold mt-2 italic max-w-xl text-[11px] leading-relaxed">Automated satellite monitoring and blockchain integrity alerts. View and resolve potential supply chain deviations in real-time.</p>
+                <p className="text-sm text-gray-500 max-w-xl">Automated satellite monitoring and blockchain integrity alerts. View and resolve potential supply chain deviations in real-time.</p>
             </div>
             
             <div className="flex gap-4 w-full xl:w-auto overflow-x-auto no-scrollbar pb-2">
-                <div className="flex items-center gap-3 px-6 py-4 bg-red-50 rounded-2xl border border-red-100 text-red-600">
-                    <ShieldAlert size={20} />
-                    <span className="text-xs font-black uppercase tracking-widest">{anomalies?.filter(a => a.status === 'OPEN').length || 0} Active Alerts</span>
+                <div className="flex items-center gap-3 px-4 py-3 bg-red-50 rounded-lg border border-red-100 text-red-700">
+                    <ShieldAlert size={18} />
+                    <span className="text-sm font-semibold">{anomalies?.filter(a => a.status === 'OPEN').length || 0} Active Alerts</span>
                 </div>
-                <div className="flex items-center gap-3 px-6 py-4 bg-emerald-50 rounded-2xl border border-emerald-100 text-emerald-600">
-                    <CheckCircle size={20} />
-                    <span className="text-xs font-black uppercase tracking-widest">{anomalies?.filter(a => a.status === 'RESOLVED').length || 0} Resolved</span>
+                <div className="flex items-center gap-3 px-4 py-3 bg-emerald-50 rounded-lg border border-emerald-100 text-emerald-700">
+                    <CheckCircle size={18} />
+                    <span className="text-sm font-semibold">{anomalies?.filter(a => a.status === 'RESOLVED').length || 0} Resolved</span>
                 </div>
             </div>
         </header>
 
-        <div className="grid grid-cols-1 gap-8">
+        <div className="grid grid-cols-1 gap-4">
             {isLoading ? (
-                <div className="h-[400px] flex flex-col items-center justify-center bg-white rounded-[3rem] border-2 border-dashed border-gray-100 shadow-inner">
-                    <div className="relative mb-6">
-                        <div className="absolute inset-0 bg-red-500/10 rounded-full animate-ping" />
-                        <Loader2 className="w-16 h-16 text-red-500 animate-spin relative z-10" />
-                    </div>
-                    <p className="text-xs font-black text-gray-400 uppercase tracking-[0.4em] italic animate-pulse">Scanning Global Nodes for Anomalies...</p>
+                <div className="h-[300px] flex flex-col items-center justify-center bg-white rounded-xl border border-gray-200">
+                    <Loader2 className="w-8 h-8 text-primary animate-spin mb-4" />
+                    <p className="text-sm font-medium text-gray-500">Scanning for Anomalies...</p>
                 </div>
             ) : anomalies?.length === 0 ? (
-                <div className="h-[400px] flex flex-col items-center justify-center bg-white rounded-[2rem] border-2 border-dashed border-gray-100 shadow-sm relative overflow-hidden group">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-emerald-500/5 group-hover:scale-110 transition-transform duration-1000">
-                        <CheckCircle size={240} strokeWidth={1} />
+                <div className="h-[300px] flex flex-col items-center justify-center bg-white rounded-xl border border-gray-200">
+                    <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mb-4">
+                        <CheckCircle size={24} />
                     </div>
-                    <div className="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-emerald-500/10 relative z-10">
-                        <CheckCircle size={32} />
-                    </div>
-                    <h3 className="text-lg font-black text-gray-900 uppercase italic tracking-tighter relative z-10">Systems Nominal</h3>
-                    <p className="text-[10px] font-black text-gray-400 mt-2 uppercase tracking-widest italic opacity-60 relative z-10">No supply chain deviations detected on current cluster.</p>
+                    <h3 className="text-lg font-bold text-gray-900 mb-1">Systems Nominal</h3>
+                    <p className="text-sm text-gray-500">No supply chain deviations detected.</p>
                 </div>
             ) : anomalies?.map((alert) => (
                 <Card key={alert._id} className={cn(
-                    "group transition-all duration-700 border-none overflow-hidden bg-white shadow-2xl shadow-black/5 relative hover:-translate-y-1",
-                    alert.status === 'OPEN' ? "hover:shadow-red-500/10 shadow-red-500/5 ring-1 ring-red-500/20" : "opacity-80 grayscale-[0.5] hover:grayscale-0"
+                    "group transition-all bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md border",
+                    alert.status === 'OPEN' ? "border-red-200" : "border-gray-200 opacity-90"
                 )}>
-                    <div className="flex flex-col xl:flex-row divide-y xl:divide-y-0 xl:divide-x divide-gray-50 h-full min-h-[280px]">
+                    <div className="flex flex-col xl:flex-row divide-y xl:divide-y-0 xl:divide-x divide-gray-100">
                         {/* Severity Indicator */}
                         <div className={cn(
-                            "w-full xl:w-24 p-8 flex xl:flex-col items-center justify-center gap-6 transition-all duration-500",
+                            "w-full xl:w-48 p-6 flex items-center justify-center gap-3",
                             alert.status === 'OPEN' 
-                                ? (alert.severity === 'HIGH' ? "bg-red-50 text-red-500" : "bg-amber-50 text-amber-500")
-                                : "bg-emerald-50 text-emerald-500"
+                                ? (alert.severity === 'HIGH' ? "bg-red-50/50 text-red-700" : "bg-amber-50/50 text-amber-700")
+                                : "bg-emerald-50/50 text-emerald-700"
                         )}>
-                            <div className="text-[10px] font-black uppercase tracking-widest writing-mode-vertical xl:rotate-180 xl:vertical-text mb-2">{alert.severity} Risk</div>
-                            <div className="p-4 bg-white/50 backdrop-blur-md rounded-2xl shadow-sm transform group-hover:scale-110 transition-transform">
-                                {alert.status === 'OPEN' ? <ShieldAlert size={28} /> : <CheckCircle size={28} />}
-                            </div>
+                            {alert.status === 'OPEN' ? <ShieldAlert size={20} /> : <CheckCircle size={20} />}
+                            <span className="text-sm font-bold uppercase tracking-wider">{alert.severity} Risk</span>
                         </div>
 
                         {/* Content Area */}
-                        <div className="flex-1 p-10 flex flex-col justify-between relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-10 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity">
-                                <Zap size={150} />
-                            </div>
-                            
-                            <div className="relative z-10">
-                                <div className="flex flex-wrap items-center gap-4 mb-6">
-                                    <span className="px-5 py-2 bg-gray-50 rounded-full text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] border border-gray-100">{alert.type}</span>
-                                    <div className="flex items-center gap-2 text-gray-400 font-bold text-[10px] bg-gray-50 px-4 py-2 rounded-full border border-gray-100">
-                                        <Clock size={12} /> {new Date(alert.createdAt).toLocaleString()}
+                        <div className="flex-1 p-6 flex flex-col justify-between">
+                            <div>
+                                <div className="flex flex-wrap items-center gap-3 mb-4">
+                                    <span className="px-3 py-1 bg-gray-100 rounded text-xs font-semibold text-gray-600 uppercase border border-gray-200">{alert.type}</span>
+                                    <div className="flex items-center gap-1.5 text-gray-500 text-sm">
+                                        <Clock size={14} /> {new Date(alert.createdAt).toLocaleString()}
                                     </div>
-                                    <div className="flex items-center gap-2 text-primary font-black text-[10px] uppercase tracking-widest bg-primary/5 px-4 py-2 rounded-full border border-primary/10 italic">
-                                        <Info size={12} /> BATCH::{alert.batchId}
+                                    <div className="flex items-center gap-1.5 text-primary font-medium text-sm bg-primary/5 px-3 py-1 rounded border border-primary/20">
+                                        <Info size={14} /> Batch: {alert.batchId}
                                     </div>
                                 </div>
-                                <h3 className="text-3xl font-black text-gray-900 tracking-tighter italic leading-none uppercase mb-6">{alert.description}</h3>
+                                <h3 className="text-xl font-bold text-gray-900 mb-6">{alert.description}</h3>
                             </div>
 
-                            <div className="flex flex-wrap items-center justify-between gap-6 pt-10 border-t border-gray-50 relative z-10">
-                                <div className="flex items-center gap-8">
+                            <div className="flex flex-wrap items-center justify-between gap-6 pt-6 border-t border-gray-100">
+                                <div className="flex items-center gap-6">
                                     <div className="flex flex-col">
-                                        <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest mb-1">Impacted Entity</span>
-                                        <div className="flex items-center gap-2.5">
-                                            <div className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 transition-colors group-hover:bg-primary group-hover:text-white">
-                                                <UserIcon size={14} />
-                                            </div>
-                                            <span className="text-xs font-black uppercase text-gray-700 tracking-tight">{alert.affectedUserId?.organization || alert.affectedUserId?.name || 'Network Node'}</span>
+                                        <span className="text-xs font-medium text-gray-500 mb-1">Impacted Entity</span>
+                                        <div className="flex items-center gap-2">
+                                            <UserIcon size={16} className="text-gray-400" />
+                                            <span className="text-sm font-semibold text-gray-900">{alert.affectedUserId?.organization || alert.affectedUserId?.name || 'Network Node'}</span>
                                         </div>
                                     </div>
                                     {alert.resolvedAt && (
-                                        <div className="flex flex-col border-l border-gray-100 pl-8">
-                                            <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest mb-1">Resolution</span>
-                                            <div className="flex items-center gap-2.5">
-                                                <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500">
-                                                    <CheckCircle size={14} />
-                                                </div>
-                                                <span className="text-xs font-black text-emerald-600 truncate max-w-[200px] italic">"{alert.resolution}"</span>
+                                        <div className="flex flex-col pl-6 border-l border-gray-200">
+                                            <span className="text-xs font-medium text-gray-500 mb-1">Resolution</span>
+                                            <div className="flex items-center gap-2">
+                                                <CheckCircle size={16} className="text-emerald-500" />
+                                                <span className="text-sm font-medium text-emerald-700">"{alert.resolution}"</span>
                                             </div>
                                         </div>
                                     )}
@@ -145,9 +129,9 @@ const AdminAnomalyAlerts = () => {
                                 {alert.status === 'OPEN' && (
                                     <button 
                                         onClick={() => handleResolve(alert._id)}
-                                        className="px-10 py-5 bg-gray-950 text-white rounded-[2.5rem] font-black uppercase text-[11px] tracking-[0.4em] flex items-center justify-center gap-4 hover:bg-primary shadow-2xl shadow-black/10 hover:shadow-primary/30 active:scale-95 transition-all text-center group/btn"
+                                        className="px-6 py-2.5 bg-gray-900 text-white rounded-lg font-semibold text-sm hover:bg-gray-800 transition-colors flex items-center gap-2"
                                     >
-                                        Initiate Mitigation <ArrowRight size={18} className="group-hover/btn:translate-x-2 transition-transform" />
+                                        Mitigate <ArrowRight size={16} />
                                     </button>
                                 )}
                             </div>

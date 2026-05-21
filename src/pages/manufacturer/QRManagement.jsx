@@ -27,7 +27,7 @@ const QRManagement = () => {
 
             <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
                 <div className="xl:col-span-3">
-                    <Card className="border-none shadow-sm bg-white overflow-hidden">
+                    <Card className="border border-gray-200 shadow-sm bg-white overflow-hidden rounded-xl">
                         <div className="p-8 border-b border-gray-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 bg-gray-50/10">
                             <h3 className="font-bold text-lg text-gray-800">Active QR Assets</h3>
                             <div className="relative w-full sm:w-64">
@@ -41,17 +41,17 @@ const QRManagement = () => {
                                 <div className="col-span-1 md:col-span-2 py-20 flex justify-center"><Loader2 className="animate-spin text-primary" size={32} /></div>
                             ) : products.filter(p => p.qrCode?.data).length > 0 ? (
                                 products.filter(p => p.qrCode?.data).map((product) => (
-                                    <div key={product._id} className="p-6 bg-gray-50/50 rounded-3xl border border-gray-100 group hover:border-primary-light transition-all flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8">
-                                        <div className="w-32 h-32 bg-white p-3 rounded-2xl shadow-sm group-hover:shadow-md transition-shadow relative shrink-0">
+                                    <div key={product._id} className="p-6 bg-gray-50/50 rounded-xl border border-gray-100 group hover:border-primary-light transition-all flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8">
+                                        <div className="w-32 h-32 bg-white p-3 rounded-xl border border-gray-100 shadow-sm transition-shadow relative shrink-0">
                                             <img src={product.qrCode?.data} alt="QR Code" className="w-full h-full object-contain" />
-                                            <div className="absolute inset-0 bg-primary/80 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl flex items-center justify-center pointer-events-none">
+                                            <div className="absolute inset-0 bg-primary/80 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center pointer-events-none">
                                                 <Download size={24} className="text-white" />
                                             </div>
                                         </div>
                                         <div className="flex-1 text-center sm:text-left">
                                             <div className="text-[10px] font-black text-primary uppercase tracking-widest mb-1">{product.productBatchId}</div>
                                             <h4 className="text-lg font-black text-gray-900 mb-1 leading-tight">{product.productName}</h4>
-                                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight mb-4 italic">{product.productType}</p>
+                                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-4">{product.productType}</p>
                                             
                                             <div className="flex flex-wrap justify-center sm:justify-start gap-2">
                                                 <a 
@@ -84,7 +84,7 @@ const QRManagement = () => {
                 </div>
 
                 <div className="space-y-6">
-                    <Card className="p-8 border-none shadow-sm bg-white">
+                    <Card className="p-8 border border-gray-200 shadow-sm bg-white rounded-xl">
                         <h4 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                             <LayoutGrid size={14} /> Scan Intelligence
                         </h4>

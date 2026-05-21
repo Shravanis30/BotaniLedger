@@ -55,8 +55,8 @@ const ProductionLog = () => {
     <ManufacturerLayout portalName="Synthesis Plant Hub">
         <header className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div>
-            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight leading-none italic">Production & <span className="text-primary font-light not-italic">Batch Log</span></h1>
-            <p className="text-gray-500 font-medium mt-2 italic text-sm">Comprehensive history of all finished goods produced and serialized on-chain.</p>
+            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight leading-none">Production & <span className="text-primary font-light">Batch Log</span></h1>
+            <p className="text-gray-500 font-medium mt-2 text-sm">Comprehensive history of all finished goods produced and serialized on-chain.</p>
           </div>
           <div className="flex items-center gap-4 w-full md:w-auto">
             <button className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-primary transition-all shadow-sm">
@@ -79,10 +79,10 @@ const ProductionLog = () => {
         ) : filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
             {filteredProducts.map((product) => (
-              <Card key={product._id} className="group hover:shadow-2xl transition-all duration-500 border-none p-0 overflow-hidden bg-white">
+              <Card key={product._id} className="group hover:shadow-md transition-all duration-500 border border-gray-200 p-0 overflow-hidden bg-white rounded-xl">
                 <div className="p-8">
                   <div className="flex justify-between items-start mb-6">
-                    <div className="w-14 h-14 bg-primary/5 text-primary rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-500 shrink-0">
+                    <div className="w-14 h-14 bg-primary/5 text-primary rounded-xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-500 shrink-0">
                       <Factory size={28} />
                     </div>
                     <div className="flex flex-col items-end gap-2">
@@ -93,7 +93,7 @@ const ProductionLog = () => {
 
                   <div className="mb-8">
                     <h3 className="text-xl font-black text-gray-900 leading-tight mb-2 group-hover:text-primary transition-colors">{product.productName}</h3>
-                    <div className="flex items-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest italic">
+                    <div className="flex items-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
                       <span>Quantity: <span className="text-primary">{product.quantity} Units</span></span>
                       <span>•</span>
                       <span>{product.productType}</span>
@@ -109,7 +109,7 @@ const ProductionLog = () => {
                     </div>
                     <div>
                       <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Source Assets</div>
-                      <div className="text-xs font-bold text-gray-800 italic">
+                      <div className="text-xs font-bold text-gray-800">
                         {product.linkedHerbBatches?.length || 0} Batches
                       </div>
                     </div>
@@ -148,7 +148,7 @@ const ProductionLog = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-gray-100">
+          <div className="text-center py-20 bg-white rounded-xl border border-dashed border-gray-200">
             <Factory className="mx-auto text-gray-200 mb-4" size={48} />
             <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">No production records found</p>
           </div>
@@ -157,7 +157,7 @@ const ProductionLog = () => {
         {/* QR Modal */}
         {selectedQR && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-6">
-            <Card className="max-w-md w-full bg-white border-none shadow-2xl overflow-hidden relative">
+            <Card className="max-w-md w-full bg-white border border-gray-200 shadow-sm overflow-hidden relative rounded-xl">
               <button 
                 onClick={() => setSelectedQR(null)}
                 className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -169,7 +169,7 @@ const ProductionLog = () => {
                 <div className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-2">Secure Product Identity</div>
                 <h3 className="text-2xl font-black text-gray-900 mb-8">{selectedQR.productName}</h3>
                 
-                <div className="w-64 h-64 mx-auto bg-white p-4 rounded-3xl shadow-inner border border-gray-50 mb-10">
+                <div className="w-64 h-64 mx-auto bg-white p-4 rounded-xl border border-gray-200 mb-10">
                   <img 
                     src={selectedQR.qrCode?.data} 
                     alt="Product QR" 
@@ -181,11 +181,11 @@ const ProductionLog = () => {
                   <a 
                     href={selectedQR.qrCode?.data}
                     download={`${selectedQR.productBatchId}-QR.png`}
-                    className="w-full py-5 bg-primary text-white rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-green-900/20 hover:scale-[1.02] transition-all"
+                    className="w-full py-5 bg-primary text-white rounded-xl font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-sm hover:bg-primary-mid transition-all"
                   >
                     <Download size={20} /> Download for Printing
                   </a>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter italic">
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
                     Unique Production ID: {selectedQR.productBatchId}
                   </p>
                 </div>

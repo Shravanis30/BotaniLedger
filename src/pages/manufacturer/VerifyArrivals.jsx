@@ -70,7 +70,7 @@ const VerifyArrivals = () => {
                             Awaiting Signature
                         </div>
                     </div>
-                    <Card className="border-none shadow-sm overflow-hidden bg-white">
+                    <Card className="border border-gray-200 shadow-sm overflow-hidden bg-white rounded-xl">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">
                                 <thead className="bg-gray-50/50 text-[10px] uppercase tracking-[0.2em] font-black text-gray-400">
@@ -106,14 +106,14 @@ const VerifyArrivals = () => {
                                                         <button 
                                                             onClick={() => handleAction(batch.batchId, 'DENY')}
                                                             disabled={verifyMutation.isPending}
-                                                            className="px-4 py-2 border-2 border-red-100 text-red-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-50 transition-all disabled:opacity-50"
+                                                            className="px-4 py-2 border border-red-200 text-red-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-50 transition-all disabled:opacity-50"
                                                         >
                                                             {processingId === batch.batchId + 'DENY' ? <Loader2 className="animate-spin" size={14} /> : 'Deny Access'}
                                                         </button>
                                                         <button 
                                                             onClick={() => handleAction(batch.batchId, 'APPROVE')}
                                                             disabled={verifyMutation.isPending}
-                                                            className="px-5 py-2 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary-mid transition-all shadow-lg shadow-green-900/10 disabled:opacity-50"
+                                                            className="px-5 py-2 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary-mid transition-all shadow-sm disabled:opacity-50"
                                                         >
                                                             {processingId === batch.batchId + 'APPROVE' ? <Loader2 className="animate-spin" size={14} /> : 'Accept & Map'}
                                                         </button>
@@ -123,7 +123,7 @@ const VerifyArrivals = () => {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan={4} className="px-8 py-20 text-center text-sm font-bold text-gray-400 uppercase tracking-widest italic">
+                                            <td colSpan={4} className="px-8 py-20 text-center text-sm font-bold text-gray-400 uppercase tracking-widest">
                                                 No arrivals currently in the queue.
                                             </td>
                                         </tr>
@@ -142,7 +142,7 @@ const VerifyArrivals = () => {
                             Approved Materials (Ready for Synthesis)
                         </h2>
                     </div>
-                    <Card className="border-none shadow-sm overflow-hidden bg-white/50 backdrop-blur-sm">
+                    <Card className="border border-gray-200 shadow-sm overflow-hidden bg-white rounded-xl">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead className="bg-gray-50/50 text-[10px] uppercase tracking-[0.2em] font-black text-gray-400">
@@ -172,7 +172,7 @@ const VerifyArrivals = () => {
                                             </tr>
                                         ))
                                     ) : (
-                                        <tr><td colSpan={4} className="px-8 py-10 text-center text-xs text-gray-400 italic">No approved inventory yet.</td></tr>
+                                        <tr><td colSpan={4} className="px-8 py-10 text-center text-xs text-gray-400">No approved inventory yet.</td></tr>
                                     )}
                                 </tbody>
                             </table>
@@ -188,7 +188,7 @@ const VerifyArrivals = () => {
                             Quarantined / Rejected Materials
                         </h2>
                     </div>
-                    <Card className="border-none shadow-sm overflow-hidden bg-white/50 backdrop-blur-sm">
+                    <Card className="border border-gray-200 shadow-sm overflow-hidden bg-white rounded-xl">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead className="bg-gray-50/50 text-[10px] uppercase tracking-[0.2em] font-black text-gray-400">
@@ -221,7 +221,7 @@ const VerifyArrivals = () => {
                                             </tr>
                                         ))
                                     ) : (
-                                        <tr><td colSpan={4} className="px-8 py-10 text-center text-xs text-gray-400 italic">No rejected materials currently quarantined.</td></tr>
+                                        <tr><td colSpan={4} className="px-8 py-10 text-center text-xs text-gray-400">No rejected materials currently quarantined.</td></tr>
                                     )}
                                 </tbody>
                             </table>
@@ -233,7 +233,7 @@ const VerifyArrivals = () => {
             {/* Detailed Report Modal */}
             {viewingBatch && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+                    <div className="bg-white rounded-xl w-full max-w-2xl shadow-lg overflow-hidden animate-in zoom-in-95 duration-200 border border-gray-200">
                         <div className="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                             <div>
                                 <h3 className="text-xl font-bold text-gray-900">Lab Analysis Report</h3>
@@ -247,19 +247,19 @@ const VerifyArrivals = () => {
                         <div className="p-8 overflow-y-auto max-h-[60vh] space-y-8">
                             {/* Summary Grid */}
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                <div className="p-4 bg-gray-50 rounded-2xl">
+                                <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
                                     <div className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1">Active Ingredient</div>
                                     <div className="text-lg font-black text-primary">{viewingBatch.labReport?.results?.activeIngredient?.measured}%</div>
                                 </div>
-                                <div className="p-4 bg-gray-50 rounded-2xl">
+                                <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
                                     <div className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1">Status</div>
                                     <div className="text-lg font-black text-success">{viewingBatch.labReport?.results?.overallResult}</div>
                                 </div>
-                                <div className="p-4 bg-gray-50 rounded-2xl">
+                                <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
                                     <div className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1">Species Match</div>
                                     <div className="text-lg font-black text-gray-900">98.2%</div>
                                 </div>
-                                <div className="p-4 bg-gray-50 rounded-2xl">
+                                <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
                                     <div className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1">Tests Run</div>
                                     <div className="text-lg font-black text-gray-900">14</div>
                                 </div>
@@ -283,14 +283,14 @@ const VerifyArrivals = () => {
 
                                 <div>
                                     <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Organoleptic Properties</h4>
-                                    <div className="p-4 border border-gray-100 rounded-2xl bg-white space-y-3">
+                                    <div className="p-4 border border-gray-100 rounded-xl bg-white space-y-3">
                                         <div className="flex justify-between text-xs">
                                             <span className="text-gray-400 font-bold">Color Profile</span>
-                                            <span className="text-gray-900 font-black italic">{viewingBatch.labReport?.results?.organoleptic?.color || 'Normal'}</span>
+                                            <span className="text-gray-900 font-black">{viewingBatch.labReport?.results?.organoleptic?.color || 'Normal'}</span>
                                         </div>
                                         <div className="flex justify-between text-xs">
                                             <span className="text-gray-400 font-bold">Odor Verification</span>
-                                            <span className="text-gray-900 font-black italic">{viewingBatch.labReport?.results?.organoleptic?.odor || 'Characteristic'}</span>
+                                            <span className="text-gray-900 font-black">{viewingBatch.labReport?.results?.organoleptic?.odor || 'Characteristic'}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -312,14 +312,14 @@ const VerifyArrivals = () => {
                                 <button 
                                     onClick={() => handleAction(viewingBatch.batchId, 'DENY')}
                                     disabled={verifyMutation.isPending}
-                                    className="px-6 py-3 border-2 border-red-100 text-red-600 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-red-50 transition-all disabled:opacity-50"
+                                    className="px-6 py-3 border border-red-200 text-red-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-50 transition-all disabled:opacity-50"
                                 >
                                     Deny
                                 </button>
                                 <button 
                                     onClick={() => handleAction(viewingBatch.batchId, 'APPROVE')}
                                     disabled={verifyMutation.isPending}
-                                    className="px-6 py-3 bg-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-primary-mid transition-all shadow-lg shadow-green-900/10 disabled:opacity-50"
+                                    className="px-6 py-3 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary-mid transition-all shadow-sm disabled:opacity-50"
                                 >
                                     Approve Arrival
                                 </button>

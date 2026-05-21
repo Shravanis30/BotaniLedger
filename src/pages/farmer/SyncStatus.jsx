@@ -90,7 +90,7 @@ const SyncStatus = () => {
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
             <div className="xl:col-span-2 space-y-8">
-                <Card className="p-8 border-none shadow-sm">
+                <Card className="p-8 border border-gray-200 shadow-sm rounded-xl">
                     <div className="flex items-center justify-between mb-8">
                         <h3 className="font-bold text-xl text-gray-800">Pending Sync Queue</h3>
                         <div className="bg-primary/5 px-4 py-1.5 rounded-full text-[10px] font-black text-primary uppercase tracking-widest">
@@ -101,7 +101,7 @@ const SyncStatus = () => {
                     {pendingBatches.length > 0 ? (
                         <div className="space-y-4">
                             {pendingBatches.map((batch, index) => (
-                                <div key={index} className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-2xl hover:border-primary/30 transition-all hover:shadow-lg hover:shadow-green-900/5 group">
+                                <div key={index} className="flex items-center justify-between p-5 bg-white border border-gray-200 rounded-xl hover:border-primary/30 transition-all hover:shadow-sm group">
                                     <div className="flex items-center gap-5">
                                         <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 group-hover:bg-primary/5 group-hover:text-primary transition-colors">
                                             <Database size={20} />
@@ -135,10 +135,10 @@ const SyncStatus = () => {
 
             <div className="space-y-6">
                 <Card className={cn(
-                    "p-8 border-none shadow-xl relative overflow-hidden text-white transition-all duration-500",
-                    isOnline ? "sidebar-gradient shadow-green-900/10" : "bg-gray-800 shadow-none"
+                    "p-8 border border-gray-200 shadow-sm relative overflow-hidden text-white transition-all duration-500 rounded-xl",
+                    isOnline ? "bg-primary" : "bg-gray-800"
                 )}>
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-[100px] -mr-16 -mt-16"></div>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-3xl -mr-16 -mt-16"></div>
                     <div className="relative z-10 space-y-8">
                         <div className="flex items-center justify-between">
                             <h4 className="font-bold text-lg opacity-80">Connection</h4>
@@ -172,9 +172,9 @@ const SyncStatus = () => {
                             onClick={handleSync}
                             disabled={!isOnline || pendingBatches.length === 0 || syncing}
                             className={cn(
-                                "w-full py-5 rounded-2xl font-black transition-all flex items-center justify-center gap-3 text-sm tracking-widest uppercase",
+                                "w-full py-5 rounded-xl font-black transition-all flex items-center justify-center gap-3 text-sm tracking-widest uppercase",
                                 isOnline && pendingBatches.length > 0
-                                    ? "bg-accent text-primary hover:bg-white hover:scale-[1.02] shadow-xl shadow-accent/20" 
+                                    ? "bg-white text-primary hover:bg-gray-50 shadow-sm" 
                                     : "bg-white/10 text-white/30 cursor-not-allowed"
                             )}
                         >
@@ -193,7 +193,7 @@ const SyncStatus = () => {
                     </div>
                 </Card>
 
-                <Card className="p-8 border-none shadow-sm bg-amber-50/50 border-2 border-amber-100">
+                <Card className="p-8 shadow-sm bg-amber-50/50 border border-amber-200 rounded-xl">
                     <div className="flex items-start gap-4">
                         <div className="p-2 bg-white rounded-xl shadow-sm text-amber-600">
                             <AlertTriangle size={20} />

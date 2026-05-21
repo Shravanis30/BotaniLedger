@@ -3,6 +3,7 @@ const ProductBatch = require('../models/ProductBatch');
 const fabricService = require('../services/fabric.service');
 const aiService = require('../services/ai.service');
 const qrService = require('../services/qr.service');
+const logger = require('../utils/logger.util');
 const { successResponse, errorResponse } = require('../utils/response.util');
 
 exports.getInventory = async (req, res) => {
@@ -11,7 +12,7 @@ exports.getInventory = async (req, res) => {
       'blockchainRecord.status': { $in: ['LAB_PASSED', 'RECEIVED', 'MANUFACTURER_APPROVED', 'MANUFACTURER_REJECTED'] }
     })
     .populate('labReport')
-    .sort({ updatedAt: -1 });
+    .sort({ createdAt: -1 });
     successResponse(res, batches);
   } catch (err) {
     errorResponse(res, 500, err.message);

@@ -33,7 +33,7 @@ const RegulatorAnomalyReports = () => {
                     <Flag size={14} /> Enforcement Dashboard
                 </div>
                 <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">Active Anomaly Reports</h1>
-                <p className="text-gray-500 font-bold mt-2 italic">Official compliance violations and data discrepancies requiring regulatory intervention.</p>
+                <p className="text-gray-500 font-bold mt-2">Official compliance violations and data discrepancies requiring regulatory intervention.</p>
             </div>
             <div className="flex gap-4">
                 <div className="relative">
@@ -48,12 +48,12 @@ const RegulatorAnomalyReports = () => {
 
         <div className="space-y-6">
             {isLoading ? (
-                <div className="h-64 flex flex-col items-center justify-center bg-white rounded-3xl border border-dashed border-gray-200">
+                <div className="h-64 flex flex-col items-center justify-center bg-white rounded-xl border border-dashed border-gray-200">
                     <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
                     <p className="text-sm font-bold text-gray-400">Scanning ledger for compliance violations...</p>
                 </div>
             ) : anomalies?.length === 0 ? (
-                <div className="h-64 flex flex-col items-center justify-center bg-white rounded-3xl border border-dashed border-gray-200">
+                <div className="h-64 flex flex-col items-center justify-center bg-white rounded-xl border border-dashed border-gray-200">
                     <div className="p-6 bg-emerald-50 rounded-full text-emerald-500 mb-6">
                         <ShieldCheck size={48} />
                     </div>
@@ -61,7 +61,7 @@ const RegulatorAnomalyReports = () => {
                     <p className="text-sm text-gray-400 mt-2 font-medium">The ecosystem is currently 100% compliant with Ministry regulations.</p>
                 </div>
             ) : anomalies?.map((alert, i) => (
-                <Card key={i} className="group hover:shadow-2xl transition-all duration-500 border-none overflow-hidden p-0 bg-white">
+                <Card key={i} className="group hover:shadow-sm transition-all duration-500 border border-gray-200 overflow-hidden p-0 bg-white rounded-xl">
                     <div className="flex min-h-[160px]">
                         <div className={cn(
                             "w-3",
@@ -70,7 +70,7 @@ const RegulatorAnomalyReports = () => {
 
                         <div className="flex-1 p-8 flex items-center gap-10">
                             <div className={cn(
-                                "p-6 rounded-3xl shrink-0",
+                                "p-6 rounded-xl shrink-0",
                                 alert.severity === 'HIGH' ? "bg-red-50 text-red-500" : "bg-amber-50 text-amber-500"
                             )}>
                                 <AlertCircle size={40} />
@@ -89,7 +89,7 @@ const RegulatorAnomalyReports = () => {
                                 </div>
                                 <h3 className="text-2xl font-black text-gray-900 tracking-tight">{alert.description}</h3>
                                 <div className="flex items-center gap-4 pt-2">
-                                    <div className="text-[10px] font-mono font-bold text-primary italic px-3 py-1 bg-primary/5 rounded-lg border border-primary/10 tracking-wider">
+                                    <div className="text-[10px] font-mono font-bold text-primary px-3 py-1 bg-primary/5 rounded-lg border border-primary/10 tracking-wider">
                                         BATCH_REF: {alert.batchId}
                                     </div>
                                     <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
@@ -99,10 +99,10 @@ const RegulatorAnomalyReports = () => {
                             </div>
 
                             <div className="w-64 space-y-4">
-                                <button className="w-full py-5 bg-gray-900 text-white rounded-2xl font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-3 shadow-xl hover:bg-black transition-all active:scale-95">
+                                <button className="w-full py-5 bg-gray-900 text-white rounded-xl font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-3 shadow-sm hover:bg-black transition-all">
                                     Take Action <ArrowRight size={18} />
                                 </button>
-                                <button className="w-full py-4 bg-white border border-gray-100 rounded-2xl font-black uppercase text-[10px] tracking-widest text-gray-400 hover:text-gray-600 transition-all">
+                                <button className="w-full py-4 bg-white border border-gray-100 rounded-xl font-black uppercase text-[10px] tracking-widest text-gray-400 hover:text-gray-600 transition-all">
                                     Lodge Official Inquiry
                                 </button>
                             </div>

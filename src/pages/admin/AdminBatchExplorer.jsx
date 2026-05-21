@@ -22,107 +22,105 @@ const AdminBatchExplorer = () => {
 
   return (
     <AdminLayout portalName="Admin Portal">
-        <header className="mb-12 flex flex-col xl:flex-row xl:items-end justify-between gap-8">
+        <header className="mb-8 flex flex-col xl:flex-row xl:items-end justify-between gap-6">
             <div>
-                <div className="text-xs font-black text-primary uppercase tracking-[0.3em] mb-3 flex items-center gap-2">
-                    <div className="w-10 h-[1px] bg-primary/20" /> Distributed Ledger Audit
+                <div className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">
+                    Distributed Ledger Audit
                 </div>
-                <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tighter leading-none italic uppercase">
-                    Batch <span className="text-primary font-light not-italic underline decoration-primary/20 underline-offset-4">Explorer</span>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                    Batch Explorer
                 </h1>
-                <p className="text-gray-400 font-bold mt-2 italic max-w-xl text-[11px]">Real-time cryptographic audit log of every botanical asset registered and synchronized on the global AYUSH blockchain.</p>
+                <p className="text-gray-500 mt-1 max-w-xl text-sm">Real-time cryptographic audit log of every botanical asset registered and synchronized on the global AYUSH blockchain.</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 w-full xl:w-auto">
                 <div className="relative group flex-1 xl:w-80">
-                    <Search size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors" />
-                    <input className="w-full pl-14 pr-8 py-5 bg-white border border-gray-100 rounded-3xl outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/20 shadow-xl shadow-black/5 text-sm font-black tracking-tight" placeholder="Search by Batch ID or Hash..." />
+                    <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors" />
+                    <input className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm shadow-sm" placeholder="Search by Batch ID or Hash..." />
                 </div>
-                <div className="flex gap-4">
-                    <button className="p-5 bg-white border border-gray-100 rounded-3xl text-gray-400 hover:text-primary hover:shadow-xl transition-all shadow-sm">
-                        <Filter size={20} />
+                <div className="flex gap-2">
+                    <button className="p-2.5 bg-white border border-gray-200 rounded-lg text-gray-500 hover:text-primary hover:border-primary/50 transition-colors shadow-sm">
+                        <Filter size={18} />
                     </button>
-                    <button className="flex-1 sm:flex-none px-8 py-5 sidebar-gradient text-white rounded-3xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-green-900/20 flex items-center justify-center gap-3 active:scale-95 transition-all">
-                        <Download size={18} /> Export Data
+                    <button className="px-6 py-2.5 bg-primary text-white rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:bg-primary-dark transition-colors shadow-sm">
+                        <Download size={16} /> Export
                     </button>
                 </div>
             </div>
         </header>
 
-        <Card className="border-none shadow-2xl shadow-black/5 overflow-hidden bg-white rounded-[3rem] p-0">
-            <div className="overflow-x-auto no-scrollbar">
-                <table className="w-full text-left border-collapse">
-                    <thead>
-                        <tr className="bg-gray-50/50 border-b border-gray-100">
-                            <th className="px-10 py-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] italic">Identity / Hash</th>
-                            <th className="px-10 py-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] italic">Botanical Profile</th>
-                            <th className="px-10 py-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] italic text-center">Origin</th>
-                            <th className="px-10 py-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] italic">Yield Metric</th>
-                            <th className="px-10 py-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] italic">Ledger Status</th>
-                            <th className="px-10 py-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] italic text-right">Verification</th>
+        <Card className="shadow-sm border border-gray-200 overflow-hidden bg-white rounded-xl p-0">
+            <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm whitespace-nowrap">
+                    <thead className="bg-gray-50 text-gray-600 font-semibold border-b border-gray-200">
+                        <tr>
+                            <th className="px-6 py-4">Identity / Hash</th>
+                            <th className="px-6 py-4">Botanical Profile</th>
+                            <th className="px-6 py-4 text-center">Origin Node</th>
+                            <th className="px-6 py-4">Yield Metric</th>
+                            <th className="px-6 py-4">Ledger Status</th>
+                            <th className="px-6 py-4 text-right">Verification</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-50">
+                    <tbody className="divide-y divide-gray-200 text-gray-700">
                         {isLoading ? (
                             <tr>
-                                <td colSpan={6} className="px-10 py-32 text-center">
-                                    <div className="relative inline-block mb-6">
-                                        <div className="absolute inset-0 bg-primary/10 rounded-full animate-ping" />
-                                        <Loader2 className="w-16 h-16 text-primary animate-spin relative z-10 mx-auto" />
-                                    </div>
-                                    <p className="text-xs font-black text-gray-400 uppercase tracking-[0.5em] italic animate-pulse">Syncing Blockchain Data...</p>
+                                <td colSpan={6} className="px-6 py-24 text-center">
+                                    <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto mb-4" />
+                                    <p className="text-sm font-medium text-gray-500">Syncing Blockchain Data...</p>
                                 </td>
                             </tr>
                         ) : batches?.length === 0 ? (
                             <tr>
-                                <td colSpan={6} className="px-10 py-32 text-center">
-                                    <Database size={60} className="text-gray-100 mx-auto mb-6 opacity-30" />
-                                    <p className="text-xs font-black text-gray-400 uppercase tracking-widest italic">No botanical assets discovered on the current ledger cluster.</p>
+                                <td colSpan={6} className="px-6 py-24 text-center">
+                                    <Database size={40} className="text-gray-300 mx-auto mb-4" />
+                                    <p className="text-sm font-medium text-gray-500">No botanical assets discovered on the current ledger cluster.</p>
                                 </td>
                             </tr>
                         ) : batches?.map((batch, i) => (
-                            <tr key={i} className="hover:bg-gray-50/50 transition-all group cursor-default">
-                                <td className="px-10 py-8">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-primary/40 group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
-                                            <Hash size={18} />
+                            <tr key={i} className="hover:bg-gray-50 transition-colors">
+                                <td className="px-6 py-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+                                            <Hash size={16} />
                                         </div>
                                         <div>
-                                            <div className="text-[10px] font-mono font-black text-primary tracking-tighter uppercase mb-1">{batch.batchId}</div>
-                                            <div className="text-[9px] font-mono text-gray-400 truncate w-32 uppercase opacity-60">TX::0x{batch.blockchainRecord?.txId?.slice(0, 16) || 'pending_sync'}...</div>
+                                            <div className="font-mono text-primary font-medium">{batch.batchId}</div>
+                                            <div className="text-xs font-mono text-gray-500 mt-1">TX: 0x{batch.blockchainRecord?.txId?.slice(0, 16) || 'pending_sync'}...</div>
                                         </div>
                                     </div>
                                 </td>
-                                <td className="px-10 py-8">
-                                    <div className="text-lg font-black text-gray-900 leading-none tracking-tighter uppercase group-hover:text-primary transition-colors italic">{batch.herbSpecies?.common}</div>
-                                    <div className="text-[10px] text-primary/60 font-black uppercase tracking-widest mt-1.5 flex items-center gap-2 pl-0.5">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/20" /> {batch.herbSpecies?.botanical}
+                                <td className="px-6 py-4">
+                                    <div className="font-semibold text-gray-900">{batch.herbSpecies?.common}</div>
+                                    <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-gray-400" /> {batch.herbSpecies?.botanical}
                                     </div>
                                 </td>
-                                <td className="px-10 py-8 text-center">
-                                    <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-4 py-1.5 rounded-2xl border border-emerald-100 uppercase tracking-widest italic group-hover:bg-emerald-500 group-hover:text-white transition-all">NODE::{batch.farmerId?.slice(-6).toUpperCase()}</span>
+                                <td className="px-6 py-4 text-center">
+                                    <span className="text-xs font-medium text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                                        {batch.farmerId?.slice(-6).toUpperCase()}
+                                    </span>
                                 </td>
-                                <td className="px-10 py-8">
-                                    <div className="flex items-end gap-1.5">
-                                        <span className="text-2xl font-black text-gray-900 tracking-tighter leading-none">{batch.quantity}</span>
-                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-0.5 opacity-60">{batch.unit}</span>
+                                <td className="px-6 py-4">
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-lg font-bold text-gray-900">{batch.quantity}</span>
+                                        <span className="text-xs font-medium text-gray-500">{batch.unit}</span>
                                     </div>
                                 </td>
-                                <td className="px-10 py-8">
-                                    <div className="flex flex-col gap-2">
+                                <td className="px-6 py-4">
+                                    <div className="flex flex-col gap-1.5 items-start">
                                         <StatusBadge status={batch.blockchainRecord?.status || 'PENDING'} />
-                                        <div className="flex items-center gap-1.5 pl-1">
-                                            <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                                            <span className="text-[8px] font-black text-gray-300 uppercase tracking-widest">Live On Chain</span>
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                            <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Live On Chain</span>
                                         </div>
                                     </div>
                                 </td>
-                                <td className="px-10 py-8 text-right">
+                                <td className="px-6 py-4 text-right">
                                     <button 
                                         onClick={() => navigate(`/verify/${batch.batchId}`)}
-                                        className="inline-flex items-center gap-2 px-6 py-3 bg-gray-50 text-gray-400 hover:bg-primary hover:text-white hover:shadow-xl hover:shadow-primary/20 rounded-2xl transition-all group/btn"
+                                        className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors"
                                     >
-                                        <span className="text-[9px] font-black uppercase tracking-[0.3em] opacity-0 group-hover/btn:opacity-100 transition-opacity translate-x-4 group-hover/btn:translate-x-0 transition-transform">Audit Proof</span>
-                                        <ExternalLink size={18} />
+                                        Audit Proof <ExternalLink size={14} />
                                     </button>
                                 </td>
                             </tr>
@@ -131,29 +129,29 @@ const AdminBatchExplorer = () => {
                 </table>
             </div>
             
-            {/* Standard Amazon-style Pagination Footer */}
-            <div className="p-10 bg-gray-50/50 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
-                <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] italic">
-                    Displaying Assets <span className="text-gray-900 mx-1">{batches?.length || 0}</span> of <span className="text-gray-900 mx-1">12,842</span> Registered on Ledger
+            {/* Pagination Footer */}
+            <div className="px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4 bg-gray-50/50">
+                <div className="text-sm text-gray-600">
+                    Showing <span className="font-semibold text-gray-900">{batches?.length || 0}</span> of <span className="font-semibold text-gray-900">12,842</span> assets
                 </div>
-                <div className="flex items-center gap-3">
-                    <button className="p-3 bg-white border border-gray-200 rounded-xl text-gray-300 hover:text-primary transition-all shadow-sm">
-                        <ChevronLeft size={20} />
+                <div className="flex items-center gap-1">
+                    <button className="p-2 text-gray-400 hover:text-primary disabled:opacity-50 transition-colors">
+                        <ChevronLeft size={18} />
                     </button>
-                    {[1, 2, 3, '...', '1284'].map((p, i) => (
+                    {[1, 2, 3, '...', 1284].map((p, i) => (
                         <button key={i} className={cn(
-                            "min-w-[44px] h-11 rounded-xl flex items-center justify-center text-[10px] font-black transition-all",
-                            p === 1 ? "bg-primary text-white shadow-xl shadow-green-900/20 scale-110" : "bg-white text-gray-400 hover:bg-gray-100 border border-transparent hover:border-gray-200"
-                        )}>
+                            "min-w-[32px] h-8 rounded-md flex items-center justify-center text-sm font-medium transition-colors",
+                            p === 1 ? "bg-primary text-white" : "text-gray-600 hover:bg-gray-200"
+                        )} disabled={p === '...'}>
                             {p}
                         </button>
                     ))}
-                    <button className="p-3 bg-white border border-gray-200 rounded-xl text-gray-300 hover:text-primary transition-all shadow-sm">
-                        <ChevronRight size={20} />
+                    <button className="p-2 text-gray-400 hover:text-primary disabled:opacity-50 transition-colors">
+                        <ChevronRight size={18} />
                     </button>
                 </div>
-                <div className="hidden xl:flex items-center gap-2 px-6 py-3 bg-white border border-gray-100 rounded-2xl shadow-sm text-[10px] font-black uppercase tracking-widest text-primary/60 italic">
-                    <Globe size={14} className="text-emerald-500 animate-[spin_5s_linear_infinite]" /> Global Satellite Sync v4.1
+                <div className="hidden xl:flex items-center gap-2 text-xs font-medium text-gray-500">
+                    <Globe size={14} className="text-emerald-500" /> Global Sync
                 </div>
             </div>
         </Card>

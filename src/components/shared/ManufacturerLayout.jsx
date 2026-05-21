@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
-import { LayoutDashboard, Truck, Factory, QrCode, ClipboardList, Settings } from 'lucide-react';
+import { LayoutDashboard, Truck, Factory, QrCode, ClipboardList } from 'lucide-react';
 
 const ManufacturerLayout = ({ children, portalName = "Synthesis Plant" }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -12,7 +12,6 @@ const ManufacturerLayout = ({ children, portalName = "Synthesis Plant" }) => {
     { label: 'Build Product', to: '/manufacturer/products', icon: Factory },
     { label: 'Production Log', to: '/manufacturer/production', icon: ClipboardList },
     { label: 'QR Ledger', to: '/manufacturer/qr', icon: QrCode },
-    { label: 'Settings', to: '/manufacturer/settings', icon: Settings },
   ];
 
   return (

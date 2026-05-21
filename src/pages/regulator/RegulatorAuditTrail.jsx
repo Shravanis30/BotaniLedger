@@ -33,14 +33,14 @@ const RegulatorAuditTrail = () => {
                     <History size={14} /> System Forensics
                 </div>
                 <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">Immutable Audit Trail</h1>
-                <p className="text-gray-500 font-bold mt-2 italic">Cryptographically linked history of all system state changes.</p>
+                <p className="text-gray-500 font-bold mt-2">Cryptographically linked history of all system state changes.</p>
             </div>
-            <button className="px-6 py-3 bg-white border border-gray-200 rounded-2xl font-bold flex items-center gap-2 hover:bg-gray-50 text-gray-700 shadow-sm transition-all">
+            <button className="px-6 py-3 bg-white border border-gray-200 rounded-xl font-bold flex items-center gap-2 hover:bg-gray-50 text-gray-700 shadow-sm transition-all">
                 <Download size={18} /> Export Audit Archive
             </button>
         </header>
 
-        <Card className="border-none shadow-sm overflow-hidden p-0 bg-white">
+        <Card className="border border-gray-200 shadow-sm overflow-hidden p-0 bg-white rounded-xl">
             <div className="p-6 border-b border-gray-50 bg-gray-50/30 flex justify-between items-center">
                 <div className="relative">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />

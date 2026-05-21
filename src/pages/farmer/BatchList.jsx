@@ -39,7 +39,7 @@ const BatchList = () => {
             <p className="text-gray-500 font-medium mt-1">Manage and track all your recorded herbal collections.</p>
           </div>
           
-          <Link to="/farmer/record" className="w-full lg:w-auto flex items-center justify-center gap-2 px-8 py-3 bg-primary text-white rounded-2xl font-bold hover:bg-primary-mid transition-all shadow-xl shadow-green-900/20 active:scale-95">
+          <Link to="/farmer/record" className="w-full lg:w-auto flex items-center justify-center gap-2 px-8 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-mid transition-all shadow-sm active:scale-95">
             <PlusCircle size={18} />
             New Collection
           </Link>
@@ -52,37 +52,37 @@ const BatchList = () => {
                 <input 
                     type="text"
                     placeholder="Search by Batch ID or Herb..."
-                    className="w-full pl-12 pr-4 py-4 bg-white border border-gray-100 rounded-2xl focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all outline-none font-medium text-gray-700 shadow-sm"
+                    className="w-full pl-12 pr-4 py-4 bg-white border border-gray-100 rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all outline-none font-medium text-gray-700 shadow-sm"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
             </div>
-            <div className="flex gap-2 bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm overflow-x-auto no-scrollbar">
+            <div className="flex gap-2 bg-white p-1.5 rounded-xl border border-gray-100 shadow-sm overflow-x-auto no-scrollbar">
                 {['ALL', 'PENDING', 'IN_TRANSIT', 'LAB_TESTING', 'CERTIFIED'].map((f) => (
                     <button
                         key={f}
                         onClick={() => setFilter(f)}
                         className={cn(
-                            "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap",
-                            filter === f ? "bg-primary text-white shadow-lg shadow-green-900/10" : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                            "px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap",
+                            filter === f ? "bg-primary text-white shadow-sm" : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
                         )}
                     >
                         {f.replace('_', ' ')}
                     </button>
                 ))}
             </div>
-            <button className="flex items-center justify-center gap-2 px-5 py-4 bg-white border border-gray-100 rounded-2xl text-gray-600 font-bold hover:bg-gray-50 transition-all text-sm shadow-sm">
+            <button className="flex items-center justify-center gap-2 px-5 py-4 bg-white border border-gray-100 rounded-xl text-gray-600 font-bold hover:bg-gray-50 transition-all text-sm shadow-sm">
                 <Download size={18} />
                 Export
             </button>
         </div>
 
         {/* Batch List */}
-        <Card className="border-none shadow-xl shadow-black/5 overflow-hidden p-0">
+        <Card className="border border-gray-200 shadow-sm overflow-hidden p-0 rounded-xl">
             {isLoading ? (
                 <div className="p-20 flex flex-col items-center justify-center">
                     <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
-                    <p className="text-sm font-bold text-gray-400 uppercase tracking-widest italic animate-pulse">Querying Distributed Ledger...</p>
+                    <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Querying Distributed Ledger...</p>
                 </div>
             ) : filteredBatches.length > 0 ? (
                 <>
@@ -103,10 +103,10 @@ const BatchList = () => {
                                         <td className="px-8 py-7">
                                             <div className="font-mono text-[10px] font-bold text-primary mb-1 uppercase tracking-tighter">NODE::{batch.batchId?.slice(-12)}</div>
                                             <div className="text-base font-black text-gray-900 group-hover:text-primary transition-colors">{batch.herbSpecies?.common}</div>
-                                            <div className="text-[10px] text-gray-400 font-bold italic uppercase tracking-tight">{batch.herbSpecies?.botanical || batch.herbSpecies?.scientific}</div>
+                                            <div className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">{batch.herbSpecies?.botanical || batch.herbSpecies?.scientific}</div>
                                         </td>
                                         <td className="px-8 py-7">
-                                            <div className="flex items-center gap-2 text-sm font-bold text-gray-600 mb-2 italic">
+                                            <div className="flex items-center gap-2 text-sm font-bold text-gray-600 mb-2">
                                                 <Calendar size={14} className="text-gray-300" />
                                                 {new Date(batch.collectionDate).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' })}
                                             </div>
@@ -123,7 +123,7 @@ const BatchList = () => {
                                                 </div>
                                                 <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden border border-gray-50">
                                                     <div 
-                                                        className="h-full bg-emerald-500 transition-all duration-1000 shadow-[0_0_10px_rgba(16,185,129,0.3)]" 
+                                                        className="h-full bg-emerald-500 transition-all duration-1000" 
                                                         style={{ width: `${batch.aiVerification?.confidence || 0}%` }}
                                                     ></div>
                                                 </div>
@@ -136,11 +136,11 @@ const BatchList = () => {
                                             <div className="flex gap-2 justify-end">
                                                 <button 
                                                   onClick={() => navigate(`/verify/${batch.batchId}`)}
-                                                  className="px-5 py-2.5 bg-white border border-gray-100 text-[10px] font-black text-gray-600 rounded-xl hover:border-primary hover:text-primary hover:shadow-xl hover:shadow-primary/5 transition-all uppercase tracking-widest active:scale-95"
+                                                  className="px-5 py-2.5 bg-white border border-gray-100 text-[10px] font-black text-gray-600 rounded-lg hover:border-primary hover:text-primary transition-all uppercase tracking-widest active:scale-95"
                                                 >
                                                     View Trace
                                                 </button>
-                                                <button className="p-2.5 bg-gray-50 text-gray-400 rounded-xl hover:bg-primary hover:text-white transition-all hover:shadow-xl hover:shadow-primary/20 active:scale-95">
+                                                <button className="p-2.5 bg-gray-50 border border-gray-100 text-gray-400 rounded-lg hover:bg-primary hover:text-white transition-all active:scale-95">
                                                     <Activity size={18} />
                                                 </button>
                                             </div>
@@ -150,7 +150,7 @@ const BatchList = () => {
                             </tbody>
                         </table>
                     </div>
-                    <div className="p-8 border-t border-gray-50 flex justify-between items-center text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] italic">
+                    <div className="p-8 border-t border-gray-50 flex justify-between items-center text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
                         <span>Cluster Synchronization Active :: {filteredBatches.length} Verified Entries</span>
                         <div className="flex gap-3">
                             <button className="p-2.5 bg-white border border-gray-100 rounded-xl opacity-50 cursor-not-allowed shadow-sm">

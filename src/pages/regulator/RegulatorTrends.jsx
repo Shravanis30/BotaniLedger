@@ -31,12 +31,12 @@ const RegulatorTrends = () => {
                     <MapIcon size={14} /> Geospatial Intelligence
                 </div>
                 <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">Regional Yield Trends</h1>
-                <p className="text-gray-500 font-bold mt-2 italic">Predictive analytics and quality mapping across Indian botanical clusters.</p>
+                <p className="text-gray-500 font-bold mt-2">Predictive analytics and quality mapping across Indian botanical clusters.</p>
             </div>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            <Card className="lg:col-span-2 p-8 border-none shadow-sm relative overflow-hidden bg-gray-900 text-white min-h-[400px]">
+            <Card className="lg:col-span-2 p-8 border border-gray-800 shadow-sm relative overflow-hidden bg-gray-900 text-white min-h-[400px] rounded-xl">
                 <div className="flex justify-between items-start relative z-10">
                     <div>
                         <h3 className="text-xl font-black mb-1">Live Cultivation Map</h3>
@@ -57,7 +57,7 @@ const RegulatorTrends = () => {
                         { l: 'Purest Grade', v: 'Himalayan Range', d: '99.2%' },
                         { l: 'New Nodes', v: 'Western Ghats', d: '42 Active' }
                     ].map((s, i) => (
-                        <div key={i} className="bg-white/5 backdrop-blur-md border border-white/10 p-4 rounded-2xl">
+                        <div key={i} className="bg-white/5 backdrop-blur-md border border-white/10 p-4 rounded-xl">
                             <div className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-1">{s.l}</div>
                             <div className="text-lg font-black">{s.v}</div>
                             <div className="text-[10px] font-bold text-gray-400 flex items-center gap-1 mt-1">
@@ -68,7 +68,7 @@ const RegulatorTrends = () => {
                 </div>
             </Card>
 
-            <Card className="p-8 border-none shadow-sm bg-white">
+            <Card className="p-8 border border-gray-200 shadow-sm bg-white rounded-xl">
                 <h3 className="text-lg font-black text-gray-900 mb-8 flex items-center gap-2">
                     Quality Index <Info size={14} className="text-gray-400" />
                 </h3>
@@ -85,14 +85,14 @@ const RegulatorTrends = () => {
                     </ResponsiveContainer>
                 </div>
                 <div className="mt-8 space-y-4">
-                    <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 italic text-[11px] text-gray-500 font-medium leading-relaxed">
+                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 text-[11px] text-gray-500 font-medium leading-relaxed">
                         "Regional trends indicate a massive surge in Himalayan Ashwagandha quality, likely due to recent soil conservation initiatives."
                     </div>
                 </div>
             </Card>
         </div>
 
-        <Card className="p-8 border-none shadow-sm bg-white">
+        <Card className="p-8 border border-gray-200 shadow-sm bg-white rounded-xl">
             <h3 className="text-xl font-black text-gray-900 mb-8">Supply Volume Analysis</h3>
             <div className="h-[300px] w-full min-h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">

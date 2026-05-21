@@ -45,15 +45,10 @@ const LabAnalytics = () => {
 
     return (
         <LabLayout portalName="Lab Tester Node">
-            <header className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+            <header className="mb-6 flex flex-col md:flex-row md:justify-between md:items-end border-b border-gray-200 pb-4">
                 <div>
-                    <div className="text-xs font-black text-primary uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
-                            <TrendingUp size={14} /> Performance Hub
-                    </div>
-                    <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight leading-none italic">
-                        Quality <span className="text-primary font-light not-italic">Analytics</span>
-                    </h1>
-                    <p className="text-gray-500 font-medium mt-3 italic text-sm">Aggregated laboratory insights and botanical purity trends.</p>
+                    <h1 className="text-2xl font-bold text-gray-900">Quality Analytics</h1>
+                    <p className="text-sm text-gray-500 mt-1">Aggregated laboratory insights and botanical purity trends.</p>
                 </div>
             </header>
 
@@ -69,11 +64,10 @@ const LabAnalytics = () => {
                 <>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
                         {/* Main Bar Chart */}
-                        <Card className="lg:col-span-2 p-10 border-none shadow-2xl shadow-black/5 bg-white relative group overflow-hidden">
-                            <div className="absolute top-0 left-0 w-1 h-full bg-primary/20" />
-                            <div className="flex justify-between items-center mb-10">
-                                <h3 className="text-lg font-black text-gray-900 italic tracking-tight uppercase">Herb Purity Index (%)</h3>
-                                <BarChart3 className="text-gray-300" size={20} />
+                        <Card className="lg:col-span-2 p-6 border border-gray-200 shadow-sm bg-white rounded-lg relative overflow-hidden">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">Herb Purity Index (%)</h3>
+                                <BarChart3 className="text-gray-400" size={16} />
                             </div>
                             <div className="h-[350px] w-full relative">
                                 <ResponsiveContainer width="100%" height="100%" minWidth={0}>
@@ -91,10 +85,10 @@ const LabAnalytics = () => {
                         </Card>
 
                         {/* Pie Chart */}
-                        <Card className="p-10 border-none shadow-2xl shadow-black/5 bg-white flex flex-col group overflow-hidden">
-                            <div className="flex justify-between items-center mb-10">
-                                <h3 className="text-lg font-black text-gray-900 italic tracking-tight uppercase">Audit Status</h3>
-                                <PieChartIcon className="text-gray-300" size={20} />
+                        <Card className="p-6 border border-gray-200 shadow-sm bg-white rounded-lg flex flex-col overflow-hidden">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">Audit Status</h3>
+                                <PieChartIcon className="text-gray-400" size={16} />
                             </div>
                             <div className="flex-1 h-[250px] w-full relative">
                                 <ResponsiveContainer width="100%" height="100%" minWidth={0}>
@@ -137,13 +131,13 @@ const LabAnalytics = () => {
                     </div>
 
                     {/* Trend Chart */}
-                    <Card className="p-10 border-none shadow-2xl shadow-black/5 bg-white relative overflow-hidden group">
-                        <div className="flex justify-between items-center mb-12">
+                    <Card className="p-6 border border-gray-200 shadow-sm bg-white rounded-lg relative overflow-hidden">
+                        <div className="flex justify-between items-center mb-6">
                             <div>
-                                <h3 className="text-lg font-black text-gray-900 italic tracking-tight uppercase">Testing Volume Velocity</h3>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 italic">Daily Ledger Activity (Rolling 7D Window)</p>
+                                <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">Testing Volume Velocity</h3>
+                                <p className="text-xs text-gray-500 mt-1">Daily Ledger Activity (Rolling 7D Window)</p>
                             </div>
-                            <Loader2 className="text-primary/20 animate-spin-slow" size={24} />
+                            <TrendingUp className="text-gray-400" size={16} />
                         </div>
                         <div className="h-[300px] w-full relative">
                             <ResponsiveContainer width="100%" height="100%" minWidth={0}>

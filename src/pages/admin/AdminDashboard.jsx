@@ -43,66 +43,65 @@ const AdminDashboard = () => {
 
     return (
         <AdminLayout portalName="Admin Portal">
-            <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-10">
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
                 <div>
-                    <div className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-2 flex items-center gap-2">
-                        <div className="w-8 h-[1px] bg-primary/20" /> System Control Hub
+                    <div className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">
+                        System Control Hub
                     </div>
-                    <h1 className="text-xl md:text-2xl font-black text-gray-900 tracking-tighter leading-none italic">
-                        Network <span className="text-primary font-light not-italic underline decoration-primary/20 underline-offset-4 tracking-normal">Intelligence</span>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                        Network Intelligence
                     </h1>
                 </div>
                 <div className="flex gap-4 w-full md:w-auto">
-                    <button className="flex-1 md:flex-none px-5 py-3.5 bg-white border border-gray-100 rounded-2xl font-black text-gray-600 text-[9px] uppercase tracking-widest hover:bg-gray-50 flex items-center justify-center gap-3 shadow-xl shadow-black/5 active:scale-95 transition-all">
-                        <Download size={14} /> Export JSON
+                    <button className="px-5 py-2.5 bg-white border border-gray-200 rounded-lg font-semibold text-gray-600 text-sm hover:bg-gray-50 flex items-center justify-center gap-2 shadow-sm transition-colors">
+                        <Download size={16} /> Export
                     </button>
-                    <button className="flex-1 md:flex-none px-7 py-3.5 sidebar-gradient text-white rounded-2xl font-black text-[9px] uppercase tracking-widest shadow-xl shadow-green-900/20 flex items-center justify-center gap-3 active:scale-95 transition-all">
-                        <Activity size={14} /> Network Audit
+                    <button className="px-5 py-2.5 bg-primary text-white rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:bg-primary-dark shadow-sm transition-colors">
+                        <Activity size={16} /> Audit
                     </button>
                 </div>
             </header>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
                 {statCards.map((stat, i) => (
-                    <Card key={i} className="p-6 border-none shadow-xl shadow-black/5 hover:shadow-primary/10 transition-all group overflow-hidden relative">
+                    <Card key={i} className="p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow group overflow-hidden relative rounded-xl bg-white">
                         {statsLoading && i < 4 && (
-                            <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center z-10 animate-pulse">
+                            <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-10 animate-pulse">
                                 <Loader2 className="animate-spin text-primary" size={20} />
                             </div>
                         )}
-                        <div className="flex justify-between items-start mb-4">
-                            <div className={cn("p-3 rounded-2xl transition-transform group-hover:scale-110", stat.bg, stat.color)}>
+                        <div className="flex justify-between items-start mb-3">
+                            <div className={cn("p-2.5 rounded-lg", stat.bg, stat.color)}>
                                 <stat.icon size={20} />
                             </div>
                             <span className={cn(
-                                "text-[10px] font-black px-2 py-1 rounded-full flex items-center gap-0.5",
-                                stat.diff.startsWith('+') ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-500"
+                                "text-xs font-semibold px-2 py-1 rounded-md flex items-center gap-1",
+                                stat.diff.startsWith('+') ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-red-50 text-red-700 border border-red-100"
                             )}>
-                                {stat.diff.startsWith('+') ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />} {stat.diff}
+                                {stat.diff.startsWith('+') ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />} {stat.diff}
                             </span>
                         </div>
-                        <div className="text-3xl font-black text-gray-900 tracking-tighter mb-1">{stat.value}</div>
-                        <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{stat.label}</div>
+                        <div className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</div>
+                        <div className="text-xs font-medium text-gray-500">{stat.label}</div>
                     </Card>
                 ))}
             </div>
 
             {/* Charts Section */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-10 mb-12">
-                <Card className="xl:col-span-2 p-10 border-none shadow-2xl shadow-black/5 bg-white relative group overflow-hidden">
-                    <div className="absolute top-0 left-0 w-1 h-full bg-primary/20" />
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+                <Card className="xl:col-span-2 p-6 border border-gray-200 shadow-sm bg-white rounded-xl">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                         <div>
-                            <h3 className="font-black text-xl text-gray-900 italic tracking-tight uppercase">Batch Registration Volume</h3>
-                            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Global supply chain throughput (30D)</div>
+                            <h3 className="font-bold text-lg text-gray-900">Batch Registration Volume</h3>
+                            <div className="text-sm text-gray-500 mt-1">Global supply chain throughput (30D)</div>
                         </div>
-                        <select className="text-[10px] font-black uppercase tracking-widest border-2 border-gray-50 rounded-xl px-4 py-2 outline-none focus:border-primary/20 cursor-pointer">
+                        <select className="text-sm font-medium border border-gray-200 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary cursor-pointer bg-white">
                             <option>Last 30 Days</option>
                             <option>Last Quarter</option>
                         </select>
                     </div>
-                    <div className="h-[350px] w-full relative">
+                    <div className="h-[300px] w-full">
                         <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                             <AreaChart data={stats?.batchVolume || []}>
                                 <defs>
@@ -111,57 +110,57 @@ const AdminDashboard = () => {
                                         <stop offset="95%" stopColor="#4CAF50" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#F1F5F9" />
-                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 800, fill: '#94a3b8' }} dy={10} />
-                                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 800, fill: '#94a3b8' }} />
+                                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#E2E8F0" />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dx={-10} />
                                 <Tooltip
-                                    contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)', fontWeight: 800, fontSize: '12px' }}
-                                    cursor={{ stroke: '#4CAF50', strokeWidth: 2, strokeDasharray: '5 5' }}
+                                    contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '13px' }}
+                                    cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '4 4' }}
                                 />
-                                <Area type="monotone" dataKey="value" stroke="#4CAF50" strokeWidth={4} fillOpacity={1} fill="url(#colorValue)" />
+                                <Area type="monotone" dataKey="value" stroke="#4CAF50" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
                 </Card>
 
-                <Card className="p-10 border-none shadow-2xl shadow-black/5 bg-white flex flex-col">
-                    <h3 className="font-black text-xl text-gray-900 italic tracking-tight uppercase mb-2">Ledger Status</h3>
-                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-10">Network-wide batch verification state</div>
-                    <div className="flex-1 h-[300px] w-full relative">
+                <Card className="p-6 border border-gray-200 shadow-sm bg-white flex flex-col rounded-xl">
+                    <h3 className="font-bold text-lg text-gray-900 mb-1">Ledger Status</h3>
+                    <div className="text-sm text-gray-500 mb-8">Network-wide batch verification state</div>
+                    <div className="flex-1 min-h-[250px] w-full relative">
                         <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                             <PieChart>
                                 <Pie
                                     data={stats?.statusDistribution || []}
                                     cx="50%"
                                     cy="50%"
-                                    innerRadius={70}
-                                    outerRadius={100}
-                                    paddingAngle={8}
+                                    innerRadius={60}
+                                    outerRadius={80}
+                                    paddingAngle={4}
                                     dataKey="value"
-                                    animationBegin={200}
-                                    animationDuration={1500}
+                                    animationBegin={0}
+                                    animationDuration={800}
                                 >
                                     {(stats?.statusDistribution || []).map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} className="hover:opacity-80 transition-opacity cursor-pointer outline-none" />
                                     ))}
                                 </Pie>
                                 <Tooltip
-                                    contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', fontWeight: 800 }}
+                                    contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
                                 />
                             </PieChart>
                         </ResponsiveContainer>
                         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                            <Database size={32} className="text-gray-100" />
+                            <Database size={24} className="text-gray-300" />
                         </div>
                     </div>
-                    <div className="space-y-3 mt-8">
+                    <div className="space-y-2 mt-6">
                         {(stats?.statusDistribution || []).map((entry, index) => (
-                            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-2xl border border-transparent hover:border-gray-200 transition-all group">
+                            <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg transition-colors">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-3 h-3 rounded-full shadow-lg group-hover:scale-125 transition-transform" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
-                                    <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">{entry.name}</span>
+                                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
+                                    <span className="text-sm font-medium text-gray-600 capitalize">{entry.name}</span>
                                 </div>
-                                <span className="text-sm font-black text-gray-900">{entry.value}%</span>
+                                <span className="text-sm font-bold text-gray-900">{entry.value}%</span>
                             </div>
                         ))}
                     </div>

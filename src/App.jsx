@@ -8,7 +8,6 @@ import FarmerDashboard from './pages/farmer/FarmerDashboard';
 import RecordCollection from './pages/farmer/RecordCollection';
 import BatchList from './pages/farmer/BatchList';
 import SyncStatus from './pages/farmer/SyncStatus';
-import Settings from './pages/shared/Settings';
 import LabDashboard from './pages/lab/LabDashboard';
 import IssuedCertificates from './pages/lab/IssuedCertificates';
 import LabAnalytics from './pages/lab/LabAnalytics';
@@ -83,11 +82,6 @@ function App() {
               <SyncStatus />
             </ProtectedRoute>
           } />
-          <Route path="/farmer/settings" element={
-            <ProtectedRoute role="farmer">
-              <Settings />
-            </ProtectedRoute>
-          } />
 
           {/* User Requested Aliases (Guarded by same role for now) */}
           <Route path="/sync" element={
@@ -95,12 +89,6 @@ function App() {
               <SyncStatus />
             </ProtectedRoute>
           } />
-          <Route path="/settings" element={
-            <ProtectedRoute role="farmer">
-              <Settings />
-            </ProtectedRoute>
-          } />
-
           {/* Lab Routes */}
           <Route path="/lab" element={
             <ProtectedRoute role="lab">
@@ -122,12 +110,6 @@ function App() {
               <PerformTest />
             </ProtectedRoute>
           } />
-          <Route path="/lab/settings" element={
-            <ProtectedRoute role="lab">
-              <Settings />
-            </ProtectedRoute>
-          } />
-
           {/* Manufacturer Routes */}
           <Route path="/manufacturer" element={
             <ProtectedRoute role="manufacturer">
@@ -154,12 +136,6 @@ function App() {
               <ProductionLog />
             </ProtectedRoute>
           } />
-          <Route path="/manufacturer/settings" element={
-            <ProtectedRoute role="manufacturer">
-              <Settings />
-            </ProtectedRoute>
-          } />
-
           {/* Admin Routes */}
           <Route path="/admin" element={
             <ProtectedRoute role="admin">

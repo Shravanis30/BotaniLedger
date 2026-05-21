@@ -9,7 +9,7 @@ exports.getPending = async (req, res) => {
   try {
     const batches = await HerbCollection.find({ 
       'blockchainRecord.status': 'PENDING' 
-    }).sort({ createdAt: 1 });
+    }).sort({ createdAt: -1 });
     successResponse(res, batches);
   } catch (err) {
     errorResponse(res, 500, err.message);

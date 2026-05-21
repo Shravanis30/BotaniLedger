@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Bell, User, Menu, Settings, Globe, HelpCircle } from 'lucide-react';
+import { Search, User, Menu, Settings, Globe, HelpCircle } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useAuthStore } from '../../lib/store';
 
@@ -41,10 +41,7 @@ const Header = ({ onMenuClick, portalName }) => {
           </div>
         </div>
 
-        <button className="p-3 bg-gray-50 text-gray-400 rounded-xl hover:bg-white hover:text-primary hover:shadow-xl hover:shadow-primary/5 transition-all relative">
-          <Bell size={18} />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
-        </button>
+
 
         <div className="flex items-center gap-3 pl-2">
             <div className="text-right hidden xl:block">
